@@ -2,14 +2,29 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 /**
- * Supabase session refresh middleware.
+ * Supabase session refresh + route gating.
  *
- * Keeps the auth cookie fresh on every matched request. Intentionally performs
- * NO route protection — gating /dashboard and /account arrives in Phase 3.
+ * Refreshes the auth cookie on every matched request, then enforces:
+ *   - protected routes (/account, /dashboard) require a session
+ *   - auth routes (/login, /signup) are redirected away once signed in
+ *
+ * All marketing routes stay public.
+ *
+ * Uses getUser(), not getSession(): getSession reads the cookie without
+ * validating it against Supabase, so it is not safe for authorisation.
  *
  * Uses the publishable (anon) key only. Never the service role key.
  */
+
+/** Routes that require an authenticated session. Prefix-matched. */
+const PROTECTED_ROUTES = ["/account", "/dashboard"];
+
+/** Routes a signed-in user should be redirected away from. */
+const AUTH_ROUTES = ["/login", "/signup"];
+
 export default async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -33,9 +48,32 @@ export default async function proxy(request: NextRequest) {
     },
   );
 
-  // Must run getUser() to trigger the token refresh. Do not remove: without it
-  // the session is never renewed and the user is silently signed out later.
-  await supabase.auth.getUser();
+  // Validates the token with Supabase AND refreshes the session.
+  // Do not remove: without it the session is never renewed and the user is
+  // silently signed out later.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isProtected = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+  const isAuthRoute = AUTH_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+
+  if (!user && isProtected) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/account";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }
