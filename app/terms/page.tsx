@@ -2,10 +2,11 @@ import Container from "@/components/layout/Container";
 import Section from "@/components/layout/Section";
 import PageHeader from "@/components/common/PageHeader";
 import { typography } from "@/lib/typography";
+import { RA_REGISTRATION_NUMBER } from "@/lib/site";
 
 export const metadata = {
   title: "Terms of Use — Stratova Quant",
-  description: "Terms of use for Stratova Quant. Research is for educational purposes only and does not constitute investment advice.",
+  description: "Terms of use for Stratova Quant, a SEBI-registered Research Analyst. Research subscriptions, scope of recommendations, and limitations of liability.",
 };
 
 export default function TermsPage() {
@@ -19,13 +20,19 @@ export default function TermsPage() {
         <Container size="reading">
           <div className="space-y-8">
             <section>
-              <h2 className="text-2xl font-semibold tracking-tight">Research for Educational Purposes</h2>
-              <p className={`${typography.body} mt-4 text-secondary`}>All research published by Stratova Quant is intended for educational and informational purposes only. It does not constitute investment advice, a solicitation, or a recommendation to buy or sell any security. Past performance does not guarantee future results.</p>
+              <h2 className="text-2xl font-semibold tracking-tight">Pre-Launch Notice</h2>
+              <p className={`${typography.body} mt-4 text-secondary`}>This page describes the terms that will apply once Stratova Quant&apos;s SEBI Research Analyst registration is granted. Until then, the service is pre-launch and no paid subscriptions are offered.</p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold tracking-tight">No Investment Advice</h2>
-              <p className={`${typography.body} mt-4 text-secondary`}>Nothing on this website should be construed as investment advice. You should consult with a qualified financial advisor before making any investment decisions. Stratova Quant is not a registered investment advisor and does not provide personalized investment recommendations.</p>
+              <h2 className="text-2xl font-semibold tracking-tight">Nature of Our Research</h2>
+              <p className={`${typography.body} mt-4 text-secondary`}>All research published by Stratova Quant, including any stock recommendations, is provided for information and research purposes. It is not a solicitation to buy or sell any security and does not take account of the objectives, financial situation, or needs of any particular recipient. Past performance is not indicative of, and is no guarantee of, future results. The value of, and income from, investments may fall as well as rise, and investors may not get back the amount originally invested.</p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold tracking-tight">Research Analyst Status and Scope of Service</h2>
+              <p className={`${typography.body} mt-4 text-secondary`}>Stratova Quant is a SEBI-registered Research Analyst. In that capacity we publish research and stock recommendations to subscribers of our research service. A subscription is a subscription to research only. Stratova Quant does not execute trades on behalf of subscribers, does not hold, manage, or come into possession of client funds or securities, and does not operate any client securities account. The recommendations we publish are general in nature and are not personalised investment advice. Nothing on this website or in any paid research constitutes advice tailored to your individual circumstances, financial situation, or investment objectives. You should assess any recommendation against your own circumstances and consult a qualified financial adviser before making investment decisions.</p>
+              <p className={`${typography.body} mt-4 text-secondary`}>SEBI Research Analyst Registration No.: <span className="font-medium text-foreground">{RA_REGISTRATION_NUMBER}</span></p>
             </section>
 
             <section>

@@ -154,7 +154,7 @@ export const STRATEGIES: Strategy[] = [
       },
     ],
     riskDisclosure:
-      "Historical performance is presented for research and informational purposes only and does not constitute investment advice or a recommendation to buy or sell any security. Past performance is not indicative of future results. This is a concentrated equity strategy involving a small number of holdings, which can create substantial company, sector, and factor concentration. The strategy experienced a historical maximum drawdown of approximately -44% and can experience severe losses even when long-term compound returns are high. Investments in equity securities involve risk, including the possible loss of principal. Quantitative models are based on historical data and may not perform as expected in future market conditions. No representation is made that any investment strategy will achieve its objectives. Investors should conduct their own due diligence and consult with qualified financial professionals before making any investment decision.",
+      "Historical performance is presented for information and research purposes. Past performance is not indicative of future results, and historical performance is no guarantee of future performance. Equity investments involve risk, including the possible loss of principal. This is a concentrated equity strategy involving a small number of holdings, which can create substantial company, sector, and factor concentration. The strategy experienced a historical maximum drawdown of approximately -44% and can experience severe losses even when long-term compound returns are high. Quantitative models are based on historical data and may not perform as expected in future market conditions. No representation is made that any investment strategy will achieve its objectives. Investors should conduct their own due diligence and consult with qualified financial professionals before making any investment decision.",
   },
   {
     slug: "stratova-nse-momentum",
@@ -330,7 +330,7 @@ export const STRATEGIES: Strategy[] = [
       },
     ],
     riskDisclosure:
-      "Historical performance is presented for research and informational purposes only and does not constitute investment advice or a recommendation to buy or sell any security. Past performance does not guarantee future results. Equity investments involve risk, including the possible loss of principal. Quantitative investment models are based on historical market data and may not perform as expected under future market conditions. Concentrated portfolios may experience periods of significant volatility and drawdowns. Investors should conduct their own research and consult qualified financial professionals before making any investment decision.",
+      "Historical performance is presented for information and research purposes. Past performance is not indicative of future results, and historical performance is no guarantee of future performance. Equity investments involve risk, including the possible loss of principal. Quantitative investment models are based on historical market data and may not perform as expected under future market conditions. Concentrated portfolios may experience periods of significant volatility and drawdowns. Investors should conduct their own research and consult qualified financial professionals before making any investment decision.",
   },
 ];
 

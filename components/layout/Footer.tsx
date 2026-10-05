@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Container from "@/components/layout/Container";
+import { IS_PRE_LAUNCH, RA_REGISTRATION_NUMBER } from "@/lib/site";
 
 type FooterLink = {
   label: string;
@@ -43,6 +44,15 @@ const FOOTER_COLUMNS: FooterColumn[] = [
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
+      {IS_PRE_LAUNCH && (
+        <div className="border-b border-border bg-foreground px-6 py-2.5">
+          <div className="mx-auto w-full max-w-[1200px]">
+            <p className="text-center text-xs font-medium tracking-wide text-white">
+              Pre-launch — not for public distribution.
+            </p>
+          </div>
+        </div>
+      )}
       <Container className="py-16">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -84,7 +94,7 @@ export default function Footer() {
               &copy; 2026 Stratova Quant.
             </span>
             <span className="text-sm text-secondary">
-              Built with transparency, evidence, and systematic thinking.
+              SEBI Research Analyst Registration No.: {RA_REGISTRATION_NUMBER}
             </span>
           </div>
         </div>
