@@ -39,6 +39,7 @@ export default function AuthField({
       </label>
       <Input
         id={id}
+        name={id}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
