@@ -29,28 +29,28 @@ const PHILOSOPHY_BLOCKS: PhilosophyBlock[] = [
 
 export default function PhilosophySection() {
   return (
-    <Section spacing="lg">
+    <Section spacing="sm">
       <Container size="default">
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <SectionHeader
-              label="PHILOSOPHY"
               title="Our Investment Philosophy"
               description="Our approach to investment research is guided by principles that emphasize evidence, discipline, and adaptability over intuition, timing, and rigidity."
               centered={false}
             />
+            <div className="mt-6 border-b border-border" />
           </div>
           <div className="lg:col-span-3">
             {PHILOSOPHY_BLOCKS.map((block, index) => (
               <div key={block.number}>
-                {index > 0 && <hr className="mb-10 border-t border-border" />}
-                <div className="flex gap-8">
-                  <span className="block text-6xl md:text-7xl lg:text-8xl font-light leading-none text-stone-600">
+                {index > 0 && <hr className="mb-6 border-t border-border" />}
+                <div className="flex gap-6">
+                  <span className="block text-5xl md:text-6xl lg:text-7xl font-light leading-none text-stone-600">
                     {block.number}
                   </span>
                   <div>
-                    <h3 className="text-xl font-medium">{block.heading}</h3>
-                    <p className={`${typography.body} mt-3 text-secondary`}>
+                    <h3 className="text-lg font-medium">{block.heading}</h3>
+                    <p className={`${typography.body} mt-2 text-secondary`}>
                       {block.body}
                     </p>
                   </div>

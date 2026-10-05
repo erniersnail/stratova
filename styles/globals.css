@@ -5,12 +5,16 @@
   --font-serif: "Playfair Display", Georgia, serif;
   --color-background: #fafaf8;
   --color-foreground: #111111;
-  --color-foreground-hover: #2a2a2a;
-  --color-secondary: #6b6a66;
-  --color-tertiary: #a8a6a1;
-  --color-border: #e5e4e0;
+  --color-foreground-hover: #1f1f1f;
+  --color-secondary: #3f3e3b;
+  --color-tertiary: #6e6c67;
+  --color-border: #c9c7c1;
   --color-surface: #ffffff;
   --color-surface-hover: #f5f4f2;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {

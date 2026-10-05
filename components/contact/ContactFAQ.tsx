@@ -15,15 +15,26 @@ export default function ContactFAQ() {
     <div className="space-y-3">
       {FAQ_ITEMS.map((item, i) => {
         const isOpen = openIndex === i;
+        const panelId = `cf-panel-${i}`;
+        const buttonId = `cf-button-${i}`;
         return (
           <div key={i} className="rounded-lg border border-border bg-surface">
             <h3>
-              <button type="button" aria-expanded={isOpen} aria-controls={`cf-panel-${i}`} onClick={() => setOpenIndex(isOpen ? null : i)} className="flex w-full items-center justify-between px-6 py-4 text-left text-sm font-medium text-foreground transition-colors hover:text-secondary">
+              <button
+                id={buttonId}
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpenIndex(isOpen ? null : i)}
+                className="flex w-full items-center justify-between px-6 py-4 text-left text-sm font-medium text-foreground transition-colors hover:text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              >
                 <span>{item.question}</span>
                 <span className={`ml-4 shrink-0 text-secondary transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`} aria-hidden="true">+</span>
               </button>
             </h3>
-            <div id={`cf-panel-${i}`} role="region" aria-labelledby={`cf-button-${i}`} hidden={!isOpen}><div className="px-6 pb-4 text-sm leading-relaxed text-secondary">{item.answer}</div></div>
+            <div id={panelId} role="region" aria-labelledby={buttonId} hidden={!isOpen}>
+              <div className="px-6 pb-4 text-sm leading-relaxed text-secondary">{item.answer}</div>
+            </div>
           </div>
         );
       })}

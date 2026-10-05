@@ -1,7 +1,7 @@
 import { typography } from "@/lib/typography";
 
 type SectionHeaderProps = {
-  label: string;
+  label?: string;
   title: string;
   description?: string;
   className?: string;
@@ -17,13 +17,17 @@ export default function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={`${centered ? "text-center" : ""} ${className}`}>
-      <span className="text-[13px] font-medium tracking-[0.15em] text-secondary uppercase">
-        {label}
-      </span>
-      <h2 className={`${typography.h2} mt-5`}>{title}</h2>
+      {label && (
+        <span className="text-sm font-semibold tracking-[0.15em] text-secondary uppercase">
+          {label}
+        </span>
+      )}
+      <h2 className={`${typography.h2} ${label ? "mt-5" : ""}`}>{title}</h2>
       {description && (
         <p
-          className={`${typography.body} mx-auto mt-5 max-w-[620px] text-secondary`}
+          className={`${typography.body} mt-4 max-w-[620px] text-secondary ${
+            centered ? "mx-auto" : ""
+          }`}
         >
           {description}
         </p>

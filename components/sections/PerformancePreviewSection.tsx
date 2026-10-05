@@ -5,15 +5,12 @@ import { typography } from "@/lib/typography";
 
 export default function PerformancePreviewSection() {
   return (
-    <Section spacing="lg">
+    <Section spacing="sm">
       <Container size="default">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           {/* Left column */}
           <div className="lg:col-span-2">
-            <span className="text-sm font-medium tracking-widest text-secondary">
-              PERFORMANCE
-            </span>
-            <h2 className={`${typography.h2} mt-4`}>
+            <h2 className={`${typography.h2}`}>
               Performance Reporting
             </h2>
             <p className={`${typography.body} mt-4 text-secondary`}>
@@ -21,15 +18,16 @@ export default function PerformancePreviewSection() {
               benchmark selection, assumptions, portfolio construction,
               turnover, and risk characteristics.
             </p>
-            <p className={`${typography.body} mt-4 text-secondary`}>
+            <p className={`${typography.body} mt-3 text-secondary`}>
               Our reporting framework is designed to emphasize transparency
               over headline numbers.
             </p>
-            <div className="mt-6">
+            <div className="mt-4">
               <Button href="/methodology" variant="secondary" size="md">
                 View Methodology
               </Button>
             </div>
+            <div className="mt-6 border-b border-border" />
           </div>
 
           {/* Right column */}
@@ -40,7 +38,7 @@ export default function PerformancePreviewSection() {
                 <div>
                   <h3 className="text-lg font-medium">Performance Reporting</h3>
                   <p className="mt-1 text-sm text-secondary">
-                    Benchmark Comparison &middot; Portfolio Growth &middot; Risk
+                    Benchmark Comparison · Portfolio Growth · Risk
                     Metrics
                   </p>
                 </div>
@@ -51,7 +49,7 @@ export default function PerformancePreviewSection() {
 
               {/* Chart placeholder */}
               <div
-                className="relative mt-6 h-[240px] w-full rounded-md border border-border"
+                className="relative mt-6 h-[200px] w-full rounded-md border border-border"
                 role="img"
                 aria-label="Chart placeholder. Empty plotting area with labeled axes. No data is displayed because performance is presented alongside methodology in a private setting."
               >
@@ -139,7 +137,7 @@ export default function PerformancePreviewSection() {
             </div>
 
             {/* Muted note */}
-            <p className="mt-4 text-xs leading-relaxed text-secondary">
+            <p className="mt-3 text-xs leading-relaxed text-secondary">
               Historical performance, when presented, will always include
               benchmark comparisons, methodology, assumptions, and appropriate
               disclosures.

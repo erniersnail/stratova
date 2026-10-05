@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button";
 
 export default function NewsletterSection() {
   return (
-    <Section spacing="lg">
+    <Section spacing="sm">
       <Container size="narrow" className="text-center">
         <SectionHeader
           label="UPDATES"
@@ -14,7 +14,7 @@ export default function NewsletterSection() {
           description="Receive notifications whenever new research papers, strategy updates, or methodology notes are published."
         />
 
-        <form className="mx-auto mt-10 flex max-w-[480px] flex-col gap-3 sm:flex-row sm:items-center">
+        <form className="mx-auto mt-6 flex max-w-[480px] flex-col gap-3 sm:flex-row sm:items-center">
           <label htmlFor="email-input" className="sr-only">
             Email address
           </label>
@@ -30,7 +30,7 @@ export default function NewsletterSection() {
           </Button>
         </form>
 
-        <p className="mt-6 text-xs text-secondary">
+        <p className="mt-4 text-xs text-secondary">
           No spam. Research updates only. You may unsubscribe at any time.
         </p>
       </Container>

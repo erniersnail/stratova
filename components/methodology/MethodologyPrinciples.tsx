@@ -32,21 +32,25 @@ export default function MethodologyPrinciples() {
   return (
     <div>
       <SectionHeader
-        label="PRINCIPLES"
         title="Core Research Principles"
         description="Four principles guide every research decision at Stratova Quant."
         centered={false}
       />
-      <div className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-2">
-        {PRINCIPLES.map((principle) => (
+      <div className="mt-8 space-y-8">
+        {PRINCIPLES.map((principle, index) => (
           <div key={principle.number}>
-            <span className="text-4xl font-light leading-none text-border">
-              {principle.number}
-            </span>
-            <h3 className="mt-4 text-xl font-medium">{principle.title}</h3>
-            <p className={`${typography.body} mt-2 text-secondary`}>
-              {principle.description}
-            </p>
+            {index > 0 && <hr className="mb-8 border-t border-border" />}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-[80px_1fr]">
+              <span className="text-4xl font-light leading-none text-tertiary">
+                {principle.number}
+              </span>
+              <div>
+                <h3 className="text-xl font-medium">{principle.title}</h3>
+                <p className={`${typography.body} mt-2 text-secondary`}>
+                  {principle.description}
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>

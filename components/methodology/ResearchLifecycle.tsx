@@ -38,17 +38,16 @@ export default function ResearchLifecycle() {
   return (
     <div>
       <SectionHeader
-        label="LIFECYCLE"
         title="Research Lifecycle"
         description="From hypothesis to publication, every strategy follows a structured research lifecycle."
         centered={false}
       />
-      <div className="mt-10 space-y-10">
+      <div className="mt-8 space-y-8">
         {STEPS.map((step, index) => (
           <div key={step.number}>
-            {index > 0 && <hr className="mb-10 border-t border-border" />}
+            {index > 0 && <hr className="mb-8 border-t border-border" />}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-[80px_1fr]">
-              <span className="text-4xl font-light leading-none text-border">
+              <span className="text-4xl font-light leading-none text-tertiary">
                 {step.number}
               </span>
               <div>

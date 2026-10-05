@@ -15,29 +15,29 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main>
-      <Container className="py-20">
+      <Container size="default" className="pt-16 pb-12">
         <PageHeader title="About" description="Stratova Quant is an independent quantitative investment research firm. Evidence-based research across U.S. and Indian equity markets." />
       </Container>
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default"><Mission /></Container>
       </Section>
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default"><InvestmentPhilosophy /></Container>
       </Section>
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default"><WhoWeServe /></Container>
       </Section>
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default"><Values /></Container>
       </Section>
     </main>

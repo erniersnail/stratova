@@ -1,6 +1,7 @@
 import Container from "@/components/layout/Container";
 import Section from "@/components/layout/Section";
 import PageHeader from "@/components/common/PageHeader";
+import SectionHeader from "@/components/common/SectionHeader";
 import Divider from "@/components/ui/Divider";
 import MethodologyPrinciples from "@/components/methodology/MethodologyPrinciples";
 import ResearchLifecycle from "@/components/methodology/ResearchLifecycle";
@@ -12,14 +13,14 @@ import FAQ from "@/components/methodology/FAQ";
 export default function MethodologyPage() {
   return (
     <main>
-      <Container className="py-20">
+      <Container size="default" className="pt-16 pb-12">
         <PageHeader
           title="Methodology"
           description="Our research process transforms investment hypotheses into disciplined, evidence-based investment strategies through systematic testing and continuous validation."
         />
       </Container>
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default">
           <MethodologyPrinciples />
         </Container>
@@ -27,7 +28,7 @@ export default function MethodologyPage() {
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default">
           <ResearchLifecycle />
         </Container>
@@ -35,7 +36,7 @@ export default function MethodologyPage() {
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default">
           <DataSources />
         </Container>
@@ -43,7 +44,7 @@ export default function MethodologyPage() {
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default">
           <ValidationFramework />
         </Container>
@@ -51,7 +52,7 @@ export default function MethodologyPage() {
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default">
           <RiskManagement />
         </Container>
@@ -59,12 +60,14 @@ export default function MethodologyPage() {
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
-        <Container size="narrow">
-          <h2 className="text-2xl font-semibold tracking-tight text-center">
-            Frequently Asked Questions
-          </h2>
-          <div className="mt-8">
+      <Section spacing="sm">
+        <Container size="default">
+          <SectionHeader
+            title="Frequently Asked Questions"
+            description="Answers to common questions about our research process and published strategies."
+            centered={false}
+          />
+          <div className="mt-6">
             <FAQ />
           </div>
         </Container>

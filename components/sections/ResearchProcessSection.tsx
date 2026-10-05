@@ -38,10 +38,10 @@ const PROCESS_STEPS: ProcessStep[] = [
 
 export default function ResearchProcessSection() {
   return (
-    <Section spacing="lg">
+    <Section spacing="sm">
       <Container size="default">
         <div className="text-center">
-          <span className="text-sm font-medium tracking-widest text-secondary">
+          <span className="text-sm font-semibold tracking-[0.15em] text-secondary">
             PROCESS
           </span>
           <h2 className={`${typography.h2} mt-4`}>
@@ -53,15 +53,16 @@ export default function ResearchProcessSection() {
             Every research publication follows a structured process designed to
             test ideas before they become investment strategies.
           </p>
+          <div className="mx-auto mt-6 w-24 border-b border-border" />
         </div>
 
-        <div className="mt-16 lg:mt-20">
+        <div className="mt-10 lg:mt-12">
           {/* Desktop: horizontal timeline */}
           <ol className="hidden lg:grid lg:grid-cols-5 lg:gap-8">
             {PROCESS_STEPS.map((step, index) => (
               <li key={step.number} className="relative">
                 <div className="flex items-center">
-                  <span className="shrink-0 text-8xl font-light leading-none text-stone-600">
+                  <span className="shrink-0 text-7xl font-light leading-none text-stone-600">
                     {step.number}
                   </span>
                   {index < PROCESS_STEPS.length - 1 && (
@@ -71,9 +72,9 @@ export default function ResearchProcessSection() {
                     />
                   )}
                 </div>
-                <h3 className="mt-4 text-xl font-medium">{step.heading}</h3>
+                <h3 className="mt-3 text-lg font-medium">{step.heading}</h3>
                 <p
-                  className={`${typography.body} mt-3 text-secondary`}
+                  className={`${typography.body} mt-2 text-secondary`}
                 >
                   {step.body}
                 </p>
@@ -90,14 +91,14 @@ export default function ResearchProcessSection() {
             {PROCESS_STEPS.map((step) => (
               <li
                 key={step.number}
-                className="relative pb-10 last:pb-0"
+                className="relative pb-8 last:pb-0"
               >
                 <div className="flex items-start gap-6">
                   <span className="relative inline-flex h-[46px] w-[46px] shrink-0 items-center justify-center bg-background text-lg font-light leading-none text-stone-600">
                     {step.number}
                   </span>
                   <div className="pt-2">
-                    <h3 className="text-xl font-medium">{step.heading}</h3>
+                    <h3 className="text-lg font-medium">{step.heading}</h3>
                     <p
                       className={`${typography.body} mt-2 text-secondary`}
                     >
