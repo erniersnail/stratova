@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Container from "@/components/layout/Container";
 import PageHeader from "@/components/common/PageHeader";
+import DataTable from "@/components/ui/data-table";
 import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 
@@ -10,6 +11,40 @@ export const metadata: Metadata = {
   title: "Dashboard — Stratova Quant",
   description: "Your subscriptions and latest recommendations.",
 };
+
+type SubscriptionRow = {
+  id: string;
+  strategy_id: string | null;
+  status: string | null;
+  plan: string | null;
+  started_at: string | null;
+  expires_at: string | null;
+};
+
+type StrategyRow = {
+  id: string;
+  name: string;
+};
+
+type RecommendationRow = {
+  id: string;
+  symbol: string;
+  action: string | null;
+  as_of: string | null;
+  rationale: string | null;
+  expires_at: string | null;
+};
+
+function formatDate(value: string | null): string {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -32,6 +67,65 @@ export default async function DashboardPage() {
 
   const firstName = profile?.full_name?.split(" ")[0];
 
+  let subscriptions: SubscriptionRow[] = [];
+  const { data: subsData, error: subsError } = await supabase
+    .from("subscriptions")
+    .select("id,strategy_id,status,plan,started_at,expires_at")
+    .eq("user_id", user.id);
+
+  if (subsError) {
+    console.error("Dashboard subscriptions fetch failed:", subsError.message);
+  } else if (subsData) {
+    subscriptions = subsData as SubscriptionRow[];
+  }
+
+  const activeStrategyIds = subscriptions
+    .filter((s) => s.status === "ACTIVE" && s.strategy_id)
+    .map((s) => s.strategy_id as string);
+
+  const allStrategyIds = [
+    ...new Set(
+      subscriptions
+        .map((s) => s.strategy_id)
+        .filter((id): id is string => typeof id === "string" && id.length > 0),
+    ),
+  ];
+
+  const strategyNames = new Map<string, string>();
+  if (allStrategyIds.length > 0) {
+    const { data: stratData, error: stratError } = await supabase
+      .from("strategies")
+      .select("id,name")
+      .in("id", allStrategyIds);
+
+    if (stratError) {
+      console.error("Dashboard strategies fetch failed:", stratError.message);
+    } else if (stratData) {
+      for (const s of stratData as StrategyRow[]) {
+        strategyNames.set(s.id, s.name);
+      }
+    }
+  }
+
+  let recommendations: RecommendationRow[] = [];
+  if (activeStrategyIds.length > 0) {
+    const { data: recData, error: recError } = await supabase
+      .from("recommendations")
+      .select("id,symbol,action,as_of,rationale,expires_at")
+      .in("strategy_id", activeStrategyIds)
+      .order("published_at", { ascending: false })
+      .limit(50);
+
+    if (recError) {
+      console.error(
+        "Dashboard recommendations fetch failed:",
+        recError.message,
+      );
+    } else if (recData) {
+      recommendations = recData as RecommendationRow[];
+    }
+  }
+
   return (
     <main>
       <Container className="py-20">
@@ -40,25 +134,128 @@ export default async function DashboardPage() {
           description="Your subscriptions and the latest research published to you."
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <section className="rounded-lg border border-border bg-surface p-6">
-            <h2 className="text-lg font-medium tracking-tight">
+        <div className="mt-12 grid grid-cols-1 gap-8">
+          <section aria-labelledby="dashboard-subscriptions">
+            <h2
+              id="dashboard-subscriptions"
+              className="text-lg font-medium tracking-tight"
+            >
               Your subscriptions
             </h2>
-            <p className="mt-3 text-sm leading-[1.75] text-secondary">
-              None yet. Subscriptions open when Stratova&apos;s SEBI RA
-              registration is granted.
-            </p>
+            <div className="mt-4">
+              <DataTable<SubscriptionRow>
+                columns={[
+                  {
+                    key: "strategy",
+                    header: "Strategy",
+                    render: (row) => (
+                      <span className="text-foreground">
+                        {row.strategy_id
+                          ? (strategyNames.get(row.strategy_id) ?? "Strategy")
+                          : "—"}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "plan",
+                    header: "Plan",
+                    render: (row) => row.plan ?? "—",
+                  },
+                  {
+                    key: "status",
+                    header: "Status",
+                    render: (row) => row.status ?? "—",
+                  },
+                  {
+                    key: "started",
+                    header: "Started",
+                    render: (row) => formatDate(row.started_at),
+                  },
+                  {
+                    key: "expires",
+                    header: "Expires",
+                    render: (row) => formatDate(row.expires_at),
+                  },
+                ]}
+                rows={subscriptions}
+                rowKey={(row) => row.id}
+                emptyState={
+                  <div className="rounded-lg border border-border bg-surface p-6">
+                    <p className="text-sm leading-[1.75] text-secondary">
+                      You don&apos;t have any subscriptions yet. Subscriptions
+                      open when Stratova&apos;s SEBI RA registration is
+                      granted.
+                    </p>
+                    <p className="mt-4 text-sm">
+                      <Link
+                        href="/pricing"
+                        className="underline hover:text-foreground"
+                      >
+                        View pricing
+                      </Link>
+                    </p>
+                  </div>
+                }
+              />
+            </div>
           </section>
 
-          <section className="rounded-lg border border-border bg-surface p-6">
-            <h2 className="text-lg font-medium tracking-tight">
+          <section aria-labelledby="dashboard-recommendations">
+            <h2
+              id="dashboard-recommendations"
+              className="text-lg font-medium tracking-tight"
+            >
               Latest recommendations
             </h2>
-            <p className="mt-3 text-sm leading-[1.75] text-secondary">
-              Nothing to show yet. Recommendations appear here once you hold an
-              active subscription.
-            </p>
+            <div className="mt-4">
+              <DataTable<RecommendationRow>
+                columns={[
+                  {
+                    key: "symbol",
+                    header: "Symbol",
+                    render: (row) => (
+                      <span className="font-medium text-foreground">
+                        {row.symbol}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "action",
+                    header: "Action",
+                    render: (row) => row.action ?? "—",
+                  },
+                  {
+                    key: "asof",
+                    header: "As of",
+                    render: (row) => formatDate(row.as_of),
+                  },
+                  {
+                    key: "rationale",
+                    header: "Rationale",
+                    render: (row) => (
+                      <span className="block max-w-[320px] truncate">
+                        {row.rationale ?? "—"}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "expires",
+                    header: "Expires",
+                    render: (row) => formatDate(row.expires_at),
+                  },
+                ]}
+                rows={recommendations}
+                rowKey={(row) => row.id}
+                emptyState={
+                  <div className="rounded-lg border border-border bg-surface p-6">
+                    <p className="text-sm leading-[1.75] text-secondary">
+                      No recommendations yet. You&apos;ll see signals here once
+                      you&apos;re subscribed and the service is live.
+                    </p>
+                  </div>
+                }
+              />
+            </div>
           </section>
         </div>
 

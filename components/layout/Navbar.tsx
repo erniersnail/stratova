@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/layout/Logo";
+import AuthLinks from "@/components/layout/AuthLinks";
 
 type NavItem = {
   label: string;
@@ -33,6 +34,9 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          <li>
+            <AuthLinks />
+          </li>
         </ul>
       </div>
     </nav>
