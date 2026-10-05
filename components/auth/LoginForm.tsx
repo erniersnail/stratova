@@ -37,6 +37,14 @@ export default function LoginForm() {
         disabled={pending}
       />
 
+      <div className="flex justify-end">
+        <Link
+          href="/forgot-password"
+          className="mb-1.5 text-sm text-secondary underline hover:text-foreground"
+        >
+          Forgot password?
+        </Link>
+      </div>
       <AuthField
         id="password"
         label="Password"
