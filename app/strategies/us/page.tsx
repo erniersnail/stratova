@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageHeader from "@/components/common/PageHeader";
-import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
 import { getPublicStrategiesByRegion } from "@/lib/strategies/fetch";
 
@@ -21,14 +20,14 @@ export default async function USStrategiesPage() {
   const strategies = await getPublicStrategiesByRegion("us");
 
   return (
-    <>
-      <PageHeader
-        title="U.S. Strategies"
-        description="Systematic quantitative strategies for NASDAQ-listed equities."
-      />
+    <main>
+      <Container className="py-20">
+        <PageHeader
+          title="U.S. Strategies"
+          description="Systematic quantitative strategies for NASDAQ-listed equities."
+        />
 
-      <Section>
-        <Container>
+        <div className="mt-12">
           {strategies.length === 0 ? (
             <div className="rounded-md border border-border bg-surface px-6 py-8">
               <p className="text-sm text-secondary">
@@ -77,8 +76,8 @@ export default async function USStrategiesPage() {
               ))}
             </ul>
           )}
-        </Container>
-      </Section>
-    </>
+        </div>
+      </Container>
+    </main>
   );
 }
