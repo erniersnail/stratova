@@ -33,6 +33,21 @@ const FOOTER_COLUMNS: FooterColumn[] = [
     ],
   },
   {
+    heading: "Compliance",
+    links: [
+      { label: "Disclaimer", href: "/compliance/disclaimer" },
+      { label: "Investor Charter", href: "/compliance/investor-charter" },
+      { label: "MITC", href: "/compliance/mitc" },
+      { label: "Grievance Redressal", href: "/compliance/grievance" },
+      { label: "Risk Disclosure", href: "/compliance/risk-disclosure" },
+      { label: "Refund Policy", href: "/compliance/refund" },
+      { label: "Conflict of Interest", href: "/compliance/conflict-of-interest" },
+      { label: "Research Methodology", href: "/compliance/research-methodology" },
+      { label: "Terms of Use", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
+    ],
+  },
+  {
     heading: "Connect",
     links: [
       { label: "Email", href: "#" },
