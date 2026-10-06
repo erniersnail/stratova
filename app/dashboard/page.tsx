@@ -6,6 +6,10 @@ import PageHeader from "@/components/common/PageHeader";
 import DataTable from "@/components/ui/data-table";
 import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
+import {
+  getCurrentRecommendationsForUser,
+  type Recommendation,
+} from "@/lib/strategies/fetch";
 
 export const metadata: Metadata = {
   title: "Dashboard — Stratova Quant",
@@ -26,14 +30,16 @@ type StrategyRow = {
   name: string;
 };
 
-type RecommendationRow = {
-  id: string;
-  symbol: string;
-  action: string | null;
-  as_of: string | null;
-  rationale: string | null;
-  expires_at: string | null;
-};
+function formatIST(value: string | null): string {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata",
+  }).format(d);
+}
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -65,7 +71,14 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .maybeSingle();
 
-  const firstName = profile?.full_name?.split(" ")[0];
+  const authName =
+    ((user.user_metadata?.full_name as string | undefined) ??
+      (user.user_metadata?.name as string | undefined) ??
+      "")?.trim() || null;
+  const profileName = profile?.full_name?.trim()
+    ? profile.full_name.trim()
+    : null;
+  const fullName = profileName ?? authName;
 
   let subscriptions: SubscriptionRow[] = [];
   const { data: subsData, error: subsError } = await supabase
@@ -78,10 +91,6 @@ export default async function DashboardPage() {
   } else if (subsData) {
     subscriptions = subsData as SubscriptionRow[];
   }
-
-  const activeStrategyIds = subscriptions
-    .filter((s) => s.status === "ACTIVE" && s.strategy_id)
-    .map((s) => s.strategy_id as string);
 
   const allStrategyIds = [
     ...new Set(
@@ -107,30 +116,14 @@ export default async function DashboardPage() {
     }
   }
 
-  let recommendations: RecommendationRow[] = [];
-  if (activeStrategyIds.length > 0) {
-    const { data: recData, error: recError } = await supabase
-      .from("recommendations")
-      .select("id,symbol,action,as_of,rationale,expires_at")
-      .in("strategy_id", activeStrategyIds)
-      .order("published_at", { ascending: false })
-      .limit(50);
-
-    if (recError) {
-      console.error(
-        "Dashboard recommendations fetch failed:",
-        recError.message,
-      );
-    } else if (recData) {
-      recommendations = recData as RecommendationRow[];
-    }
-  }
+  const recommendations: Recommendation[] =
+    await getCurrentRecommendationsForUser(user.id);
 
   return (
     <main>
       <Container className="py-20">
         <PageHeader
-          title={firstName ? `Welcome, ${firstName}` : "Welcome"}
+          title={`Welcome, ${fullName ?? "there"}`}
           description="Your subscriptions and the latest research published to you."
         />
 
@@ -207,9 +200,28 @@ export default async function DashboardPage() {
             >
               Latest recommendations
             </h2>
+            <div
+              className="mt-4 rounded-md border border-border bg-surface px-4 py-3"
+              role="note"
+            >
+              <p className="text-sm text-secondary">
+                Pre-launch — not for public distribution. Stratova&apos;s SEBI
+                Research Analyst registration is pending.
+              </p>
+            </div>
             <div className="mt-4">
-              <DataTable<RecommendationRow>
+              <DataTable<Recommendation>
                 columns={[
+                  {
+                    key: "strategy",
+                    header: "Strategy",
+                    render: (row) => (
+                      <span className="text-foreground">
+                        {strategyNames.get(row.strategy_id) ??
+                          row.strategy_id}
+                      </span>
+                    ),
+                  },
                   {
                     key: "symbol",
                     header: "Symbol",
@@ -226,22 +238,13 @@ export default async function DashboardPage() {
                   },
                   {
                     key: "asof",
-                    header: "As of",
-                    render: (row) => formatDate(row.as_of),
-                  },
-                  {
-                    key: "rationale",
-                    header: "Rationale",
-                    render: (row) => (
-                      <span className="block max-w-[320px] truncate">
-                        {row.rationale ?? "—"}
-                      </span>
-                    ),
+                    header: "As of (IST)",
+                    render: (row) => formatIST(row.as_of),
                   },
                   {
                     key: "expires",
-                    header: "Expires",
-                    render: (row) => formatDate(row.expires_at),
+                    header: "Expires (IST)",
+                    render: (row) => formatIST(row.expires_at),
                   },
                 ]}
                 rows={recommendations}
