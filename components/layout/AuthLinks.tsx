@@ -63,7 +63,7 @@ export default function AuthLinks() {
         Log in
       </Link>
       <Link href="/signup" className={linkClassName}>
-        Join waitlist
+        Sign up
       </Link>
     </div>
   );

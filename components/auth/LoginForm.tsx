@@ -64,7 +64,7 @@ export default function LoginForm() {
       <p className="pt-2 text-sm text-secondary">
         Don&apos;t have an account?{" "}
         <Link href="/signup" className="underline hover:text-foreground">
-          Join the waitlist
+          Create an account
         </Link>
       </p>
     </form>

@@ -20,8 +20,9 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Stratova Quant",
   description: "Quantitative Investment Research Platform",
-  // Pre-launch gate: every page inherits noindex,nofollow from this root
-  // metadata unless a page overrides it. At launch (NEXT_PUBLIC_PUBLIC_MODE=true)
+  // Public-mode gate: every page inherits noindex,nofollow from this root
+  // metadata unless a page overrides it. In public mode
+  // (NEXT_PUBLIC_PUBLIC_MODE unset or "true")
   // the directive is omitted entirely rather than set to "index", so we never
   // emit a conflicting instruction.
   ...(IS_PUBLIC_MODE

@@ -96,15 +96,11 @@ export default async function AccountPage() {
                 )}
               </dd>
             </div>
-            <div className="flex flex-col gap-1 border-b border-border pb-4 sm:flex-row sm:justify-between">
+            <div className={`flex flex-col gap-1 sm:flex-row sm:justify-between${planLabel ? " border-b border-border pb-4" : ""}`}>
               <dt className="text-sm text-secondary">KYC status</dt>
               <dd className="text-sm font-medium text-foreground">
                 {profile?.kyc_status ?? "pending"}
               </dd>
-            </div>
-            <div className="flex flex-col gap-1 border-b border-border pb-4 sm:flex-row sm:justify-between">
-              <dt className="text-sm text-secondary">Waitlist status</dt>
-              <dd className="text-sm font-medium text-foreground">pending</dd>
             </div>
             {planLabel && (
               <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">

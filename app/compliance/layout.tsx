@@ -22,15 +22,6 @@ export default function ComplianceLayout({
     <main>
       <Section spacing="sm">
         <Container size="narrow">
-          <div
-            className="rounded-md border border-border bg-surface px-4 py-3"
-            role="note"
-          >
-            <p className="text-sm text-secondary">
-              Pre-launch — not for public distribution. Stratova&apos;s SEBI
-              Research Analyst registration is pending.
-            </p>
-          </div>
           <nav aria-label="Compliance pages" className="mt-8">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {COMPLIANCE_PAGES.map((page) => (

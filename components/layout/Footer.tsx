@@ -110,7 +110,9 @@ export default function Footer() {
               &copy; 2026 Stratova Quant.
             </span>
             <span className="text-sm text-secondary">
-              SEBI Research Analyst Registration No.: {RA_REGISTRATION_NUMBER}
+              {RA_REGISTRATION_NUMBER
+                ? `SEBI Research Analyst Registration No.: ${RA_REGISTRATION_NUMBER}`
+                : null}
             </span>
           </div>
         </div>

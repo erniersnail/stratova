@@ -158,9 +158,7 @@ export default async function DashboardPage() {
                     Preview access — all strategies
                   </p>
                   <p className="mt-1 text-sm text-secondary">
-                    You have preview access to every current strategy. Paid
-                    subscriptions open when Stratova&apos;s SEBI RA
-                    registration is granted.
+                    You have preview access to every current strategy.
                   </p>
                 </div>
               )}
@@ -204,9 +202,7 @@ export default async function DashboardPage() {
                   previewSubscription ? null : (
                     <div className="rounded-lg border border-border bg-surface p-6">
                       <p className="text-sm leading-[1.75] text-secondary">
-                        You don&apos;t have any subscriptions yet. Once you
-                        subscribe, you&apos;ll see your plans and start dates
-                        here.
+                        You don&apos;t have any active subscriptions yet.
                       </p>
                       <p className="mt-4 text-sm">
                         <Link
@@ -230,15 +226,6 @@ export default async function DashboardPage() {
             >
               Latest recommendations
             </h2>
-            <div
-              className="mt-4 rounded-md border border-border bg-surface px-4 py-3"
-              role="note"
-            >
-              <p className="text-sm text-secondary">
-                Pre-launch — not for public distribution. Stratova&apos;s SEBI
-                Research Analyst registration is pending.
-              </p>
-            </div>
             <div className="mt-4">
               <DataTable<Recommendation>
                 columns={[
@@ -283,8 +270,7 @@ export default async function DashboardPage() {
                 emptyState={
                   <div className="rounded-lg border border-border bg-surface p-6">
                     <p className="text-sm leading-[1.75] text-secondary">
-                      No recommendations yet. You&apos;ll see signals here once
-                      you&apos;re subscribed and the service is live.
+                      No recommendations yet.
                     </p>
                   </div>
                 }

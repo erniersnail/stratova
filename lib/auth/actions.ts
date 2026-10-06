@@ -36,9 +36,9 @@ function authErrorMessage(raw: string): string {
 }
 
 /**
- * Signs a new user up and joins them to the waitlist.
+ * Signs a new user up.
  *
- * Stratova is pre-launch: this creates an ACCOUNT and records consent. It does
+ * Creates an ACCOUNT and records consent. It does
  * not create a subscription and takes no payment.
  *
  * Profile and consent rows are written here when a session is available

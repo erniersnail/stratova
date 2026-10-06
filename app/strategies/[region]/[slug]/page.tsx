@@ -124,7 +124,7 @@ export default async function StrategyDetailPage({
                 Availability
               </dt>
               <dd className={`${typography.body} mt-1 text-foreground`}>
-                Pre-launch
+                Live
               </dd>
             </div>
           </dl>
@@ -133,17 +133,7 @@ export default async function StrategyDetailPage({
 
       <Section>
         <Container>
-          <div
-            className="rounded-md border border-border bg-surface px-4 py-3"
-            role="note"
-          >
-            <p className="text-sm text-secondary">
-              Pre-launch — for informational purposes. Not investment advice.
-              Stratova&apos;s SEBI Research Analyst registration is pending.
-            </p>
-          </div>
-
-          <h2 className={`${typography.h3} mt-8 text-foreground`}>
+          <h2 className={`${typography.h3} text-foreground`}>
             Current picks
           </h2>
 

@@ -9,23 +9,25 @@
 /**
  * SEBI Research Analyst registration number.
  *
- * ⚠️ PENDING — this is a placeholder, NOT a real registration number.
- * Stratova Quant's RA registration is in progress. Replace the string below
- * with the issued number BEFORE setting PUBLIC_MODE to "true". Never launch
- * with the placeholder in place.
+ * Set to null while the only value we have is the placeholder below — callers
+ * must skip rendering the registration line entirely when this is null.
+ * Replace the placeholder with the issued number when it is available;
+ * never render the placeholder itself.
  */
-export const RA_REGISTRATION_NUMBER = "RA-XXXXXX — pending";
+const RA_REGISTRATION_PLACEHOLDER = "RA-XXXXXX — pending";
+export const RA_REGISTRATION_NUMBER: string | null =
+  RA_REGISTRATION_PLACEHOLDER.includes("pending")
+    ? null
+    : RA_REGISTRATION_PLACEHOLDER;
 
 /**
- * Public mode gate.
+ * Public mode gate (hidden safety switch).
  *
- * Defaults to pre-launch when NEXT_PUBLIC_PUBLIC_MODE is unset or anything
- * other than the exact string "true". Failing closed is deliberate: a missing
- * or misconfigured variable must never accidentally expose the site publicly.
- *
- * Set NEXT_PUBLIC_PUBLIC_MODE="true" to launch.
+ * Defaults to PUBLIC: any unset or unrecognized value means public mode.
+ * Set NEXT_PUBLIC_PUBLIC_MODE="false" explicitly to fall back to the
+ * lockdown mode (noindex, robots disallow-all, footer banner).
  */
-export const IS_PUBLIC_MODE = process.env.NEXT_PUBLIC_PUBLIC_MODE === "true";
+export const IS_PUBLIC_MODE = process.env.NEXT_PUBLIC_PUBLIC_MODE !== "false";
 
-/** True when the site is pre-launch and must not be publicly distributed. */
+/** True only when the safety switch is explicitly set to "false". */
 export const IS_PRE_LAUNCH = !IS_PUBLIC_MODE;
