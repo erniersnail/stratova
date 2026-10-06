@@ -5,7 +5,6 @@ import PageHeader from "@/components/common/PageHeader";
 import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
 import DataTable from "@/components/ui/data-table";
-import SubscribeForm from "@/components/strategies/SubscribeForm";
 import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
@@ -14,6 +13,12 @@ import {
 } from "@/lib/strategies/fetch";
 import { createClient } from "@/lib/supabase/server";
 import { formatIST } from "@/lib/format/date";
+import {
+  nextRebalanceDate,
+  formatRebalanceDate,
+} from "@/lib/strategies/rebalance";
+import { subscribeAction } from "@/lib/auth/actions";
+import SubscribePayForm from "@/components/strategies/SubscribePayForm";
 
 type Region = "india" | "us";
 
@@ -49,7 +54,6 @@ export default async function StrategyDetailPage({
   const strategy = await getStrategyBySlug(slug);
   if (!strategy || strategy.region !== region) notFound();
 
-  // Auth check — recommendations are gated to signed-in users only.
   const supabase = await createClient();
   const {
     data: { user },
@@ -59,26 +63,32 @@ export default async function StrategyDetailPage({
     ? await getCurrentRecommendations(strategy.id)
     : [];
 
-  // Current user's ACTIVE subscription for this strategy (most recent).
-  type ActiveSubscription = { id: string; capital_allocated: number | null };
-  let activeSub: ActiveSubscription | null = null;
+  // Current user's PENDING or ACTIVE subscription for this strategy.
+  type ExistingSub = {
+    id: string;
+    capital_allocated: number | null;
+    status: string;
+  };
+  let existingSub: ExistingSub | null = null;
   if (user) {
     const { data: subs } = await supabase
       .from("subscriptions")
-      .select("id, capital_allocated")
+      .select("id, capital_allocated, status")
       .eq("user_id", user.id)
       .eq("strategy_id", strategy.id)
-      .eq("status", "ACTIVE")
-      .order("started_at", { ascending: false })
+      .in("status", ["PENDING", "ACTIVE"])
+      .order("created_at", { ascending: false })
       .limit(1);
-    activeSub = subs && subs.length > 0 ? (subs[0] as ActiveSubscription) : null;
+    existingSub = subs && subs.length > 0 ? (subs[0] as ExistingSub) : null;
   }
-  const capital = activeSub?.capital_allocated ?? null;
-  // Per-position weight — read straight from the VM-published row; never
-  // computed here. All current picks share the same weight.
+  const capital = existingSub?.capital_allocated ?? null;
   const perPositionWeight = picks[0]?.weight_pct ?? null;
 
-  // target_shares = floor(capital * weight_pct / price). null → render "—".
+  const nextDate = nextRebalanceDate(strategy.slug);
+  const nextDateStr = formatRebalanceDate(nextDate);
+  const fee = strategy.fee_per_rebalance ?? null;
+  const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
+
   const targetShares = (r: Recommendation): number | null =>
     capital !== null &&
     r.weight_pct !== null &&
@@ -171,10 +181,10 @@ export default async function StrategyDetailPage({
             </div>
             <div className="rounded-md border border-border bg-surface p-5">
               <dt className="text-xs font-medium uppercase tracking-wide text-tertiary">
-                Availability
+                Next rebalance
               </dt>
               <dd className={`${typography.body} mt-1 text-foreground`}>
-                Live
+                {nextDateStr}
               </dd>
             </div>
           </dl>
@@ -201,29 +211,67 @@ export default async function StrategyDetailPage({
             </div>
           ) : (
             <div className="mt-4 space-y-6">
-              {activeSub && (
-                <div className="rounded-md border border-border bg-surface px-4 py-3">
+              {existingSub ? (
+                <div className="rounded-md border border-border bg-surface px-4 py-4">
                   <p className="text-sm font-medium text-foreground">
-                    Allocated capital:{" "}
-                    {capital !== null
-                      ? `₹${capital.toLocaleString("en-IN")}`
-                      : "—"}
+                    {existingSub.status === "PENDING"
+                      ? "Awaiting first rebalance"
+                      : "Subscribed"}
                   </p>
-                  <p className="mt-1 text-sm text-secondary">
-                    Per-position weight:{" "}
-                    {perPositionWeight !== null
-                      ? `${(perPositionWeight * 100).toFixed(2)}%`
-                      : "—"}
+                  <dl className="mt-3 space-y-1 text-sm">
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-secondary">Allocated capital</dt>
+                      <dd className="text-foreground">
+                        {capital !== null
+                          ? `₹${capital.toLocaleString("en-IN")}`
+                          : "—"}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-secondary">Next rebalance</dt>
+                      <dd className="text-foreground">{nextDateStr}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-secondary">Fee</dt>
+                      <dd className="text-foreground">{feeStr}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-secondary">Per-position weight</dt>
+                      <dd className="text-foreground">
+                        {perPositionWeight !== null
+                          ? `${(perPositionWeight * 100).toFixed(2)}%`
+                          : "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                  {existingSub.status === "PENDING" && (
+                    <p className={`${typography.body} mt-4 text-secondary`}>
+                      Your subscription will activate at the next
+                      rebalance on {nextDateStr}. You'll receive a
+                      payment confirmation email if pending.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-md border border-border bg-surface px-4 py-4">
+                  <p className="text-sm font-medium text-foreground">
+                    Subscribe to {strategy.name}
                   </p>
+                  <p className={`${typography.body} mt-2 text-secondary`}>
+                    Next rebalance: <span className="text-foreground">{nextDateStr}</span>
+                    <br />
+                    Fee: <span className="text-foreground">{feeStr}</span>
+                  </p>
+                  <p className={`${typography.body} mt-3 text-secondary`}>
+                    This subscription covers the rebalance on {nextDateStr}.
+                  </p>
+                  <SubscribePayForm
+                    strategyId={strategy.id}
+                    fee={fee}
+                    feeStr={feeStr}
+                  />
                 </div>
               )}
-
-              <SubscribeForm
-                strategyId={strategy.id}
-                strategyPath={`/strategies/${region}/${slug}`}
-                strategyName={strategy.name}
-                currentAmount={capital}
-              />
 
               <DataTable
                 columns={columns}

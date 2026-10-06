@@ -9,6 +9,7 @@ export type Strategy = {
   risk_level: string | null;
   benchmark: string | null;
   fee: number | null;
+  fee_per_rebalance: number | null;
   returns_json: unknown | null;
   is_public: boolean;
   display_order: number;
