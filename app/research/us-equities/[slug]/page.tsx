@@ -14,7 +14,9 @@ import StrategyFAQ from "@/components/strategies/StrategyFAQ";
 import RiskDisclosure from "@/components/strategies/RiskDisclosure";
 
 export function generateStaticParams() {
-  return STRATEGIES.map((strategy) => ({ slug: strategy.slug }));
+  return STRATEGIES.filter((s) => s.region === "us").map((s) => ({
+    slug: s.slug,
+  }));
 }
 
 type Props = {
@@ -24,10 +26,7 @@ type Props = {
 export default async function StrategyDetailsPage({ params }: Props) {
   const { slug } = await params;
   const strategy = getStrategy(slug);
-
-  if (!strategy) {
-    notFound();
-  }
+  if (!strategy || strategy.region !== 'us') notFound();
 
   return (
     <main>
