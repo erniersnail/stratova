@@ -258,6 +258,108 @@ export async function forgotPasswordAction(
   return { success: RESET_LINK_SENT };
 }
 
+// ── Subscription (capital allocation) ────────────────────────────────────────
+
+export type SubscribeState = {
+  error?: string;
+  success?: string;
+};
+
+const MIN_ALLOCATION = 10_000;
+const MAX_ALLOCATION = 10_000_000;
+
+/**
+ * Creates (mode="subscribe") or updates (mode="change") the current user's
+ * ACTIVE subscription for one strategy. Amount is validated to be an integer
+ * between ₹10,000 and ₹1,00,00,000. The DB unique index on
+ * (user_id, strategy_id) where status='ACTIVE' is the final guard against
+ * duplicates. On error, returns a generic message (never leaks internals).
+ */
+export async function subscribeAction(
+  _prev: SubscribeState,
+  formData: FormData,
+): Promise<SubscribeState> {
+  const strategyId = String(formData.get("strategyId") ?? "").trim();
+  const strategyPath = String(formData.get("strategyPath") ?? "").trim();
+  const mode = String(formData.get("mode") ?? "subscribe");
+  const amountRaw = String(formData.get("amount") ?? "")
+    .replace(/[,\s₹]/g, "");
+
+  if (!strategyId) {
+    return { error: "Something went wrong. Please try again." };
+  }
+  if (!/^\d+$/.test(amountRaw)) {
+    return { error: "Enter an amount in rupees (whole numbers only)." };
+  }
+  const amount = Number(amountRaw);
+  if (amount < MIN_ALLOCATION) {
+    return { error: "Minimum allocation is ₹10,000." };
+  }
+  if (amount > MAX_ALLOCATION) {
+    return { error: "Maximum allocation is ₹1,00,00,000." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Please log in to subscribe." };
+  }
+
+  if (mode === "change") {
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .update({ capital_allocated: amount })
+      .eq("user_id", user.id)
+      .eq("strategy_id", strategyId)
+      .eq("status", "ACTIVE")
+      .select("id");
+
+    if (error || !data || data.length === 0) {
+      return { error: "Something went wrong. Please try again." };
+    }
+    revalidatePath(strategyPath || "/dashboard");
+    revalidatePath("/dashboard");
+    return { success: "Allocation updated." };
+  }
+
+  // Insert path — refuse if an ACTIVE row already exists (the unique index
+  // enforces this too; this check just gives a friendly message).
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("strategy_id", strategyId)
+    .eq("status", "ACTIVE")
+    .limit(1);
+
+  if (existing && existing.length > 0) {
+    return {
+      error: "You already have an active subscription to this strategy.",
+    };
+  }
+
+  const { error } = await supabase.from("subscriptions").insert({
+    user_id: user.id,
+    strategy_id: strategyId,
+    status: "ACTIVE",
+    plan: "standard",
+    capital_allocated: amount,
+    started_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    return { error: "Something went wrong. Please try again." };
+  }
+
+  revalidatePath(strategyPath || "/dashboard");
+  revalidatePath("/dashboard");
+  return { success: "Subscribed." };
+}
+
+
 /**
  * Sets the new password after following the reset link. Requires the session
  * established by the email link's code exchange.

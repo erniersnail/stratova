@@ -24,6 +24,9 @@ export type Recommendation = {
   rationale: string | null;
   expires_at: string | null;
   published_at: string;
+  // VM-published — read verbatim, never computed or overridden client-side.
+  weight_pct: number | null;
+  price: number | null;
 };
 
 /**

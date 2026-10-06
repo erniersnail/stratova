@@ -24,12 +24,14 @@ type SubscriptionRow = {
   plan: string | null;
   started_at: string | null;
   expires_at: string | null;
+  capital_allocated: number | null;
 };
 
 type StrategyRow = {
   id: string;
   name: string;
   slug: string;
+  region: string | null;
 };
 
 function formatDate(value: string | null): string {
@@ -74,7 +76,7 @@ export default async function DashboardPage() {
   let subscriptions: SubscriptionRow[] = [];
   const { data: subsData, error: subsError } = await supabase
     .from("subscriptions")
-    .select("id,strategy_id,status,plan,started_at,expires_at")
+    .select("id,strategy_id,status,plan,started_at,expires_at,capital_allocated")
     .eq("user_id", user.id);
 
   if (subsError) {
@@ -99,10 +101,11 @@ export default async function DashboardPage() {
 
   const strategyNames = new Map<string, string>();
   const strategySlugs = new Map<string, string>();
+  const strategyRegions = new Map<string, string>();
   if (allStrategyIds.length > 0) {
     const { data: stratData, error: stratError } = await supabase
       .from("strategies")
-      .select("id,name,slug")
+      .select("id,name,slug,region")
       .in("id", allStrategyIds);
 
     if (stratError) {
@@ -111,6 +114,7 @@ export default async function DashboardPage() {
       for (const s of stratData as StrategyRow[]) {
         strategyNames.set(s.id, s.name);
         strategySlugs.set(s.id, s.slug);
+        if (s.region) strategyRegions.set(s.id, s.region);
       }
     }
   } else {
@@ -119,7 +123,7 @@ export default async function DashboardPage() {
     // strategy_ids still resolve to names.
     const { data: stratData, error: stratError } = await supabase
       .from("strategies")
-      .select("id,name,slug")
+      .select("id,name,slug,region")
       .eq("is_public", true);
 
     if (stratError) {
@@ -128,12 +132,21 @@ export default async function DashboardPage() {
       for (const s of stratData as StrategyRow[]) {
         strategyNames.set(s.id, s.name);
         strategySlugs.set(s.id, s.slug);
+        if (s.region) strategyRegions.set(s.id, s.region);
       }
     }
   }
 
   const recommendations: Recommendation[] =
     await getCurrentRecommendationsForUser(user.id);
+
+  // Capital allocated per strategy — feeds the Target Shares column.
+  const capitalByStrategy = new Map<string, number>();
+  for (const s of subscriptions) {
+    if (s.strategy_id && s.capital_allocated !== null) {
+      capitalByStrategy.set(s.strategy_id, s.capital_allocated);
+    }
+  }
 
   return (
     <main>

@@ -5,6 +5,7 @@ import PageHeader from "@/components/common/PageHeader";
 import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
 import DataTable from "@/components/ui/data-table";
+import SubscribeForm from "@/components/strategies/SubscribeForm";
 import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
@@ -58,6 +59,34 @@ export default async function StrategyDetailPage({
     ? await getCurrentRecommendations(strategy.id)
     : [];
 
+  // Current user's ACTIVE subscription for this strategy (most recent).
+  type ActiveSubscription = { id: string; capital_allocated: number | null };
+  let activeSub: ActiveSubscription | null = null;
+  if (user) {
+    const { data: subs } = await supabase
+      .from("subscriptions")
+      .select("id, capital_allocated")
+      .eq("user_id", user.id)
+      .eq("strategy_id", strategy.id)
+      .eq("status", "ACTIVE")
+      .order("started_at", { ascending: false })
+      .limit(1);
+    activeSub = subs && subs.length > 0 ? (subs[0] as ActiveSubscription) : null;
+  }
+  const capital = activeSub?.capital_allocated ?? null;
+  // Per-position weight — read straight from the VM-published row; never
+  // computed here. All current picks share the same weight.
+  const perPositionWeight = picks[0]?.weight_pct ?? null;
+
+  // target_shares = floor(capital * weight_pct / price). null → render "—".
+  const targetShares = (r: Recommendation): number | null =>
+    capital !== null &&
+    r.weight_pct !== null &&
+    r.price !== null &&
+    r.price > 0
+      ? Math.floor((capital * r.weight_pct) / r.price)
+      : null;
+
   const columns = [
     {
       key: "symbol",
@@ -76,19 +105,40 @@ export default async function StrategyDetailPage({
       ),
     },
     {
+      key: "price",
+      header: "Price",
+      render: (r: Recommendation) => (
+        <span className="text-secondary">{r.price ?? "—"}</span>
+      ),
+    },
+    {
+      key: "weight",
+      header: "Weight",
+      render: (r: Recommendation) => (
+        <span className="text-secondary">
+          {r.weight_pct !== null
+            ? `${(r.weight_pct * 100).toFixed(2)}%`
+            : "—"}
+        </span>
+      ),
+    },
+    {
+      key: "target_shares",
+      header: "Target Shares",
+      render: (r: Recommendation) => {
+        const target = targetShares(r);
+        return (
+          <span className="text-foreground">
+            {target !== null ? target : "—"}
+          </span>
+        );
+      },
+    },
+    {
       key: "as_of",
       header: "As of (IST)",
       render: (r: Recommendation) => (
         <span className="text-secondary">{formatIST(r.as_of)}</span>
-      ),
-    },
-    {
-      key: "expires",
-      header: "Expires (IST)",
-      render: (r: Recommendation) => (
-        <span className="text-secondary">
-          {r.expires_at ? formatIST(r.expires_at) : "—"}
-        </span>
       ),
     },
   ];
@@ -150,7 +200,31 @@ export default async function StrategyDetailPage({
               </Link>
             </div>
           ) : (
-            <div className="mt-4">
+            <div className="mt-4 space-y-6">
+              {activeSub && (
+                <div className="rounded-md border border-border bg-surface px-4 py-3">
+                  <p className="text-sm font-medium text-foreground">
+                    Allocated capital:{" "}
+                    {capital !== null
+                      ? `₹${capital.toLocaleString("en-IN")}`
+                      : "—"}
+                  </p>
+                  <p className="mt-1 text-sm text-secondary">
+                    Per-position weight:{" "}
+                    {perPositionWeight !== null
+                      ? `${(perPositionWeight * 100).toFixed(2)}%`
+                      : "—"}
+                  </p>
+                </div>
+              )}
+
+              <SubscribeForm
+                strategyId={strategy.id}
+                strategyPath={`/strategies/${region}/${slug}`}
+                strategyName={strategy.name}
+                currentAmount={capital}
+              />
+
               <DataTable
                 columns={columns}
                 rows={picks}
