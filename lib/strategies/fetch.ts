@@ -129,3 +129,35 @@ export async function getCurrentRecommendationsForUser(
     return [];
   }
 }
+
+/**
+ * Full history across every ACTIVE subscription the user holds — both
+ * current and expired picks. RLS enforces the subscription check; the
+ * explicit filter is for readability. Newest first, capped at 200.
+ */
+export async function getRecommendationHistoryForUser(
+  userId: string,
+): Promise<Recommendation[]> {
+  if (!userId) return [];
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("recommendations")
+      .select("*")
+      .order("as_of", { ascending: false })
+      .order("published_at", { ascending: false })
+      .limit(200);
+
+    if (error) {
+      console.error(
+        "[strategies] getRecommendationHistoryForUser failed:",
+        error.message,
+      );
+      return [];
+    }
+    return (data as Recommendation[]) ?? [];
+  } catch (err) {
+    console.error("[strategies] getRecommendationHistoryForUser threw:", err);
+    return [];
+  }
+}

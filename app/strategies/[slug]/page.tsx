@@ -12,18 +12,7 @@ import {
   type Recommendation,
 } from "@/lib/strategies/fetch";
 import { createClient } from "@/lib/supabase/server";
-
-const IST = "en-IN" as const;
-
-function formatIST(value: string): string {
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "—";
-  return new Intl.DateTimeFormat(IST, {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Asia/Kolkata",
-  }).format(d);
-}
+import { formatIST } from "@/lib/format/date";
 
 export async function generateMetadata({
   params,

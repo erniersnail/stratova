@@ -136,6 +136,60 @@ export async function signOutAction(): Promise<void> {
   redirect("/");
 }
 
+// ── Profile editing ─────────────────────────────────────────────────────────
+
+export type ProfileState = {
+  error?: string;
+  success?: string;
+  fields?: { fullName?: string; phone?: string };
+};
+
+const PROFILE_UPDATED = "Profile updated.";
+
+/**
+ * Updates the current user's profile (full_name, phone). Email is never
+ * editable here — it is owned by Supabase Auth.
+ */
+export async function updateProfileAction(
+  _prev: ProfileState,
+  formData: FormData,
+): Promise<ProfileState> {
+  const fullName = String(formData.get("fullName") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+
+  const fields = { fullName, phone };
+
+  if (!fullName) {
+    return { error: "Enter your full name.", fields };
+  }
+
+  if (phone && !/^\+?[0-9]{10,15}$/.test(phone)) {
+    return { error: "Enter a valid phone number (10–15 digits).", fields };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Something went wrong. Please try again.", fields };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: fullName, phone: phone || null })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: "Something went wrong. Please try again.", fields };
+  }
+
+  revalidatePath("/account");
+  return { success: PROFILE_UPDATED, fields };
+}
+
 // ── Password reset ──────────────────────────────────────────────────────────
 
 type ResetState = {

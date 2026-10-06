@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import { signOutAction } from "@/lib/auth/actions";
 import { typography } from "@/lib/typography";
+import ProfileForm from "@/components/account/ProfileForm";
 
 export const metadata: Metadata = {
   title: "Your account — Stratova Quant",
@@ -102,6 +103,22 @@ export default async function AccountPage() {
           )}
         </section>
 
+        {/* Edit profile */}
+        <section className="mt-16">
+          <h2 className="text-xl font-semibold tracking-tight">Edit profile</h2>
+          <p className={`${typography.body} mt-3 text-sm text-secondary`}>
+            Update your name and phone number. Your email is managed through
+            sign-in and can&apos;t be changed here.
+          </p>
+
+          <div className="mt-6 max-w-[440px]">
+            <ProfileForm
+              initialFullName={profile?.full_name ?? ""}
+              initialPhone={(profile as { phone?: string | null })?.phone ?? ""}
+            />
+          </div>
+        </section>
+
         {/* Consents */}
         <section className="mt-16">
           <h2 className="text-xl font-semibold tracking-tight">
@@ -152,6 +169,13 @@ export default async function AccountPage() {
             className="text-sm text-secondary underline hover:text-foreground"
           >
             Contact us
+          </Link>
+
+          <Link
+            href="/account/history"
+            className="text-sm text-secondary underline hover:text-foreground"
+          >
+            View recommendation history →
           </Link>
         </section>
       </Container>

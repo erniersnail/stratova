@@ -10,6 +10,7 @@ import {
   getCurrentRecommendationsForUser,
   type Recommendation,
 } from "@/lib/strategies/fetch";
+import { formatIST } from "@/lib/format/date";
 
 export const metadata: Metadata = {
   title: "Dashboard — Stratova Quant",
@@ -29,17 +30,6 @@ type StrategyRow = {
   id: string;
   name: string;
 };
-
-function formatIST(value: string | null): string {
-  if (!value) return "—";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Asia/Kolkata",
-  }).format(d);
-}
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
@@ -259,6 +249,14 @@ export default async function DashboardPage() {
                 }
               />
             </div>
+            <p className="mt-4 text-sm">
+              <Link
+                href="/account/history"
+                className="underline hover:text-foreground"
+              >
+                View full history →
+              </Link>
+            </p>
           </section>
         </div>
 
