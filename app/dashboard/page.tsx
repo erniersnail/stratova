@@ -29,6 +29,7 @@ type SubscriptionRow = {
 type StrategyRow = {
   id: string;
   name: string;
+  slug: string;
 };
 
 function formatDate(value: string | null): string {
@@ -97,10 +98,11 @@ export default async function DashboardPage() {
   ];
 
   const strategyNames = new Map<string, string>();
+  const strategySlugs = new Map<string, string>();
   if (allStrategyIds.length > 0) {
     const { data: stratData, error: stratError } = await supabase
       .from("strategies")
-      .select("id,name")
+      .select("id,name,slug")
       .in("id", allStrategyIds);
 
     if (stratError) {
@@ -108,6 +110,24 @@ export default async function DashboardPage() {
     } else if (stratData) {
       for (const s of stratData as StrategyRow[]) {
         strategyNames.set(s.id, s.name);
+        strategySlugs.set(s.id, s.slug);
+      }
+    }
+  } else {
+    // Preview-only users hold no strategy_id rows, so the map above stays
+    // empty — fall back to the full public catalog so recommendation
+    // strategy_ids still resolve to names.
+    const { data: stratData, error: stratError } = await supabase
+      .from("strategies")
+      .select("id,name,slug")
+      .eq("is_public", true);
+
+    if (stratError) {
+      console.error("Dashboard strategies fetch failed:", stratError.message);
+    } else if (stratData) {
+      for (const s of stratData as StrategyRow[]) {
+        strategyNames.set(s.id, s.name);
+        strategySlugs.set(s.id, s.slug);
       }
     }
   }
@@ -228,6 +248,7 @@ export default async function DashboardPage() {
                     render: (row) => (
                       <span className="text-foreground">
                         {strategyNames.get(row.strategy_id) ??
+                          strategySlugs.get(row.strategy_id) ??
                           row.strategy_id}
                       </span>
                     ),

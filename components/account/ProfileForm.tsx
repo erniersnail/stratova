@@ -1,11 +1,31 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import AuthField from "@/components/auth/AuthField";
 import Button from "@/components/ui/Button";
 import { updateProfileAction, type ProfileState } from "@/lib/auth/actions";
 
 const initialState: ProfileState = {};
+
+const SUCCESS_TIMEOUT_MS = 4000;
+
+// Self-hiding wrapper: mounts visible, hides itself after `ms`. The only
+// setState is inside the timer callback, never in an effect body.
+function HideAfter({
+  ms,
+  children,
+}: {
+  ms: number;
+  children: React.ReactNode;
+}) {
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(false), ms);
+    return () => clearTimeout(t);
+  }, [ms]);
+  if (!visible) return null;
+  return <>{children}</>;
+}
 
 type ProfileFormProps = {
   initialFullName: string;
@@ -24,6 +44,33 @@ export default function ProfileForm({
     state.fields?.fullName ?? initialFullName,
   );
   const [phone, setPhone] = useState(state.fields?.phone ?? initialPhone);
+  // Success auto-dismiss: each successful submit renders a fresh
+  // <HideAfter> (keyed by message identity) that hides itself after 4s.
+  // Typing in either field sets `dismissed`, unmounting the message.
+  // A new success clears `dismissed`. Errors persist until resubmit.
+  const [dismissed, setDismissed] = useState(false);
+  const [lastSuccess, setLastSuccess] = useState<string | undefined>(
+    undefined,
+  );
+
+  if (state.success !== lastSuccess) {
+    setLastSuccess(state.success);
+    if (state.success) {
+      setDismissed(false);
+    }
+  }
+
+  const showSuccess = Boolean(state.success) && !dismissed;
+
+  const handleFullNameChange = (value: string) => {
+    setFullName(value);
+    setDismissed(true);
+  };
+
+  const handlePhoneChange = (value: string) => {
+    setPhone(value);
+    setDismissed(true);
+  };
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
@@ -36,20 +83,22 @@ export default function ProfileForm({
         </div>
       )}
 
-      {state.success && (
-        <div
-          role="status"
-          className="rounded-md border border-border bg-surface px-4 py-3"
-        >
-          <p className="text-sm text-foreground">{state.success}</p>
-        </div>
+      {showSuccess && (
+        <HideAfter key={state.success} ms={SUCCESS_TIMEOUT_MS}>
+          <div
+            role="status"
+            className="rounded-md border border-border bg-surface px-4 py-3"
+          >
+            <p className="text-sm text-foreground">{state.success}</p>
+          </div>
+        </HideAfter>
       )}
 
       <AuthField
         id="fullName"
         label="Full name"
         value={fullName}
-        onChange={setFullName}
+        onChange={handleFullNameChange}
         autoComplete="name"
         placeholder="Your full name"
         required
@@ -61,7 +110,7 @@ export default function ProfileForm({
         label="Phone (optional)"
         type="tel"
         value={phone}
-        onChange={setPhone}
+        onChange={handlePhoneChange}
         autoComplete="tel"
         placeholder="+919876543210"
         disabled={pending}
