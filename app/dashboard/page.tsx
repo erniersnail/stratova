@@ -91,49 +91,24 @@ export default async function DashboardPage() {
     (s) => s.strategy_id !== null && s.strategy_id.length > 0,
   );
 
-  const allStrategyIds = [
-    ...new Set(
-      subscriptions
-        .map((s) => s.strategy_id)
-        .filter((id): id is string => typeof id === "string" && id.length > 0),
-    ),
-  ];
-
   const strategyNames = new Map<string, string>();
   const strategySlugs = new Map<string, string>();
   const strategyRegions = new Map<string, string>();
-  if (allStrategyIds.length > 0) {
-    const { data: stratData, error: stratError } = await supabase
-      .from("strategies")
-      .select("id,name,slug,region")
-      .in("id", allStrategyIds);
+  // Always fetch the full public catalog — the user may see recommendations
+  // for strategies they are not subscribed to (e.g. admin RLS bypass), and
+  // those must resolve to names, never raw UUIDs.
+  const { data: stratData, error: stratError } = await supabase
+    .from("strategies")
+    .select("id,name,slug,region")
+    .eq("is_public", true);
 
-    if (stratError) {
-      console.error("Dashboard strategies fetch failed:", stratError.message);
-    } else if (stratData) {
-      for (const s of stratData as StrategyRow[]) {
-        strategyNames.set(s.id, s.name);
-        strategySlugs.set(s.id, s.slug);
-        if (s.region) strategyRegions.set(s.id, s.region);
-      }
-    }
-  } else {
-    // Preview-only users hold no strategy_id rows, so the map above stays
-    // empty — fall back to the full public catalog so recommendation
-    // strategy_ids still resolve to names.
-    const { data: stratData, error: stratError } = await supabase
-      .from("strategies")
-      .select("id,name,slug,region")
-      .eq("is_public", true);
-
-    if (stratError) {
-      console.error("Dashboard strategies fetch failed:", stratError.message);
-    } else if (stratData) {
-      for (const s of stratData as StrategyRow[]) {
-        strategyNames.set(s.id, s.name);
-        strategySlugs.set(s.id, s.slug);
-        if (s.region) strategyRegions.set(s.id, s.region);
-      }
+  if (stratError) {
+    console.error("Dashboard strategies fetch failed:", stratError.message);
+  } else if (stratData) {
+    for (const s of stratData as StrategyRow[]) {
+      strategyNames.set(s.id, s.name);
+      strategySlugs.set(s.id, s.slug);
+      if (s.region) strategyRegions.set(s.id, s.region);
     }
   }
 
@@ -194,6 +169,14 @@ export default async function DashboardPage() {
                     render: (row) => row.plan ?? "—",
                   },
                   {
+                    key: "capital",
+                    header: "Capital allocated",
+                    render: (row) =>
+                      row.capital_allocated !== null
+                        ? `₹${row.capital_allocated.toLocaleString("en-IN")}`
+                        : "—",
+                  },
+                  {
                     key: "status",
                     header: "Status",
                     render: (row) => row.status ?? "—",
@@ -207,6 +190,24 @@ export default async function DashboardPage() {
                     key: "expires",
                     header: "Expires",
                     render: (row) => formatDate(row.expires_at),
+                  },
+                  {
+                    key: "view",
+                    header: "",
+                    render: (row) => {
+                      if (!row.strategy_id) return "—";
+                      const region = strategyRegions.get(row.strategy_id);
+                      const slug = strategySlugs.get(row.strategy_id);
+                      if (!region || !slug) return "—";
+                      return (
+                        <Link
+                          href={`/strategies/${region}/${slug}`}
+                          className="underline hover:text-foreground"
+                        >
+                          View strategy
+                        </Link>
+                      );
+                    },
                   },
                 ]}
                 rows={paidSubscriptions}
@@ -249,7 +250,7 @@ export default async function DashboardPage() {
                       <span className="text-foreground">
                         {strategyNames.get(row.strategy_id) ??
                           strategySlugs.get(row.strategy_id) ??
-                          row.strategy_id}
+                          "—"}
                       </span>
                     ),
                   },
@@ -266,6 +267,20 @@ export default async function DashboardPage() {
                     key: "action",
                     header: "Action",
                     render: (row) => row.action ?? "—",
+                  },
+                  {
+                    key: "target",
+                    header: "Target Shares",
+                    render: (row) => {
+                      const cap = capitalByStrategy.get(row.strategy_id);
+                      const target =
+                        cap && row.weight_pct && row.price
+                          ? Math.floor((cap * row.weight_pct) / row.price)
+                          : null;
+                      return target !== null
+                        ? target.toLocaleString("en-IN")
+                        : "—";
+                    },
                   },
                   {
                     key: "asof",
