@@ -15,7 +15,23 @@ export default function robots(): MetadataRoute.Robots {
     };
   }
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://stratovaquant.com";
+
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: [
+          "/dashboard",
+          "/account",
+          "/auth/",
+          "/forgot-password",
+          "/reset-password",
+        ],
+      },
+    ],
+    sitemap: `${siteUrl}/sitemap.xml`,
   };
 }

@@ -5,6 +5,12 @@ import Pagination from "@/components/common/Pagination";
 import ResearchFilters from "@/components/research/ResearchFilters";
 import ResearchGrid from "@/components/research/ResearchGrid";
 
+export const metadata = {
+  title: "Research — Stratova Quant",
+  description:
+    "Browse research covering quantitative investing, factor models, portfolio construction, and market structure.",
+};
+
 export default function ResearchPage() {
   return (
     <main>

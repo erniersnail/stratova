@@ -5,6 +5,12 @@ import TrustSection from "@/components/sections/TrustSection";
 import PerformancePreviewSection from "@/components/sections/PerformancePreviewSection";
 import NewsletterSection from "@/components/sections/NewsletterSection";
 
+export const metadata = {
+  title: "Stratova Quant — Quantitative Investment Research",
+  description:
+    "Stratova Quant develops disciplined, evidence-based systematic investment research for long-term investors across U.S. and Indian equity markets.",
+};
+
 export default function Home() {
   return (
     <>
