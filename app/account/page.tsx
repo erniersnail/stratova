@@ -42,14 +42,30 @@ export default async function AccountPage() {
   // Backfills profile + consent rows when email confirmation delayed signup.
   await ensureProfile(supabase, user);
 
-  const [{ data: profile }, { data: consents }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase
-      .from("consents")
-      .select("doc_type, doc_version, accepted_at")
-      .eq("user_id", user.id)
-      .order("accepted_at", { ascending: false }),
-  ]);
+  const [{ data: profile }, { data: consents }, { data: subscriptions }] =
+    await Promise.all([
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("consents")
+        .select("doc_type, doc_version, accepted_at")
+        .eq("user_id", user.id)
+        .order("accepted_at", { ascending: false }),
+      supabase
+        .from("subscriptions")
+        .select("strategy_id,status,plan")
+        .eq("user_id", user.id)
+        .eq("status", "ACTIVE"),
+    ]);
+
+  const hasPreview = (subscriptions ?? []).some((s) => s.plan === "preview");
+  const hasPaid = (subscriptions ?? []).some(
+    (s) => s.strategy_id !== null && s.strategy_id !== "",
+  );
+  const planLabel = hasPaid
+    ? "Subscribed"
+    : hasPreview
+      ? "Preview access (all strategies)"
+      : null;
 
   return (
     <main>
@@ -86,10 +102,18 @@ export default async function AccountPage() {
                 {profile?.kyc_status ?? "pending"}
               </dd>
             </div>
-            <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
+            <div className="flex flex-col gap-1 border-b border-border pb-4 sm:flex-row sm:justify-between">
               <dt className="text-sm text-secondary">Waitlist status</dt>
               <dd className="text-sm font-medium text-foreground">pending</dd>
             </div>
+            {planLabel && (
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
+                <dt className="text-sm text-secondary">Plan</dt>
+                <dd className="text-sm font-medium text-foreground">
+                  {planLabel}
+                </dd>
+              </div>
+            )}
           </dl>
 
           {!profile && (

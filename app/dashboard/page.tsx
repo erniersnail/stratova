@@ -82,6 +82,12 @@ export default async function DashboardPage() {
     subscriptions = subsData as SubscriptionRow[];
   }
 
+  const previewSubscription =
+    subscriptions.find((s) => s.plan === "preview") ?? null;
+  const paidSubscriptions = subscriptions.filter(
+    (s) => s.strategy_id !== null && s.strategy_id.length > 0,
+  );
+
   const allStrategyIds = [
     ...new Set(
       subscriptions
@@ -125,7 +131,19 @@ export default async function DashboardPage() {
             >
               Your subscriptions
             </h2>
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
+              {previewSubscription && (
+                <div className="rounded-md border border-border bg-surface px-4 py-3">
+                  <p className="text-sm font-medium text-foreground">
+                    Preview access — all strategies
+                  </p>
+                  <p className="mt-1 text-sm text-secondary">
+                    You have preview access to every current strategy. Paid
+                    subscriptions open when Stratova&apos;s SEBI RA
+                    registration is granted.
+                  </p>
+                </div>
+              )}
               <DataTable<SubscriptionRow>
                 columns={[
                   {
@@ -160,24 +178,26 @@ export default async function DashboardPage() {
                     render: (row) => formatDate(row.expires_at),
                   },
                 ]}
-                rows={subscriptions}
+                rows={paidSubscriptions}
                 rowKey={(row) => row.id}
                 emptyState={
-                  <div className="rounded-lg border border-border bg-surface p-6">
-                    <p className="text-sm leading-[1.75] text-secondary">
-                      You don&apos;t have any subscriptions yet. Subscriptions
-                      open when Stratova&apos;s SEBI RA registration is
-                      granted.
-                    </p>
-                    <p className="mt-4 text-sm">
-                      <Link
-                        href="/pricing"
-                        className="underline hover:text-foreground"
-                      >
-                        View pricing
-                      </Link>
-                    </p>
-                  </div>
+                  previewSubscription ? null : (
+                    <div className="rounded-lg border border-border bg-surface p-6">
+                      <p className="text-sm leading-[1.75] text-secondary">
+                        You don&apos;t have any subscriptions yet. Once you
+                        subscribe, you&apos;ll see your plans and start dates
+                        here.
+                      </p>
+                      <p className="mt-4 text-sm">
+                        <Link
+                          href="/pricing"
+                          className="underline hover:text-foreground"
+                        >
+                          View pricing
+                        </Link>
+                      </p>
+                    </div>
+                  )
                 }
               />
             </div>
