@@ -15,19 +15,19 @@ type StrategyCard = {
 
 const STRATEGY_CARDS: StrategyCard[] = [
   {
-    href: "/research/us-equities",
+    href: "/strategies/us",
     label: "United States",
-    title: "U.S. Equities",
+    title: "U.S. Strategies",
     description:
-      "Systematic equity research focused on liquid U.S. companies using quantitative screening, portfolio construction, and ongoing evaluation.",
+      "Systematic equity strategies focused on liquid U.S. companies using quantitative screening, portfolio construction, and ongoing evaluation.",
     linkLabel: "View Strategies",
   },
   {
-    href: "/research/india-equities",
+    href: "/strategies/india",
     label: "India",
-    title: "Indian Equities",
+    title: "India Strategies",
     description:
-      "Evidence-based research covering Indian listed companies with an emphasis on systematic processes and long-term portfolio construction.",
+      "Evidence-based strategies covering Indian listed companies with an emphasis on systematic processes and long-term portfolio construction.",
     linkLabel: "View Strategies",
   },
 ];

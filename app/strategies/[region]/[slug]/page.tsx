@@ -14,14 +14,22 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { formatIST } from "@/lib/format/date";
 
+type Region = "india" | "us";
+
+function isRegion(value: string): value is Region {
+  return value === "india" || value === "us";
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ region: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { region, slug } = await params;
+  if (!isRegion(region)) return { title: "Strategy not found" };
   const strategy = await getStrategyBySlug(slug);
-  if (!strategy) return { title: "Strategy not found" };
+  if (!strategy || strategy.region !== region)
+    return { title: "Strategy not found" };
   return {
     title: `${strategy.name} — Stratova`,
     description:
@@ -33,11 +41,12 @@ export async function generateMetadata({
 export default async function StrategyDetailPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ region: string; slug: string }>;
 }) {
-  const { slug } = await params;
+  const { region, slug } = await params;
+  if (!isRegion(region)) notFound();
   const strategy = await getStrategyBySlug(slug);
-  if (!strategy) notFound();
+  if (!strategy || strategy.region !== region) notFound();
 
   // Auth check — recommendations are gated to signed-in users only.
   const supabase = await createClient();

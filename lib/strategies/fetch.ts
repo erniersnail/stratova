@@ -12,6 +12,7 @@ export type Strategy = {
   returns_json: unknown | null;
   is_public: boolean;
   display_order: number;
+  region: string | null;
 };
 
 export type Recommendation = {
@@ -50,7 +51,35 @@ export async function getPublicStrategies(): Promise<Strategy[]> {
   }
 }
 
-export async function getStrategyBySlug(slug: string): Promise<Strategy | null> {
+export async function getPublicStrategiesByRegion(
+  region: "india" | "us",
+): Promise<Strategy[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("strategies")
+      .select("*")
+      .eq("is_public", true)
+      .eq("region", region)
+      .order("display_order", { ascending: true });
+
+    if (error) {
+      console.error(
+        "[strategies] getPublicStrategiesByRegion failed:",
+        error.message,
+      );
+      return [];
+    }
+    return (data as Strategy[]) ?? [];
+  } catch (err) {
+    console.error("[strategies] getPublicStrategiesByRegion threw:", err);
+    return [];
+  }
+}
+
+export async function getStrategyBySlug(
+  slug: string,
+): Promise<Strategy | null> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
