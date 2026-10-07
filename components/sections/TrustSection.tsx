@@ -30,7 +30,7 @@ export default function TrustSection() {
   return (
     <Section spacing="none" className="py-12">
       <Container size="default">
-        <p className="mb-10 text-center text-xs tracking-[0.2em] text-foreground/70 uppercase">
+        <p className="mb-10 text-center text-xs tracking-[0.2em] text-foreground uppercase">
           HOW WE OPERATE
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
