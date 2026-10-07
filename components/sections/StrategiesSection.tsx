@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
-import SectionHeader from "@/components/common/SectionHeader";
 import Paper from "@/components/ui/Paper";
 import { typography } from "@/lib/typography";
 
@@ -103,11 +102,17 @@ export default function StrategiesSection() {
   return (
     <Section spacing="none" className="py-12">
       <Container size="default">
-        <SectionHeader
-          title="Global Markets."
-          description="Rules based. Evidence driven. Built to outperform."
-          centered
-        />
+        <div className="text-center">
+          <h2 className={`${typography.h2} text-foreground sm:text-4xl`}>
+            Our Strategies
+          </h2>
+          <p className="mt-3 font-serif text-xl text-secondary italic sm:text-2xl">
+            Two Regions. One Discipline.
+          </p>
+          <p className={`${typography.body} mt-4 text-secondary`}>
+            Rules based. Evidence driven. Built to outperform.
+          </p>
+        </div>
         <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
           {STRATEGY_CARDS.map((card) => (
             <article
