@@ -82,8 +82,7 @@ export default async function PerformancePreviewSection() {
           <div className="lg:col-span-2">
             <h2 className={`${typography.h2}`}>Portfolio performance</h2>
             <p className={`${typography.body} mt-4 text-secondary`}>
-              Combined return across all active strategies. Benchmark: NIFTY
-              500.
+              Combined return vs NIFTY 500.
             </p>
             <p className={`${typography.body} mt-4 text-secondary`}>
               Performance is best read alongside methodology, benchmark
@@ -91,34 +90,10 @@ export default async function PerformancePreviewSection() {
               transparency over headline numbers.
             </p>
             <div className="mt-4">
-              <Button href="/methodology" variant="secondary" size="md">
+              <Button href="/methodology" variant="primary" size="md">
                 View Methodology
               </Button>
             </div>
-
-            {/* Quick stats — mirrors the chart's headline numbers */}
-            {legend.length > 0 && (
-              <div className="mt-8 border-t border-border pt-4">
-                <p className="text-xs font-medium tracking-wide text-tertiary uppercase">
-                  Since 3 Aug 2026
-                </p>
-                <dl className="mt-3 space-y-2">
-                  {legend.map((item) => (
-                    <div
-                      key={item.name}
-                      className="flex items-center justify-between gap-4 text-sm"
-                    >
-                      <dt className="text-secondary">{item.name}</dt>
-                      <dd className="font-medium text-foreground">
-                        {item.returnPct.startsWith("-")
-                          ? `${item.returnPct}%`
-                          : `+${item.returnPct}%`}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
           </div>
 
           {/* Right column */}
@@ -127,8 +102,7 @@ export default async function PerformancePreviewSection() {
               {/* Paper header */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-medium">Combined portfolio</h3>
-                  <p className="mt-1 text-sm text-secondary">
+                  <p className="text-sm text-secondary">
                     Rebased to 100 on 3 Aug 2026
                   </p>
                 </div>
