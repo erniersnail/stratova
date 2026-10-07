@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export type Strategy = {
   id: string;
@@ -37,7 +38,7 @@ export type Recommendation = {
  */
 export async function getPublicStrategies(): Promise<Strategy[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("strategies")
       .select("*")
@@ -59,7 +60,7 @@ export async function getPublicStrategiesByRegion(
   region: "india" | "us",
 ): Promise<Strategy[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("strategies")
       .select("*")
@@ -85,7 +86,7 @@ export async function getStrategyBySlug(
   slug: string,
 ): Promise<Strategy | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("strategies")
       .select("*")
@@ -112,7 +113,7 @@ export async function getCurrentRecommendations(
   strategyId: string,
 ): Promise<Recommendation[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("recommendations")
       .select("*")
@@ -209,7 +210,7 @@ export async function getStrategyPerformance(
 ): Promise<PerformancePoint[]> {
   if (!strategyId) return [];
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("strategy_performance")
       .select("date, total_value")
