@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Container from "@/components/layout/Container";
 import Section from "@/components/layout/Section";
 import Button from "@/components/ui/Button";
@@ -9,8 +10,17 @@ export default function Hero() {
       spacing="none"
       className="relative min-h-[560px] overflow-hidden lg:min-h-[640px]"
     >
-      {/* Dark placeholder background until hero image is added (public/images/hero.jpg) */}
-      <div className="absolute inset-0 z-0 bg-[#1a1a1a]" />
+      {/* Full-bleed background image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/hero.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-right"
+          sizes="100vw"
+        />
+      </div>
 
       {/* Gradient overlay - light on left for text legibility, fades to transparent */}
       <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#faf8f4] via-[#faf8f4]/85 to-transparent" />
