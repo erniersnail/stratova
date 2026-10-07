@@ -10,10 +10,8 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: "Research", href: "/research" },
   { label: "Strategies", href: "/strategies" },
-  { label: "Methodology", href: "/methodology" },
   { label: "Performance", href: "/performance" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {

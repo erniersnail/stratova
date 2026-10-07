@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 type AuthLinksState = "loading" | "logged-out" | "logged-in";
 
 const linkClassName =
-  "text-sm font-semibold text-secondary tracking-wide transition-colors duration-200 hover:text-foreground";
+  "text-sm font-semibold text-secondary tracking-wide whitespace-nowrap transition-colors duration-200 hover:text-foreground";
 
 /**
  * Client island mounted inside the server Navbar. Reads the session in the
@@ -63,8 +63,13 @@ export default function AuthLinks() {
       <Link href="/login" className={linkClassName}>
         Log in
       </Link>
-      <Button href="/signup" variant="primary" size="sm">
-        Join Waitlist
+      <Button
+        href="/signup"
+        variant="primary"
+        size="sm"
+        className="whitespace-nowrap"
+      >
+        Sign up
       </Button>
     </div>
   );
