@@ -6,98 +6,35 @@ import SectionHeader from "@/components/common/SectionHeader";
 import Paper from "@/components/ui/Paper";
 import { typography } from "@/lib/typography";
 
-type FeatureIcon = "chart" | "clock" | "shield" | "trend";
-
-type StrategyFeature = {
-  icon: FeatureIcon;
-  label: string;
-};
-
 type StrategyCard = {
   href: string;
   label: string;
-  code: string;
   title: string;
   description: string;
   image: string;
-  stat?: string;
-  features: StrategyFeature[];
+  tags: string[];
   linkLabel: string;
 };
-
-const FEATURE_ICON_PATHS: Record<FeatureIcon, React.ReactNode> = {
-  chart: (
-    <>
-      <line x1="4" y1="20" x2="4" y2="12" />
-      <line x1="10" y1="20" x2="10" y2="6" />
-      <line x1="16" y1="20" x2="16" y2="14" />
-      <line x1="2" y1="20" x2="22" y2="20" />
-    </>
-  ),
-  clock: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <polyline points="12 7 12 12 15.5 14" />
-    </>
-  ),
-  shield: <path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z" />,
-  trend: (
-    <>
-      <polyline points="3 17 9 11 13 15 21 7" />
-      <polyline points="15 7 21 7 21 13" />
-    </>
-  ),
-};
-
-function FeatureIconGlyph({ icon }: { icon: FeatureIcon }) {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="shrink-0 text-tertiary"
-    >
-      {FEATURE_ICON_PATHS[icon]}
-    </svg>
-  );
-}
-
-const CARD_FEATURES: StrategyFeature[] = [
-  { icon: "chart", label: "Systematic" },
-  { icon: "clock", label: "Low Turnover" },
-  { icon: "shield", label: "Risk Aware" },
-  { icon: "trend", label: "Benchmark Focused" },
-];
 
 const STRATEGY_CARDS: StrategyCard[] = [
   {
     href: "/strategies/us",
     label: "United States",
-    code: "US",
     title: "U.S. Strategies",
     description:
       "Systematic equity strategies focused on liquid U.S. companies using quantitative screening, portfolio construction, and ongoing evaluation.",
     image: "/images/statue_liberty.png",
-    stat: "1 strategy · Coming soon",
-    features: CARD_FEATURES,
+    tags: ["Systematic", "Momentum", "Benchmark Outperformer"],
     linkLabel: "View Strategies",
   },
   {
     href: "/strategies/india",
     label: "India",
-    code: "IN",
     title: "India Strategies",
     description:
       "Evidence-based strategies covering Indian listed companies with an emphasis on systematic processes and long-term portfolio construction.",
     image: "/images/india_gate.png",
-    stat: "4 strategies · Live since Aug 2026",
-    features: CARD_FEATURES,
+    tags: ["Systematic", "Multi-Cap", "Benchmark Outperformer"],
     linkLabel: "View Strategies",
   },
 ];
@@ -125,38 +62,29 @@ export default function StrategiesSection() {
                   >
                     {/* Text content */}
                     <div className="relative z-10 flex h-full min-h-[inherit] flex-col justify-between p-6 lg:p-8">
-                      <div>
-                        <div className="flex items-center gap-3 pr-[180px]">
-                          <span className="flex h-9 w-9 items-center justify-center border border-border bg-surface text-xs font-semibold tracking-wider text-foreground">
-                            {card.code}
+                      <div className="min-h-[200px]">
+                        <div className="pr-[200px]">
+                          <span className="text-xs font-medium tracking-widest text-tertiary uppercase">
+                            {card.label}
                           </span>
-                          <div>
-                            <span className="text-xs font-medium tracking-widest text-tertiary uppercase">
-                              {card.label}
-                            </span>
-                            <h3 className="mt-1 text-2xl font-medium">
-                              {card.title}
-                            </h3>
-                          </div>
+                          <h3 className="mt-1 text-2xl font-medium">
+                            {card.title}
+                          </h3>
                         </div>
-                        <p
-                          className={`${typography.body} mt-3 text-secondary`}
-                        >
-                          {card.description}
-                        </p>
-                        {card.stat && (
-                          <p className="mt-4 text-xs font-medium tracking-widest text-tertiary uppercase">
-                            {card.stat}
+                        <div className="pr-[140px] sm:pr-[180px]">
+                          <p
+                            className={`${typography.body} mt-3 text-secondary`}
+                          >
+                            {card.description}
                           </p>
-                        )}
-                        <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2">
-                          {card.features.map((feature) => (
+                        </div>
+                        <ul className="mt-4 flex flex-wrap gap-2">
+                          {card.tags.map((tag) => (
                             <li
-                              key={feature.label}
-                              className="flex items-center gap-2 text-xs font-medium text-secondary"
+                              key={tag}
+                              className="rounded-full border border-border px-2.5 py-1 text-xs tracking-wide text-secondary"
                             >
-                              <FeatureIconGlyph icon={feature.icon} />
-                              {feature.label}
+                              {tag}
                             </li>
                           ))}
                         </ul>
@@ -183,8 +111,7 @@ export default function StrategiesSection() {
                       </div>
 
                       <div className="mt-6">
-                        <hr className="border-t border-border" />
-                        <span className="mt-4 block text-sm font-medium text-foreground">
+                        <span className="block text-sm font-medium text-foreground">
                           {card.linkLabel} &rarr;
                         </span>
                       </div>
@@ -199,3 +126,4 @@ export default function StrategiesSection() {
     </Section>
   );
 }
+
