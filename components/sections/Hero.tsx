@@ -31,19 +31,19 @@ export default function Hero() {
           <h1 className={`${typography.hero} text-foreground`}>
             Systematic investing.
             <br />
-            Disciplined for the long term.
+            Built to compound.
           </h1>
           <p className="mt-8 max-w-[520px] text-base leading-[1.75] text-secondary">
-            Stratova Quant develops disciplined, evidence-based systematic
-            investment research for long-term investors across U.S. and Indian
-            equity markets.
+            Stratova applies the same rigor quant funds use — algorithms,
+            data, discipline — bringing institutional-grade systematic
+            research to individual investors.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="/strategies" variant="primary" size="md">
               View Strategies
             </Button>
-            <Button href="/methodology" variant="secondary" size="md">
-              Our Methodology
+            <Button href="/performance" variant="secondary" size="md">
+              See Performance
             </Button>
           </div>
         </div>
