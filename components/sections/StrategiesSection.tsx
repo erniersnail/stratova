@@ -125,7 +125,7 @@ export default function StrategiesSection() {
                   <div className="flex h-full flex-col justify-between p-6 lg:p-8">
                     <div>
                       {/* Header row: region box + title left, image right */}
-                      <div className="flex min-h-[120px] items-center justify-between gap-4">
+                      <div className="flex min-h-[100px] items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
                             {card.code}
@@ -136,28 +136,28 @@ export default function StrategiesSection() {
                             </h3>
                           </div>
                         </div>
-                        <div className="flex h-[120px] w-[120px] shrink-0 items-center justify-center">
+                        <div className="flex h-[100px] w-[100px] shrink-0 items-center justify-center">
                           <Image
                             src={card.image}
                             alt=""
-                            width={120}
-                            height={120}
+                            width={100}
+                            height={100}
                             className="max-h-full max-w-full object-contain"
                           />
                         </div>
                       </div>
 
                       {/* Description */}
-                      <div className="mt-4 min-h-[108px]">
+                      <div className="mt-4">
                         <p className={`${typography.body} text-secondary`}>
                           {card.description}
                         </p>
                       </div>
 
-                      <hr className="my-6 border-t border-border" />
+                      <hr className="my-5 border-t border-border" />
 
-                      {/* Feature icon row */}
-                      <ul className="flex flex-wrap gap-x-6 gap-y-2">
+                      {/* Feature icon row — spread across full width */}
+                      <ul className="flex w-full flex-wrap items-center justify-between gap-y-2">
                         {card.features.map((feature) => (
                           <li
                             key={feature.label}
@@ -170,7 +170,7 @@ export default function StrategiesSection() {
                       </ul>
                     </div>
 
-                    <div className="mt-6">
+                    <div className="mt-5">
                       <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
                         LEARN MORE &rarr;
                       </span>
