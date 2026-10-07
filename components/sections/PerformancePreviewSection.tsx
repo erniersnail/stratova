@@ -86,7 +86,7 @@ export default async function PerformancePreviewSection() {
             </p>
             <p className={`${typography.body} mt-4 text-secondary`}>
               Performance is best read alongside methodology, benchmark
-              selection, and portfolio construction. Our reporting favours
+              selection, and portfolio construction. Our reporting favors
               transparency over headline numbers.
             </p>
             <div className="mt-4">
