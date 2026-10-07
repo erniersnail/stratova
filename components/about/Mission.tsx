@@ -6,7 +6,7 @@ const MISSION_ITEMS = [
     number: "01",
     title: "What we do",
     description:
-      "We develop systematic investment strategies based on empirical research. Our work spans quantitative screening, factor modeling, portfolio construction, and risk management across U.S. and Indian equity markets.",
+      "We develop systematic investment strategies based on empirical research. Our work spans quantitative screening, factor modeling, portfolio construction, and risk management for individual investors.",
   },
   {
     number: "02",

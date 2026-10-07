@@ -9,14 +9,14 @@ import Values from "@/components/about/Values";
 
 export const metadata = {
   title: "About — Stratova Quant",
-  description: "Stratova Quant is an independent quantitative investment research firm. Evidence-based research across U.S. and Indian equity markets.",
+  description: "Stratova applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
 };
 
 export default function AboutPage() {
   return (
     <main>
       <Container size="default" className="pt-16 pb-12">
-        <PageHeader title="About" description="Stratova Quant is an independent quantitative investment research firm. Evidence-based research across U.S. and Indian equity markets." />
+        <PageHeader title="About" description="We apply the same rigor quant funds use to build systematic strategies for individual investors." />
       </Container>
 
       <Section spacing="sm">

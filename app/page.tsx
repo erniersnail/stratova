@@ -6,9 +6,9 @@ import PerformancePreviewSection from "@/components/sections/PerformancePreviewS
 import NewsletterSection from "@/components/sections/NewsletterSection";
 
 export const metadata = {
-  title: "Stratova Quant — Quantitative Investment Research",
+  title: "Stratova Quant — Systematic Investing",
   description:
-    "Stratova Quant develops disciplined, evidence-based systematic investment research for long-term investors across U.S. and Indian equity markets.",
+    "Stratova applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
 };
 
 export default function Home() {

@@ -79,7 +79,8 @@ export default function Footer() {
               Quantitative Research
             </span>
             <p className="mt-5 text-sm leading-[1.75] text-secondary">
-              Systematic investment research across U.S. and Indian equity markets.
+              Systematic investing for individual investors. Built to
+              compound.
             </p>
           </div>
           {FOOTER_COLUMNS.map((column) => (
