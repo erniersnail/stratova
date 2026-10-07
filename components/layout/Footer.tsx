@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
       )}
       <Container className="py-16">
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
           <div>
             <span className="text-xl font-semibold tracking-wide text-foreground">
               STRATOVA
