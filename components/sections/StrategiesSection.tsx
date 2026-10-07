@@ -12,7 +12,6 @@ type StrategyCard = {
   description: string;
   subdescription: string;
   image: string;
-  features: string[];
 };
 
 const SHARED_SUBDESCRIPTION =
@@ -26,7 +25,6 @@ const STRATEGY_CARDS: StrategyCard[] = [
     description: "Systematic strategies across America's full market-cap spectrum.",
     subdescription: SHARED_SUBDESCRIPTION,
     image: "/images/statue_liberty.png",
-    features: ["Systematic", "Nasdaq 100", "Benchmark Outperformer"],
   },
   {
     href: "/strategies/india",
@@ -35,7 +33,6 @@ const STRATEGY_CARDS: StrategyCard[] = [
     description: "Systematic strategies across India's full market-cap spectrum.",
     subdescription: SHARED_SUBDESCRIPTION,
     image: "/images/india_gate.png",
-    features: ["Systematic", "Multi-Cap", "Benchmark Outperformer"],
   },
 ];
 
@@ -73,10 +70,6 @@ export default function StrategiesSection() {
                         <span className="text-tertiary">
                           {card.subdescription}
                         </span>
-                      </p>
-                      <hr className="my-5 border-t border-border" />
-                      <p className="mt-5 text-xs tracking-wide text-tertiary">
-                        {card.features.join(" · ")}
                       </p>
                       <div className="mt-5">
                         <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
