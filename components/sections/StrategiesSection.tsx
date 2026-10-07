@@ -103,17 +103,11 @@ export default function StrategiesSection() {
   return (
     <Section spacing="sm">
       <Container size="default">
-        <div className="text-center">
-          <p className="text-center text-xs font-medium tracking-[0.2em] text-tertiary uppercase">
-            OUR STRATEGIES
-          </p>
-          <SectionHeader
-            title="Global Markets."
-            description="Rules based. Evidence driven. Built to outperform our benchmarks over the long term."
-            centered
-            className="mt-4"
-          />
-        </div>
+        <SectionHeader
+          title="Global Markets."
+          description="Rules based. Evidence driven. Built to outperform."
+          centered
+        />
         <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
           {STRATEGY_CARDS.map((card) => (
             <article
