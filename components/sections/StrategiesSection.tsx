@@ -6,7 +6,7 @@ import SectionHeader from "@/components/common/SectionHeader";
 import Paper from "@/components/ui/Paper";
 import { typography } from "@/lib/typography";
 
-type FeatureIcon = "chart" | "trend" | "calendar" | "pie" | "target";
+type FeatureIcon = "chart" | "trend" | "pie" | "target";
 
 type StrategyFeature = {
   icon: FeatureIcon;
@@ -34,14 +34,6 @@ const FEATURE_ICON_PATHS: Record<FeatureIcon, React.ReactNode> = {
     <>
       <polyline points="3 17 9 11 13 15 21 7" />
       <polyline points="15 7 21 7 21 13" />
-    </>
-  ),
-  calendar: (
-    <>
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <line x1="8" y1="3" x2="8" y2="7" />
-      <line x1="16" y1="3" x2="16" y2="7" />
-      <line x1="3" y1="10" x2="21" y2="10" />
     </>
   ),
   pie: (
@@ -88,8 +80,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     image: "/images/statue_liberty.png",
     features: [
       { icon: "chart", label: "Systematic" },
-      { icon: "trend", label: "Momentum-Driven" },
-      { icon: "calendar", label: "Monthly Rebalanced" },
+      { icon: "trend", label: "Nasdaq 100" },
       { icon: "target", label: "Benchmark Outperformer" },
     ],
   },
@@ -102,7 +93,6 @@ const STRATEGY_CARDS: StrategyCard[] = [
     image: "/images/india_gate.png",
     features: [
       { icon: "chart", label: "Systematic" },
-      { icon: "trend", label: "Momentum-Driven" },
       { icon: "pie", label: "Multi-Cap" },
       { icon: "target", label: "Benchmark Outperformer" },
     ],
@@ -118,7 +108,7 @@ export default function StrategiesSection() {
             OUR STRATEGIES
           </p>
           <SectionHeader
-            title="Two Strategies. Global Markets."
+            title="Global Markets."
             description="Rules based. Evidence driven. Built to outperform our benchmarks over the long term."
             centered
             className="mt-4"
@@ -135,7 +125,7 @@ export default function StrategiesSection() {
                   <div className="flex h-full flex-col justify-between p-6 lg:p-8">
                     <div>
                       {/* Header row: region box + title left, image right */}
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex min-h-[120px] items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
                             {card.code}
@@ -146,21 +136,23 @@ export default function StrategiesSection() {
                             </h3>
                           </div>
                         </div>
-                        <Image
-                          src={card.image}
-                          alt=""
-                          width={120}
-                          height={120}
-                          className="shrink-0 object-contain"
-                        />
+                        <div className="flex h-[120px] w-[120px] shrink-0 items-center justify-center">
+                          <Image
+                            src={card.image}
+                            alt=""
+                            width={120}
+                            height={120}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        </div>
                       </div>
 
                       {/* Description */}
-                      <p
-                        className={`${typography.body} mt-4 text-secondary`}
-                      >
-                        {card.description}
-                      </p>
+                      <div className="mt-4 min-h-[108px]">
+                        <p className={`${typography.body} text-secondary`}>
+                          {card.description}
+                        </p>
+                      </div>
 
                       <hr className="my-6 border-t border-border" />
 
