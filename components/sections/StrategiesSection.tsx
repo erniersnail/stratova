@@ -6,36 +6,106 @@ import SectionHeader from "@/components/common/SectionHeader";
 import Paper from "@/components/ui/Paper";
 import { typography } from "@/lib/typography";
 
+type FeatureIcon = "chart" | "trend" | "calendar" | "pie" | "target";
+
+type StrategyFeature = {
+  icon: FeatureIcon;
+  label: string;
+};
+
 type StrategyCard = {
   href: string;
-  label: string;
+  code: string;
   title: string;
   description: string;
   image: string;
-  tags: string[];
-  linkLabel: string;
+  features: StrategyFeature[];
 };
+
+const FEATURE_ICON_PATHS: Record<FeatureIcon, React.ReactNode> = {
+  chart: (
+    <>
+      <line x1="5" y1="20" x2="5" y2="14" />
+      <line x1="12" y1="20" x2="12" y2="9" />
+      <line x1="19" y1="20" x2="19" y2="4" />
+    </>
+  ),
+  trend: (
+    <>
+      <polyline points="3 17 9 11 13 15 21 7" />
+      <polyline points="15 7 21 7 21 13" />
+    </>
+  ),
+  calendar: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <line x1="8" y1="3" x2="8" y2="7" />
+      <line x1="16" y1="3" x2="16" y2="7" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </>
+  ),
+  pie: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 3v9h9" />
+    </>
+  ),
+  target: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1" />
+    </>
+  ),
+};
+
+function FeatureIconGlyph({ icon }: { icon: FeatureIcon }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0 text-tertiary"
+    >
+      {FEATURE_ICON_PATHS[icon]}
+    </svg>
+  );
+}
 
 const STRATEGY_CARDS: StrategyCard[] = [
   {
     href: "/strategies/us",
-    label: "United States",
+    code: "US",
     title: "U.S. Strategies",
     description:
       "Systematic equity strategies focused on liquid U.S. companies using quantitative screening, portfolio construction, and ongoing evaluation.",
     image: "/images/statue_liberty.png",
-    tags: ["Systematic", "Momentum", "Benchmark Outperformer"],
-    linkLabel: "View Strategies",
+    features: [
+      { icon: "chart", label: "Systematic" },
+      { icon: "trend", label: "Momentum-Driven" },
+      { icon: "calendar", label: "Monthly Rebalanced" },
+      { icon: "target", label: "Benchmark Outperformer" },
+    ],
   },
   {
     href: "/strategies/india",
-    label: "India",
+    code: "IN",
     title: "India Strategies",
     description:
       "Evidence-based strategies covering Indian listed companies with an emphasis on systematic processes and long-term portfolio construction.",
     image: "/images/india_gate.png",
-    tags: ["Systematic", "Multi-Cap", "Benchmark Outperformer"],
-    linkLabel: "View Strategies",
+    features: [
+      { icon: "chart", label: "Systematic" },
+      { icon: "trend", label: "Momentum-Driven" },
+      { icon: "pie", label: "Multi-Cap" },
+      { icon: "target", label: "Benchmark Outperformer" },
+    ],
   },
 ];
 
@@ -43,11 +113,17 @@ export default function StrategiesSection() {
   return (
     <Section spacing="sm">
       <Container size="default">
-        <SectionHeader
-          title="Strategies"
-          description="Systematic investment strategies developed through rigorous research, disciplined portfolio construction, and institutional-grade backtesting."
-          centered={false}
-        />
+        <div className="text-center">
+          <p className="text-center text-xs font-medium tracking-[0.2em] text-tertiary uppercase">
+            OUR STRATEGIES
+          </p>
+          <SectionHeader
+            title="Two Strategies. Global Markets."
+            description="Rules based. Evidence driven. Built to outperform our benchmarks over the long term."
+            centered
+            className="mt-4"
+          />
+        </div>
         <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
           {STRATEGY_CARDS.map((card) => (
             <article
@@ -55,66 +131,57 @@ export default function StrategiesSection() {
               className="h-full transition-all duration-200 hover:border-foreground hover:shadow-sm"
             >
               <Link href={card.href} className="block h-full">
-                <Paper padding="none" hover className="relative h-full overflow-hidden">
-                  <div
-                    className="relative overflow-hidden"
-                    style={{ minHeight: "280px" }}
-                  >
-                    {/* Text content */}
-                    <div className="relative z-10 flex h-full min-h-[inherit] flex-col justify-between p-6 lg:p-8">
-                      <div className="min-h-[200px]">
-                        <div className="pr-[200px]">
-                          <span className="text-xs font-medium tracking-widest text-tertiary uppercase">
-                            {card.label}
+                <Paper padding="none" hover className="h-full">
+                  <div className="flex h-full flex-col justify-between p-6 lg:p-8">
+                    <div>
+                      {/* Header row: region box + title left, image right */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
+                            {card.code}
                           </span>
-                          <h3 className="mt-1 text-2xl font-medium">
-                            {card.title}
-                          </h3>
+                          <div>
+                            <h3 className="text-2xl font-medium">
+                              {card.title}
+                            </h3>
+                          </div>
                         </div>
-                        <div className="pr-[140px] sm:pr-[180px]">
-                          <p
-                            className={`${typography.body} mt-3 text-secondary`}
-                          >
-                            {card.description}
-                          </p>
-                        </div>
-                        <ul className="mt-4 flex flex-wrap gap-2">
-                          {card.tags.map((tag) => (
-                            <li
-                              key={tag}
-                              className="rounded-full border border-border px-2.5 py-1 text-xs tracking-wide text-secondary"
-                            >
-                              {tag}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Card image, bleeding off the top-right edge with left fade */}
-                      <div
-                        className="pointer-events-none absolute z-0 select-none"
-                        style={{ top: "20px", right: "-40px" }}
-                      >
                         <Image
                           src={card.image}
                           alt=""
-                          width={220}
-                          height={220}
-                          className="object-contain opacity-90"
-                          style={{
-                            maskImage:
-                              "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
-                            WebkitMaskImage:
-                              "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
-                          }}
+                          width={120}
+                          height={120}
+                          className="shrink-0 object-contain"
                         />
                       </div>
 
-                      <div className="mt-6">
-                        <span className="block text-sm font-medium text-foreground">
-                          {card.linkLabel} &rarr;
-                        </span>
-                      </div>
+                      {/* Description */}
+                      <p
+                        className={`${typography.body} mt-4 text-secondary`}
+                      >
+                        {card.description}
+                      </p>
+
+                      <hr className="my-6 border-t border-border" />
+
+                      {/* Feature icon row */}
+                      <ul className="flex flex-wrap gap-x-6 gap-y-2">
+                        {card.features.map((feature) => (
+                          <li
+                            key={feature.label}
+                            className="flex items-center gap-2 text-xs tracking-wide text-secondary"
+                          >
+                            <FeatureIconGlyph icon={feature.icon} />
+                            {feature.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="mt-6">
+                      <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
+                        LEARN MORE &rarr;
+                      </span>
                     </div>
                   </div>
                 </Paper>
