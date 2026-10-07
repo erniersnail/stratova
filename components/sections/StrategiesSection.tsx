@@ -10,9 +10,13 @@ type StrategyCard = {
   code: string;
   title: string;
   description: string;
+  subdescription: string;
   image: string;
   features: string[];
 };
+
+const SHARED_SUBDESCRIPTION =
+  "Institutional-grade quant research, delivered to individual investors.";
 
 const STRATEGY_CARDS: StrategyCard[] = [
   {
@@ -20,6 +24,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     code: "US",
     title: "U.S. Strategies",
     description: "Systematic strategies across America's full market-cap spectrum.",
+    subdescription: SHARED_SUBDESCRIPTION,
     image: "/images/statue_liberty.png",
     features: ["Systematic", "Nasdaq 100", "Benchmark Outperformer"],
   },
@@ -28,6 +33,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     code: "IN",
     title: "India Strategies",
     description: "Systematic strategies across India's full market-cap spectrum.",
+    subdescription: SHARED_SUBDESCRIPTION,
     image: "/images/india_gate.png",
     features: ["Systematic", "Multi-Cap", "Benchmark Outperformer"],
   },
@@ -63,6 +69,10 @@ export default function StrategiesSection() {
                       </div>
                       <p className="mt-5 text-sm text-secondary">
                         {card.description}
+                        <br />
+                        <span className="text-tertiary">
+                          {card.subdescription}
+                        </span>
                       </p>
                       <hr className="my-5 border-t border-border" />
                       <p className="mt-5 text-xs tracking-wide text-tertiary">
