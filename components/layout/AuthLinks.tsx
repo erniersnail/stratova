@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Button from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthLinksState = "loading" | "logged-out" | "logged-in";
@@ -62,9 +63,9 @@ export default function AuthLinks() {
       <Link href="/login" className={linkClassName}>
         Log in
       </Link>
-      <Link href="/signup" className={linkClassName}>
-        Sign up
-      </Link>
+      <Button href="/signup" variant="primary" size="sm">
+        Join Waitlist
+      </Button>
     </div>
   );
 }

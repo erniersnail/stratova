@@ -5,10 +5,19 @@ import { typography } from "@/lib/typography";
 
 export default function Hero() {
   return (
-    <Section spacing="lg">
+    <Section
+      spacing="none"
+      className="relative min-h-[560px] overflow-hidden lg:min-h-[640px]"
+    >
+      {/* Dark placeholder background until hero image is added (public/images/hero.jpg) */}
+      <div className="absolute inset-0 z-0 bg-[#1a1a1a]" />
+
+      {/* Gradient overlay - light on left for text legibility, fades to transparent */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#faf8f4] via-[#faf8f4]/85 to-transparent" />
+
       {/* Text content */}
-      <Container size="default">
-        <div className="max-w-[720px]">
+      <Container size="default" className="relative z-10">
+        <div className="flex max-w-[720px] flex-col justify-center min-h-[560px] lg:min-h-[640px]">
           <h1 className={`${typography.hero} text-foreground`}>
             Systematic investing.
             <br />

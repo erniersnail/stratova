@@ -1,5 +1,5 @@
 export const typography = {
-  hero: "font-serif text-[60px] font-bold leading-[1.1] tracking-tight",
+  hero: "font-serif text-[52px] sm:text-[64px] lg:text-[76px] font-bold leading-[1.05] tracking-tight",
   h1: "font-serif text-4xl font-semibold tracking-tight",
   h2: "font-serif text-3xl font-semibold tracking-tight",
   h3: "font-serif text-xl font-medium",
