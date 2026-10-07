@@ -5,7 +5,7 @@ type ChartPoint = {
 
 type EquityCurveChartProps = {
   data: ChartPoint[];
-  height?: number; // default 240
+  height?: number; // default 280
 };
 
 const VIEW_W = 600;
@@ -14,15 +14,6 @@ const PAD_RIGHT = 14;
 const PAD_TOP = 10;
 const LABEL_H = 20;
 
-function niceStep(rawStep: number): number {
-  if (!Number.isFinite(rawStep) || rawStep <= 0) return 1;
-  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
-  for (const m of [1, 2, 2.5, 5, 10]) {
-    if (rawStep <= m * mag) return m * mag;
-  }
-  return 10 * mag;
-}
-
 /**
  * Minimal static equity-curve chart. Server component, hand-rolled inline
  * SVG — no chart libraries, no interactivity, no tooltips.
@@ -30,11 +21,11 @@ function niceStep(rawStep: number): number {
  * Degenerate inputs never crash:
  * - empty / all-non-finite data → bordered placeholder, no SVG
  * - single point → centered dot with its date label
- * - all-same values → artificial ±1 range centers a flat line, grid skipped
+ * - all-same values → artificial ±1 range centers a flat line
  */
 export default function EquityCurveChart({
   data,
-  height = 240,
+  height = 280,
 }: EquityCurveChartProps) {
   const points = (data ?? []).filter(
     (p) => p && typeof p.date === "string" && Number.isFinite(p.value),
@@ -64,7 +55,7 @@ export default function EquityCurveChart({
     min -= 1;
     max += 1;
   } else {
-    const pad = (max - min) * 0.08;
+    const pad = (max - min) * 0.05;
     min -= pad;
     max += pad;
   }
@@ -80,20 +71,13 @@ export default function EquityCurveChart({
     .map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(2)},${y(p.value).toFixed(2)}`)
     .join(" ");
 
-  // Y gridlines at nice round numbers; skipped when degenerate/complex.
-  let gridlines: number[] = [];
-  const step = niceStep(span / 4);
-  if (span > 0) {
-    const lines: number[] = [];
-    for (
-      let g = Math.ceil(min / step) * step;
-      g <= max && lines.length <= 6;
-      g += step
-    ) {
-      lines.push(Math.round(g * 100) / 100);
-    }
-    if (lines.length >= 1 && lines.length <= 5) gridlines = lines;
-  }
+  // Y gridlines at fixed fractions of the padded domain — purely visual,
+  // never affect scaling.
+  const gridlines = Array.from(
+    new Set(
+      [0.25, 0.5, 0.75].map((f) => Math.round((min + span * f) * 100) / 100),
+    ),
+  );
 
   // X labels: first, middle, last — deduped (3 max, fewer for tiny series).
   const labelIdx = Array.from(

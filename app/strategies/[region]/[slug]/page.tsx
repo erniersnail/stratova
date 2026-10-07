@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
-import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
 import DataTable from "@/components/ui/data-table";
 import { typography } from "@/lib/typography";
@@ -168,14 +167,14 @@ export default async function StrategyDetailPage({
   ];
 
   return (
-    <>
-      <PageHeader
-        title={strategy.name}
-        description={strategy.short_description ?? undefined}
-      />
+    <main>
+      <Container className="py-20">
+        <PageHeader
+          title={strategy.name}
+          description={strategy.short_description ?? undefined}
+        />
 
-      <Section>
-        <Container>
+        <div className="mt-16">
           <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <div className="rounded-md border border-border bg-surface p-5">
               <dt className="text-xs font-medium uppercase tracking-wide text-tertiary">
@@ -202,12 +201,10 @@ export default async function StrategyDetailPage({
               </dd>
             </div>
           </dl>
-        </Container>
-      </Section>
+        </div>
 
-      {hasCurve && returnPct !== null && (
-        <Section>
-          <Container>
+        {hasCurve && returnPct !== null && (
+          <div className="mt-16">
             <h2 className={`${typography.h3} text-foreground`}>
               Performance since inception
             </h2>
@@ -217,12 +214,10 @@ export default async function StrategyDetailPage({
                 Inception: {perf[0].date} · Return: {returnPct}%
               </p>
             </div>
-          </Container>
-        </Section>
-      )}
+          </div>
+        )}
 
-      <Section>
-        <Container>
+        <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>
             Current picks
           </h2>
@@ -317,8 +312,8 @@ export default async function StrategyDetailPage({
               />
             </div>
           )}
-        </Container>
-      </Section>
-    </>
+        </div>
+      </Container>
+    </main>
   );
 }
