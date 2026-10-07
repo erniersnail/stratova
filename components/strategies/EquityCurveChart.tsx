@@ -6,6 +6,7 @@ export type ChartPoint = {
 export type ChartSeries = {
   name: string;
   data: ChartPoint[];
+  color?: string;
 };
 
 type EquityCurveChartProps = {
@@ -38,6 +39,12 @@ const PAD_RIGHT = 14;
 const PAD_TOP = 10;
 const LABEL_H = 20;
 
+export type MultiSeriesEntry = {
+  name: string;
+  points: ChartPoint[];
+  color?: string;
+};
+
 /**
  * Minimal static equity-curve chart. Server component, hand-rolled inline
  * SVG — no chart libraries, no interactivity, no tooltips.
@@ -54,10 +61,11 @@ export default function EquityCurveChart({
 }: EquityCurveChartProps) {
   // Multi-series mode takes precedence when the prop is provided.
   if (series !== undefined) {
-    const cleaned = series
-      .map((s) => ({
+    const cleaned: MultiSeriesEntry[] = series
+      .map((s, si) => ({
         name: s.name,
         points: (s.data ?? []).filter(isValidPoint),
+        color: s.color ?? SERIES_COLORS[si % SERIES_COLORS.length],
       }))
       .filter((s) => s.points.length >= 2);
     if (cleaned.length === 0) return <ChartPlaceholder height={height} />;
@@ -179,6 +187,7 @@ export default function EquityCurveChart({
 type CleanSeries = {
   name: string;
   points: ChartPoint[];
+  color?: string;
 };
 
 /**
@@ -268,7 +277,7 @@ function MultiSeriesChart({
         />
       ))}
       {series.map((s, si) => {
-        const color = SERIES_COLORS[si % SERIES_COLORS.length];
+        const color = s.color ?? SERIES_COLORS[si % SERIES_COLORS.length];
         const d = s.points
           .map(
             (p, i) =>

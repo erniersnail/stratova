@@ -201,6 +201,47 @@ export type PerformancePoint = {
   total_value: number;
 };
 
+export type BenchmarkPoint = { date: string; close: number };
+
+/**
+ * Daily closes for one benchmark symbol from a start date, oldest first.
+ * Public RLS read — cookie-free client. Degrades to [] on error.
+ */
+export async function getBenchmark(
+  symbol: string,
+  fromDate: string,
+): Promise<BenchmarkPoint[]> {
+  if (!symbol || !fromDate) return [];
+  try {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("benchmarks")
+      .select("date, close")
+      .eq("symbol", symbol)
+      .gte("date", fromDate)
+      .order("date", { ascending: true });
+
+    if (error) {
+      console.error("[strategies] getBenchmark failed:", error.message);
+      return [];
+    }
+    return ((data as BenchmarkPoint[]) ?? [])
+      .filter(
+        (r) =>
+          typeof r?.date === "string" &&
+          r.date.length >= 10 &&
+          Number.isFinite(Number(r?.close)),
+      )
+      .map((r) => ({
+        date: r.date.slice(0, 10),
+        close: Number(r.close),
+      }));
+  } catch (err) {
+    console.error("[strategies] getBenchmark threw:", err);
+    return [];
+  }
+}
+
 /**
  * Daily portfolio snapshots for one strategy, oldest first.
  * Degrades to [] on error — callers hide the chart when data is thin.

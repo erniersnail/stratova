@@ -7,48 +7,83 @@ import EquityCurveChart, {
   type ChartSeries,
 } from "@/components/strategies/EquityCurveChart";
 import {
+  getBenchmark,
   getPublicStrategies,
   getStrategyPerformance,
 } from "@/lib/strategies/fetch";
 import { typography } from "@/lib/typography";
 
 export default async function PerformancePreviewSection() {
-  // Server-side fetch: one normalized series per strategy with data.
-  // Strategies with <2 points (or a non-positive first value) are dropped.
-  const strategies = await getPublicStrategies();
+  // Combined India portfolio vs NIFTY 500, normalized to 100 at window start.
+  const WINDOW_START = "2026-08-03";
+  const strategies = (await getPublicStrategies()).filter(
+    (s) => s.region === "india",
+  );
   const snapshots = await Promise.all(
     strategies.map(async (strategy) => ({
       name: strategy.name,
-      perf: await getStrategyPerformance(strategy.id),
+      perf: (await getStrategyPerformance(strategy.id)).filter(
+        (p) => p.date >= WINDOW_START,
+      ),
     })),
   );
 
-  const series: ChartSeries[] = [];
-  const legend: { name: string; returnPct: string; color: string }[] = [];
-  for (const { name, perf } of snapshots) {
+  // Equal-weighted combined curve: per date, average normalized values
+  // across strategies that have data on that date.
+  const normByDate = new Map<string, { sum: number; count: number }>();
+  for (const { perf } of snapshots) {
     if (perf.length < 2 || perf[0].total_value <= 0) continue;
     const first = perf[0].total_value;
-    const data = perf.map((p) => ({
-      date: p.date,
-      value: (100 * p.total_value) / first,
-    }));
-    const color = SERIES_COLORS[series.length % SERIES_COLORS.length];
-    series.push({ name, data });
-    legend.push({
-      name,
-      returnPct: (((data[data.length - 1].value / 100 - 1) * 100).toFixed(2)),
-      color,
-    });
+    for (const p of perf) {
+      const v = (100 * p.total_value) / first;
+      const slot = normByDate.get(p.date);
+      if (slot) {
+        slot.sum += v;
+        slot.count += 1;
+      } else {
+        normByDate.set(p.date, { sum: v, count: 1 });
+      }
+    }
   }
+  const combined = [...normByDate.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([date, { sum, count }]) => ({ date, value: sum / count }));
+
+  const bm = await getBenchmark("NIFTY 500", WINDOW_START);
+  const bmCurve =
+    bm.length >= 2 && bm[0].close > 0
+      ? bm.map((b) => ({
+          date: b.date,
+          value: (100 * b.close) / bm[0].close,
+        }))
+      : [];
+
+  const series: ChartSeries[] =
+    combined.length >= 2 && bmCurve.length >= 2
+      ? [
+          { name: "Combined Portfolio", color: "#111111", data: combined },
+          { name: "NIFTY 500", color: "#b08900", data: bmCurve },
+        ]
+      : [];
+  const legend: { name: string; returnPct: string; color: string }[] =
+    series.map((s) => ({
+      name: s.name,
+      returnPct: (
+        (s.data[s.data.length - 1].value / 100 - 1) *
+        100
+      ).toFixed(2),
+      color: s.color ?? SERIES_COLORS[0],
+    }));
   return (
     <Section spacing="sm">
       <Container size="default">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           {/* Left column */}
           <div className="lg:col-span-2">
-            <h2 className={`${typography.h2}`}>
-              Performance Reporting
-            </h2>
+            <h2 className={`${typography.h2}`}>Portfolio performance</h2>
+            <p className={`${typography.body} mt-4 text-secondary`}>
+              Combined return across all active strategies, vs NIFTY 500.
+            </p>
             <p className={`${typography.body} mt-4 text-secondary`}>
               Performance should always be interpreted alongside methodology,
               benchmark selection, assumptions, portfolio construction,
@@ -101,7 +136,9 @@ export default async function PerformancePreviewSection() {
                         />
                         <span className="text-foreground">{item.name}</span>
                         <span className="text-secondary">
-                          {item.returnPct}%
+                          {item.returnPct.startsWith("-")
+                            ? `${item.returnPct}%`
+                            : `+${item.returnPct}%`}
                         </span>
                       </li>
                     ))}
@@ -206,9 +243,8 @@ export default async function PerformancePreviewSection() {
 
             {/* Muted note */}
             <p className="mt-3 text-xs leading-relaxed text-secondary">
-              Historical performance, when presented, will always include
-              benchmark comparisons, methodology, assumptions, and appropriate
-              disclosures.
+              Historical performance includes benchmark comparisons and full
+              methodology notes.
             </p>
           </div>
         </div>
