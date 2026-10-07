@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import {
   getCurrentRecommendationsForUser,
+  getStrategyPerformance,
+  type PerformancePoint,
   type Recommendation,
 } from "@/lib/strategies/fetch";
 import { formatIST } from "@/lib/format/date";
@@ -123,6 +125,44 @@ export default async function DashboardPage() {
     }
   }
 
+  // Client-window returns: value of the allocated capital from the
+  // subscription start date to the latest snapshot. One line per
+  // subscription; skipped when started_at is null or the window has
+  // fewer than 2 snapshots.
+  type ClientWindow = {
+    subscriptionId: string;
+    name: string;
+    startedOn: string;
+    capital: number;
+    current: number;
+    returnPct: string;
+  };
+  const clientWindows: ClientWindow[] = [];
+  const perfCache = new Map<string, PerformancePoint[]>();
+  for (const s of paidSubscriptions) {
+    if (!s.strategy_id || !s.started_at || s.capital_allocated === null) {
+      continue;
+    }
+    if (!perfCache.has(s.strategy_id)) {
+      perfCache.set(s.strategy_id, await getStrategyPerformance(s.strategy_id));
+    }
+    const startDay = s.started_at.slice(0, 10);
+    const window = (perfCache.get(s.strategy_id) ?? []).filter(
+      (p) => p.date >= startDay,
+    );
+    if (window.length < 2 || window[0].total_value <= 0) continue;
+    const first = window[0].total_value;
+    const last = window[window.length - 1].total_value;
+    clientWindows.push({
+      subscriptionId: s.id,
+      name: strategyNames.get(s.strategy_id) ?? "Strategy",
+      startedOn: startDay,
+      capital: s.capital_allocated,
+      current: s.capital_allocated * (last / first),
+      returnPct: (((last / first) - 1) * 100).toFixed(2),
+    });
+  }
+
   return (
     <main>
       <Container className="py-20">
@@ -230,6 +270,21 @@ export default async function DashboardPage() {
                   )
                 }
               />
+              {clientWindows.length > 0 && (
+                <ul className="mt-4 space-y-1">
+                  {clientWindows.map((w) => (
+                    <li
+                      key={w.subscriptionId}
+                      className="text-sm text-secondary"
+                    >
+                      {w.name} — Since {w.startedOn}: ₹
+                      {w.capital.toLocaleString("en-IN")} → ₹
+                      {Math.round(w.current).toLocaleString("en-IN")} (
+                      {w.returnPct}%)
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </section>
 

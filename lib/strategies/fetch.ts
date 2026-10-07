@@ -194,3 +194,50 @@ export async function getRecommendationHistoryForUser(
     return [];
   }
 }
+
+export type PerformancePoint = {
+  date: string; // YYYY-MM-DD
+  total_value: number;
+};
+
+/**
+ * Daily portfolio snapshots for one strategy, oldest first.
+ * Degrades to [] on error — callers hide the chart when data is thin.
+ */
+export async function getStrategyPerformance(
+  strategyId: string,
+): Promise<PerformancePoint[]> {
+  if (!strategyId) return [];
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("strategy_performance")
+      .select("date, total_value")
+      .eq("strategy_id", strategyId)
+      .order("date", { ascending: true });
+
+    if (error) {
+      console.error(
+        "[strategies] getStrategyPerformance failed:",
+        error.message,
+      );
+      return [];
+    }
+    // Defensive: numeric columns arrive as strings from PostgREST; coerce
+    // and drop malformed rows so the chart never receives NaN.
+    return ((data as PerformancePoint[]) ?? [])
+      .filter(
+        (r) =>
+          typeof r?.date === "string" &&
+          r.date.length >= 10 &&
+          Number.isFinite(Number(r?.total_value)),
+      )
+      .map((r) => ({
+        date: r.date.slice(0, 10),
+        total_value: Number(r.total_value),
+      }));
+  } catch (err) {
+    console.error("[strategies] getStrategyPerformance threw:", err);
+    return [];
+  }
+}

@@ -9,15 +9,16 @@ import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
   getCurrentRecommendations,
+  getStrategyPerformance,
   type Recommendation,
 } from "@/lib/strategies/fetch";
+import EquityCurveChart from "@/components/strategies/EquityCurveChart";
 import { createClient } from "@/lib/supabase/server";
 import { formatIST } from "@/lib/format/date";
 import {
   nextRebalanceDate,
   formatRebalanceDate,
 } from "@/lib/strategies/rebalance";
-import { subscribeAction } from "@/lib/auth/actions";
 import SubscribePayForm from "@/components/strategies/SubscribePayForm";
 
 type Region = "india" | "us";
@@ -62,6 +63,19 @@ export default async function StrategyDetailPage({
   const picks: Recommendation[] = user
     ? await getCurrentRecommendations(strategy.id)
     : [];
+
+  // Public — no auth gate. Two points minimum to draw a curve.
+  const perf = await getStrategyPerformance(strategy.id);
+  const hasCurve = perf.length >= 2 && perf[0].total_value > 0;
+  const chartData = hasCurve
+    ? perf.map((p) => ({
+        date: p.date,
+        value: (100 * p.total_value) / perf[0].total_value,
+      }))
+    : [];
+  const returnPct = hasCurve
+    ? (((chartData[chartData.length - 1].value / 100 - 1) * 100).toFixed(2))
+    : null;
 
   // Current user's PENDING or ACTIVE subscription for this strategy.
   type ExistingSub = {
@@ -191,6 +205,22 @@ export default async function StrategyDetailPage({
         </Container>
       </Section>
 
+      {hasCurve && returnPct !== null && (
+        <Section>
+          <Container>
+            <h2 className={`${typography.h3} text-foreground`}>
+              Performance since inception
+            </h2>
+            <div className="mt-4 rounded-md border border-border bg-surface p-5">
+              <EquityCurveChart data={chartData} />
+              <p className="mt-4 text-sm text-secondary">
+                Inception: {perf[0].date} · Return: {returnPct}%
+              </p>
+            </div>
+          </Container>
+        </Section>
+      )}
+
       <Section>
         <Container>
           <h2 className={`${typography.h3} text-foreground`}>
@@ -247,7 +277,7 @@ export default async function StrategyDetailPage({
                   {existingSub.status === "PENDING" && (
                     <p className={`${typography.body} mt-4 text-secondary`}>
                       Your subscription will activate at the next
-                      rebalance on {nextDateStr}. You'll receive a
+                      rebalance on {nextDateStr}. You&apos;ll receive a
                       payment confirmation email if pending.
                     </p>
                   )}
