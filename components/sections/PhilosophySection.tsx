@@ -45,7 +45,7 @@ export default function PhilosophySection() {
         <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {PHILOSOPHY_BLOCKS.map((block) => (
             <div key={block.number}>
-              <div className="font-serif text-6xl font-semibold text-foreground/25">
+              <div className="font-serif text-6xl font-semibold text-foreground/55">
                 {block.number}
               </div>
               <h3 className="mt-4 text-lg font-medium text-foreground">
