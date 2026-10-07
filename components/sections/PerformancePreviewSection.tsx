@@ -1,9 +1,7 @@
-import Link from "next/link";
 import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
 import EquityCurveChart, {
-  SERIES_COLORS,
   type ChartSeries,
 } from "@/components/strategies/EquityCurveChart";
 import {
@@ -65,73 +63,87 @@ export default async function PerformancePreviewSection() {
           { name: "NIFTY 500", color: "#b08900", data: bmCurve },
         ]
       : [];
-  const legend: { name: string; returnPct: string; color: string }[] =
-    series.map((s) => ({
-      name: s.name,
-      returnPct: (
-        (s.data[s.data.length - 1].value / 100 - 1) *
-        100
-      ).toFixed(2),
-      color: s.color ?? SERIES_COLORS[0],
-    }));
+  // Headline returns for the stats block (same math as the chart series).
+  const combinedReturn =
+    combined.length >= 2
+      ? (combined[combined.length - 1].value / 100 - 1) * 100
+      : null;
+  const niftyReturn =
+    bmCurve.length >= 2
+      ? (bmCurve[bmCurve.length - 1].value / 100 - 1) * 100
+      : null;
   return (
     <Section spacing="md">
       <Container size="default">
-        {/* Header — full width, left-aligned */}
-        <div className="max-w-[720px]">
-          <h2 className={`${typography.h2} text-foreground sm:text-4xl`}>
-            Portfolio performance
-          </h2>
-          <p className="mt-3 text-lg text-foreground/85">
-            Combined return vs NIFTY 500.
-          </p>
-          <p className="mt-4 text-base leading-[1.75] text-secondary">
-            Performance is best read alongside methodology, benchmark
-            selection, and portfolio construction. Our reporting favors
-            transparency over headline numbers.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-5">
 
-        {/* Chart card — full width */}
-        <div className="mt-12 rounded-md border border-border bg-surface px-6 py-8">
-          {/* Chart card top row */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-secondary">
-              Rebased to 100 on 3 Aug 2026
+          {/* LEFT: 2 columns of 5 — title, copy, CTA, stats */}
+          <div className="lg:col-span-2">
+            <h2 className={`${typography.h2} text-foreground sm:text-4xl`}>
+              Portfolio performance
+            </h2>
+            <p className="mt-3 text-lg text-foreground/85">
+              Combined return vs NIFTY 500.
             </p>
-            <p className="text-sm text-tertiary">
-              Live from daily snapshots.
+            <p className="mt-4 text-base leading-[1.75] text-secondary">
+              Performance is best read alongside methodology, benchmark
+              selection, and portfolio construction. Our reporting favors
+              transparency over headline numbers.
             </p>
+
+            <Button
+              href="/methodology"
+              variant="primary"
+              size="md"
+              className="mt-8"
+            >
+              View Methodology
+            </Button>
+
+            {/* Stats block below the button */}
+            <div className="mt-10 border-t border-border pt-6">
+              <p className="mb-4 text-xs tracking-[0.15em] text-tertiary uppercase">
+                Since 3 Aug 2026
+              </p>
+              <dl className="space-y-3">
+                <div className="flex justify-between">
+                  <dt className="text-sm text-secondary">
+                    Combined portfolio
+                  </dt>
+                  <dd className="text-sm font-medium text-foreground">
+                    {combinedReturn !== null
+                      ? `${combinedReturn >= 0 ? "+" : ""}${combinedReturn.toFixed(2)}%`
+                      : "—"}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-sm text-secondary">NIFTY 500</dt>
+                  <dd className="text-sm font-medium text-foreground">
+                    {niftyReturn !== null
+                      ? `${niftyReturn >= 0 ? "+" : ""}${niftyReturn.toFixed(2)}%`
+                      : "—"}
+                  </dd>
+                </div>
+              </dl>
+            </div>
           </div>
 
-          {series.length > 0 ? (
-            <>
-              {/* Chart — full card width */}
-              <div className="mt-6">
-                <EquityCurveChart series={series} height={320} />
+          {/* RIGHT: 3 columns of 5 — chart card only */}
+          <div className="lg:col-span-3">
+            <div className="rounded-md border border-border bg-surface px-6 py-6">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-secondary">
+                  Rebased to 100 on 3 Aug 2026
+                </p>
+                <p className="text-sm text-tertiary">
+                  Live from daily snapshots.
+                </p>
               </div>
-                  {/* Legend */}
-                  <div className="mt-6 flex flex-wrap gap-x-10 gap-y-2">
-                    {legend.map((item) => (
-                      <span
-                        key={item.name}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="text-foreground">{item.name}</span>
-                        <span className="text-secondary">
-                          {item.returnPct.startsWith("-")
-                            ? `${item.returnPct}%`
-                            : `+${item.returnPct}%`}
-                        </span>
-                      </span>
-                    ))}
-                  </div>
-                </>
+
+              {series.length > 0 ? (
+                <div className="mt-6">
+                  <EquityCurveChart series={series} height={280} />
+                </div>
               ) : (
                 /* Original empty placeholder — shown until strategies publish data */
                 <div
@@ -221,26 +233,14 @@ export default async function PerformancePreviewSection() {
                 </svg>
                 </div>
               )}
-
-              {/* Bottom row */}
-              <div className="mt-6 flex items-center justify-between border-t border-border pt-6">
-                <Link
-                  href="/strategies"
-                  className="text-sm font-semibold underline underline-offset-4"
-                >
-                  See all strategies &rarr;
-                </Link>
-                <Button href="/methodology" variant="primary" size="md">
-                  View Methodology
-                </Button>
-              </div>
             </div>
+          </div>
+        </div>
 
-            {/* Caption */}
-            <p className="mt-6 text-sm text-secondary">
-              Historical performance includes benchmark comparisons and full
-              methodology notes.
-            </p>
+        <p className="mt-8 text-sm text-secondary">
+          Historical performance includes benchmark comparisons and full
+          methodology notes.
+        </p>
       </Container>
     </Section>
   );
