@@ -101,7 +101,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
 
 export default function StrategiesSection() {
   return (
-    <Section spacing="sm">
+    <Section spacing="none" className="py-12">
       <Container size="default">
         <SectionHeader
           title="Global Markets."
@@ -116,10 +116,10 @@ export default function StrategiesSection() {
             >
               <Link href={card.href} className="block h-full">
                 <Paper padding="none" hover className="h-full">
-                  <div className="flex h-full flex-col justify-between p-6 lg:p-8">
+                  <div className="flex h-full flex-col justify-between p-6 lg:p-7">
                     <div>
                       {/* Header row: region box + title left, image right */}
-                      <div className="flex min-h-[100px] items-center justify-between gap-4">
+                      <div className="flex min-h-[88px] items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
                             {card.code}
@@ -130,12 +130,12 @@ export default function StrategiesSection() {
                             </h3>
                           </div>
                         </div>
-                        <div className="flex h-[100px] w-[100px] shrink-0 items-center justify-center">
+                        <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center">
                           <Image
                             src={card.image}
                             alt=""
-                            width={100}
-                            height={100}
+                            width={88}
+                            height={88}
                             className="max-h-full max-w-full object-contain"
                           />
                         </div>
@@ -148,7 +148,7 @@ export default function StrategiesSection() {
                         </p>
                       </div>
 
-                      <hr className="my-5 border-t border-border" />
+                      <hr className="my-4 border-t border-border" />
 
                       {/* Feature icon row — spread across full width */}
                       <ul className="flex w-full flex-wrap items-center justify-between gap-y-2">
@@ -164,7 +164,7 @@ export default function StrategiesSection() {
                       </ul>
                     </div>
 
-                    <div className="mt-5">
+                    <div className="mt-4">
                       <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
                         LEARN MORE &rarr;
                       </span>
