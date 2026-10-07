@@ -106,9 +106,6 @@ export default function StrategiesSection() {
           <h2 className={`${typography.h2} text-foreground sm:text-4xl`}>
             Our Strategies
           </h2>
-          <p className="mt-3 font-serif text-xl text-secondary italic sm:text-2xl">
-            Two Regions. One Discipline.
-          </p>
           <p className={`${typography.body} mt-4 text-secondary`}>
             Rules based. Evidence driven. Built to outperform.
           </p>
