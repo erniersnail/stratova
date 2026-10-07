@@ -283,7 +283,7 @@ function MultiSeriesChart({
           y={y(g) - 4}
           fontSize={11}
           fill="currentColor"
-          className="text-tertiary"
+          className="text-foreground/70"
         >
           {Math.abs(g - Math.round(g)) < 0.05
             ? String(Math.round(g))

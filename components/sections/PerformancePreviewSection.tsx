@@ -82,7 +82,8 @@ export default async function PerformancePreviewSection() {
           <div className="lg:col-span-2">
             <h2 className={`${typography.h2}`}>Portfolio performance</h2>
             <p className={`${typography.body} mt-4 text-secondary`}>
-              Combined return across all active strategies, vs NIFTY 500.
+              Combined return across all active strategies. Benchmark: NIFTY
+              500.
             </p>
             <p className={`${typography.body} mt-4 text-secondary`}>
               Performance is best read alongside methodology, benchmark
@@ -94,6 +95,30 @@ export default async function PerformancePreviewSection() {
                 View Methodology
               </Button>
             </div>
+
+            {/* Quick stats — mirrors the chart's headline numbers */}
+            {legend.length > 0 && (
+              <div className="mt-8 border-t border-border pt-4">
+                <p className="text-xs font-medium tracking-wide text-tertiary uppercase">
+                  Since 3 Aug 2026
+                </p>
+                <dl className="mt-3 space-y-2">
+                  {legend.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between gap-4 text-sm"
+                    >
+                      <dt className="text-secondary">{item.name}</dt>
+                      <dd className="font-medium text-foreground">
+                        {item.returnPct.startsWith("-")
+                          ? `${item.returnPct}%`
+                          : `+${item.returnPct}%`}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
           </div>
 
           {/* Right column */}
