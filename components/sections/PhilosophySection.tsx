@@ -38,7 +38,6 @@ export default function PhilosophySection() {
               description="Our approach to investment research is guided by principles that emphasize evidence, discipline, and adaptability over intuition, timing, and rigidity."
               centered={false}
             />
-            <div className="mt-6 border-b border-border" />
           </div>
           <div className="lg:col-span-3">
             {PHILOSOPHY_BLOCKS.map((block, index) => (

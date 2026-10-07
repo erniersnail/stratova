@@ -9,32 +9,35 @@ type TrustItem = {
 
 const TRUST_ITEMS: TrustItem[] = [
   {
-    headline: "Evidence Based",
-    body: "Every decision is backed by data and rigorous research.",
+    headline: "Transparent",
+    body: "Every recommendation published with rationale.",
   },
   {
-    headline: "Risk Managed",
-    body: "Focus on downside protection while compounding steadily.",
+    headline: "Accountable",
+    body: "Benchmark-relative. Measured against the market.",
   },
   {
-    headline: "Risk Adjusted",
-    body: "Our goal is consistent, risk-adjusted outperformance.",
+    headline: "Independent",
+    body: "No commissions. Subscription-funded only.",
   },
   {
-    headline: "Aligned With Investors",
-    body: "We think like owners and invest alongside our members.",
+    headline: "Systematic",
+    body: "Rules-based, not reactive.",
   },
 ];
 
 export default function TrustSection() {
   return (
-    <Section spacing="sm">
+    <Section spacing="none" className="py-12">
       <Container size="default">
+        <p className="mb-10 text-center text-xs tracking-[0.2em] text-tertiary uppercase">
+          HOW WE OPERATE
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {TRUST_ITEMS.map((item, index) => (
             <div
               key={item.headline}
-              className={`px-6 py-8 text-center ${
+              className={`px-6 py-6 text-center ${
                 index > 0 ? "lg:border-l lg:border-border" : ""
               }`}
             >
