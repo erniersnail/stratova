@@ -75,51 +75,45 @@ export default async function PerformancePreviewSection() {
       color: s.color ?? SERIES_COLORS[0],
     }));
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="default">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          {/* Left column */}
-          <div className="lg:col-span-2">
-            <h2 className={`${typography.h2}`}>Portfolio performance</h2>
-            <p className={`${typography.body} mt-4 text-secondary`}>
-              Combined return vs NIFTY 500.
+        {/* Header — full width, left-aligned */}
+        <div className="max-w-[720px]">
+          <h2 className={`${typography.h2} text-foreground sm:text-4xl`}>
+            Portfolio performance
+          </h2>
+          <p className="mt-3 text-lg text-foreground/85">
+            Combined return vs NIFTY 500.
+          </p>
+          <p className="mt-4 text-base leading-[1.75] text-secondary">
+            Performance is best read alongside methodology, benchmark
+            selection, and portfolio construction. Our reporting favors
+            transparency over headline numbers.
+          </p>
+        </div>
+
+        {/* Chart card — full width */}
+        <div className="mt-12 rounded-md border border-border bg-surface px-6 py-8">
+          {/* Chart card top row */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-secondary">
+              Rebased to 100 on 3 Aug 2026
             </p>
-            <p className={`${typography.body} mt-4 text-secondary`}>
-              Performance is best read alongside methodology, benchmark
-              selection, and portfolio construction. Our reporting favors
-              transparency over headline numbers.
+            <p className="text-sm text-tertiary">
+              Live from daily snapshots.
             </p>
-            <div className="mt-4">
-              <Button href="/methodology" variant="primary" size="md">
-                View Methodology
-              </Button>
-            </div>
           </div>
 
-          {/* Right column */}
-          <div className="lg:col-span-3">
-            <div className="rounded-lg border border-border bg-surface p-6">
-              {/* Paper header */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm text-secondary">
-                    Rebased to 100 on 3 Aug 2026
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs text-secondary">
-                  Live from daily snapshots.
-                </span>
+          {series.length > 0 ? (
+            <>
+              {/* Chart — full card width */}
+              <div className="mt-6">
+                <EquityCurveChart series={series} height={320} />
               </div>
-
-              {series.length > 0 ? (
-                <>
-                  {/* Live multi-strategy chart */}
-                  <div className="mt-6">
-                    <EquityCurveChart series={series} height={280} />
-                  </div>
-                  <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {/* Legend */}
+                  <div className="mt-6 flex flex-wrap gap-x-10 gap-y-2">
                     {legend.map((item) => (
-                      <li
+                      <span
                         key={item.name}
                         className="flex items-center gap-2 text-sm"
                       >
@@ -134,15 +128,9 @@ export default async function PerformancePreviewSection() {
                             ? `${item.returnPct}%`
                             : `+${item.returnPct}%`}
                         </span>
-                      </li>
+                      </span>
                     ))}
-                  </ul>
-                  <Link
-                    href="/strategies"
-                    className="mt-4 inline-block text-sm font-medium text-foreground underline hover:no-underline"
-                  >
-                    See all strategies &rarr;
-                  </Link>
+                  </div>
                 </>
               ) : (
                 /* Original empty placeholder — shown until strategies publish data */
@@ -233,15 +221,26 @@ export default async function PerformancePreviewSection() {
                 </svg>
                 </div>
               )}
+
+              {/* Bottom row */}
+              <div className="mt-6 flex items-center justify-between border-t border-border pt-6">
+                <Link
+                  href="/strategies"
+                  className="text-sm font-semibold underline underline-offset-4"
+                >
+                  See all strategies &rarr;
+                </Link>
+                <Button href="/methodology" variant="primary" size="md">
+                  View Methodology
+                </Button>
+              </div>
             </div>
 
-            {/* Muted note */}
-            <p className="mt-3 text-xs leading-relaxed text-secondary">
+            {/* Caption */}
+            <p className="mt-6 text-sm text-secondary">
               Historical performance includes benchmark comparisons and full
               methodology notes.
             </p>
-          </div>
-        </div>
       </Container>
     </Section>
   );
