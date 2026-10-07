@@ -1,9 +1,45 @@
+import Link from "next/link";
 import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
+import EquityCurveChart, {
+  SERIES_COLORS,
+  type ChartSeries,
+} from "@/components/strategies/EquityCurveChart";
+import {
+  getPublicStrategies,
+  getStrategyPerformance,
+} from "@/lib/strategies/fetch";
 import { typography } from "@/lib/typography";
 
-export default function PerformancePreviewSection() {
+export default async function PerformancePreviewSection() {
+  // Server-side fetch: one normalized series per strategy with data.
+  // Strategies with <2 points (or a non-positive first value) are dropped.
+  const strategies = await getPublicStrategies();
+  const snapshots = await Promise.all(
+    strategies.map(async (strategy) => ({
+      name: strategy.name,
+      perf: await getStrategyPerformance(strategy.id),
+    })),
+  );
+
+  const series: ChartSeries[] = [];
+  const legend: { name: string; returnPct: string; color: string }[] = [];
+  for (const { name, perf } of snapshots) {
+    if (perf.length < 2 || perf[0].total_value <= 0) continue;
+    const first = perf[0].total_value;
+    const data = perf.map((p) => ({
+      date: p.date,
+      value: (100 * p.total_value) / first,
+    }));
+    const color = SERIES_COLORS[series.length % SERIES_COLORS.length];
+    series.push({ name, data });
+    legend.push({
+      name,
+      returnPct: (((data[data.length - 1].value / 100 - 1) * 100).toFixed(2)),
+      color,
+    });
+  }
   return (
     <Section spacing="sm">
       <Container size="default">
@@ -36,23 +72,54 @@ export default function PerformancePreviewSection() {
               {/* Paper header */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-medium">Performance Reporting</h3>
+                  <h3 className="text-lg font-medium">Strategy performance</h3>
                   <p className="mt-1 text-sm text-secondary">
-                    Benchmark Comparison · Portfolio Growth · Risk
-                    Metrics
+                    Normalized to 100 at inception
                   </p>
                 </div>
                 <span className="shrink-0 text-xs text-secondary">
-                  Available alongside published research.
+                  Live from daily snapshots.
                 </span>
               </div>
 
-              {/* Chart placeholder */}
-              <div
-                className="relative mt-6 h-[200px] w-full rounded-md border border-border"
-                role="img"
-                aria-label="Chart placeholder. Empty plotting area with labeled axes. No data is displayed because performance is presented alongside methodology in a private setting."
-              >
+              {series.length > 0 ? (
+                <>
+                  {/* Live multi-strategy chart */}
+                  <div className="mt-6">
+                    <EquityCurveChart series={series} height={280} />
+                  </div>
+                  <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {legend.map((item) => (
+                      <li
+                        key={item.name}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-foreground">{item.name}</span>
+                        <span className="text-secondary">
+                          {item.returnPct}%
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/strategies"
+                    className="mt-4 inline-block text-sm font-medium text-foreground underline hover:no-underline"
+                  >
+                    See all strategies &rarr;
+                  </Link>
+                </>
+              ) : (
+                /* Original empty placeholder — shown until strategies publish data */
+                <div
+                  className="relative mt-6 h-[200px] w-full rounded-md border border-border"
+                  role="img"
+                  aria-label="Chart placeholder. Empty plotting area with labeled axes. No data is displayed because performance is presented alongside methodology in a private setting."
+                >
                 <svg
                   viewBox="0 0 600 240"
                   className="h-full w-full"
@@ -133,7 +200,8 @@ export default function PerformancePreviewSection() {
                     50
                   </text>
                 </svg>
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Muted note */}

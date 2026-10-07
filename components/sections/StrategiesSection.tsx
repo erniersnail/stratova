@@ -10,6 +10,7 @@ type StrategyCard = {
   label: string;
   title: string;
   description: string;
+  stat?: string;
   linkLabel: string;
 };
 
@@ -20,6 +21,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     title: "U.S. Strategies",
     description:
       "Systematic equity strategies focused on liquid U.S. companies using quantitative screening, portfolio construction, and ongoing evaluation.",
+    stat: "1 strategy · Coming soon",
     linkLabel: "View Strategies",
   },
   {
@@ -28,6 +30,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     title: "India Strategies",
     description:
       "Evidence-based strategies covering Indian listed companies with an emphasis on systematic processes and long-term portfolio construction.",
+    stat: "4 strategies · Live since Aug 2026",
     linkLabel: "View Strategies",
   },
 ];
@@ -69,6 +72,11 @@ export default function StrategiesSection() {
                         >
                           {card.description}
                         </p>
+                        {card.stat && (
+                          <p className="mt-4 text-xs font-medium tracking-widest text-tertiary uppercase">
+                            {card.stat}
+                          </p>
+                        )}
                       </div>
 
                       <div>

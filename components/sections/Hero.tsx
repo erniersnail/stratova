@@ -1,34 +1,14 @@
 import Container from "@/components/layout/Container";
 import Section from "@/components/layout/Section";
 import Button from "@/components/ui/Button";
-import Image from "next/image";
 import { typography } from "@/lib/typography";
 
 export default function Hero() {
   return (
-    <Section spacing="none" className="relative min-h-[60vh] overflow-hidden">
-      {/* Full-width background image - fades from right into the text area */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/hero-architecture.svg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-right"
-          style={{
-            filter: 'grayscale(100%) brightness(1.08)',
-            maskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 55%, black 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 35%, black 55%, black 100%)',
-          }}
-          sizes="100vw"
-        />
-      </div>
-      {/* White gradient overlay for extra smoothness */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-white via-white/60 to-transparent" />
-
+    <Section spacing="lg">
       {/* Text content */}
-      <Container size="default" className="relative z-10">
-        <div className="max-w-[600px] py-10 lg:py-14">
+      <Container size="default">
+        <div className="max-w-[720px]">
           <h1 className={`${typography.hero} text-foreground`}>
             Systematic investing.
             <br />
@@ -40,8 +20,8 @@ export default function Hero() {
             equity markets.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Button href="/research" variant="primary" size="md">
-              Explore Research
+            <Button href="/strategies" variant="primary" size="md">
+              View Strategies
             </Button>
             <Button href="/methodology" variant="secondary" size="md">
               Our Methodology
