@@ -1,7 +1,5 @@
 import Section from "@/components/layout/Section";
 import Container from "@/components/layout/Container";
-import SectionHeader from "@/components/common/SectionHeader";
-import { typography } from "@/lib/typography";
 
 type PhilosophyBlock = {
   number: string;
@@ -29,34 +27,35 @@ const PHILOSOPHY_BLOCKS: PhilosophyBlock[] = [
 
 export default function PhilosophySection() {
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="default">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          <div className="lg:col-span-2">
-            <SectionHeader
-              title="Our Investment Philosophy"
-              description="Our approach to investment research is guided by principles that emphasize evidence, discipline, and adaptability over intuition, timing, and rigidity."
-              centered={false}
-            />
-          </div>
-          <div className="lg:col-span-3">
-            {PHILOSOPHY_BLOCKS.map((block, index) => (
-              <div key={block.number}>
-                {index > 0 && <hr className="mb-6 border-t border-border" />}
-                <div className="flex gap-6">
-                  <span className="block text-5xl md:text-6xl lg:text-7xl font-light leading-none text-stone-600">
-                    {block.number}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-medium">{block.heading}</h3>
-                    <p className={`${typography.body} mt-2 text-secondary`}>
-                      {block.body}
-                    </p>
-                  </div>
-                </div>
+        {/* Centered header */}
+        <div className="text-center">
+          <h2 className="font-serif text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            Our Investment Philosophy
+          </h2>
+          <p className="mx-auto mt-4 max-w-[640px] text-base leading-[1.75] text-secondary">
+            Our approach to investment research is guided by principles
+            that emphasize evidence, discipline, and adaptability over
+            intuition, timing, and rigidity.
+          </p>
+        </div>
+
+        {/* 3-column grid */}
+        <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          {PHILOSOPHY_BLOCKS.map((block) => (
+            <div key={block.number}>
+              <div className="font-serif text-6xl font-semibold text-tertiary/40">
+                {block.number}
               </div>
-            ))}
-          </div>
+              <h3 className="mt-4 text-lg font-medium text-foreground">
+                {block.heading}
+              </h3>
+              <p className="mt-2 text-sm leading-[1.7] text-secondary">
+                {block.body}
+              </p>
+            </div>
+          ))}
         </div>
       </Container>
     </Section>
