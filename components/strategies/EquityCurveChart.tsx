@@ -113,9 +113,7 @@ export default function EquityCurveChart({
       role="img"
       aria-label={`Equity curve, ${points[0].date} to ${last.date}`}
     >
-      <title>
-        Equity curve from {points[0].date} to {last.date}
-      </title>
+      <title>{`Equity curve from ${points[0].date} to ${last.date}`}</title>
       {gridlines.map((g) => (
         <line
           key={g}
