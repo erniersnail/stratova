@@ -74,8 +74,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     href: "/strategies/us",
     code: "US",
     title: "U.S. Strategies",
-    description:
-      "Systematic equity strategies focused on liquid U.S. companies using quantitative screening, portfolio construction, and ongoing evaluation.",
+    description: "Systematic strategies across America's full market-cap spectrum.",
     image: "/images/statue_liberty.png",
     features: [
       { icon: "chart", label: "Systematic" },
@@ -87,8 +86,7 @@ const STRATEGY_CARDS: StrategyCard[] = [
     href: "/strategies/india",
     code: "IN",
     title: "India Strategies",
-    description:
-      "Evidence-based strategies covering Indian listed companies with an emphasis on systematic processes and long-term portfolio construction.",
+    description: "Systematic strategies across India's full market-cap spectrum.",
     image: "/images/india_gate.png",
     features: [
       { icon: "chart", label: "Systematic" },
