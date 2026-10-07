@@ -30,7 +30,7 @@ export default function TrustSection() {
   return (
     <Section spacing="none" className="py-12">
       <Container size="default">
-        <p className="mb-10 text-center text-xs tracking-[0.2em] text-tertiary uppercase">
+        <p className="mb-10 text-center text-xs tracking-[0.2em] text-foreground/70 uppercase">
           HOW WE OPERATE
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -44,7 +44,7 @@ export default function TrustSection() {
               <h3 className={`${typography.h3} font-serif text-foreground`}>
                 {item.headline}
               </h3>
-              <p className={`${typography.body} mt-3 text-secondary`}>
+              <p className={`${typography.body} mt-3 text-foreground/75`}>
                 {item.body}
               </p>
             </div>
