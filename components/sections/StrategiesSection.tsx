@@ -111,22 +111,22 @@ export default function StrategiesSection() {
           description="Systematic investment strategies developed through rigorous research, disciplined portfolio construction, and institutional-grade backtesting."
           centered={false}
         />
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
           {STRATEGY_CARDS.map((card) => (
             <article
               key={card.title}
-              className="transition-all duration-200 hover:border-foreground hover:shadow-sm"
+              className="h-full transition-all duration-200 hover:border-foreground hover:shadow-sm"
             >
-              <Link href={card.href} className="block">
-                <Paper padding="none" hover>
+              <Link href={card.href} className="block h-full">
+                <Paper padding="none" hover className="relative h-full overflow-hidden">
                   <div
                     className="relative overflow-hidden"
                     style={{ minHeight: "280px" }}
                   >
                     {/* Text content */}
-                    <div className="relative z-10 flex h-full min-h-[inherit] flex-col p-6 lg:p-8">
-                      <div className="pr-[132px]">
-                        <div className="flex items-center gap-3">
+                    <div className="relative z-10 flex h-full min-h-[inherit] flex-col justify-between p-6 lg:p-8">
+                      <div>
+                        <div className="flex items-center gap-3 pr-[180px]">
                           <span className="flex h-9 w-9 items-center justify-center border border-border bg-surface text-xs font-semibold tracking-wider text-foreground">
                             {card.code}
                           </span>
@@ -162,14 +162,23 @@ export default function StrategiesSection() {
                         </ul>
                       </div>
 
-                      {/* Card image, top-right */}
-                      <div className="pointer-events-none absolute top-6 right-6 z-0 lg:top-8 lg:right-8">
+                      {/* Card image, bleeding off the top-right edge with left fade */}
+                      <div
+                        className="pointer-events-none absolute z-0 select-none"
+                        style={{ top: "20px", right: "-40px" }}
+                      >
                         <Image
                           src={card.image}
                           alt=""
-                          width={120}
-                          height={120}
-                          className="object-contain"
+                          width={220}
+                          height={220}
+                          className="object-contain opacity-90"
+                          style={{
+                            maskImage:
+                              "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
+                            WebkitMaskImage:
+                              "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
+                          }}
                         />
                       </div>
 

@@ -17,13 +17,13 @@ export default function Hero() {
           alt=""
           fill
           priority
-          className="object-cover object-right"
+          className="object-cover object-right brightness-[0.95] contrast-[1.05]"
           sizes="100vw"
         />
       </div>
 
       {/* Gradient overlay - light on left for text legibility, fades to transparent */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#faf8f4] via-[#faf8f4]/85 to-transparent" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#faf8f4] from-25% via-[#faf8f4]/90 via-55% to-transparent to-85%" />
 
       {/* Text content */}
       <Container size="default" className="relative z-10">
