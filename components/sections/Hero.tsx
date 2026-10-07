@@ -33,7 +33,7 @@ export default function Hero() {
             <br />
             Built to compound.
           </h1>
-          <p className="mt-8 max-w-[520px] text-base leading-[1.75] text-secondary">
+          <p className="mt-8 max-w-[560px] text-lg leading-[1.7] text-foreground/85">
             Stratova applies the same rigor quant funds use — algorithms,
             data, discipline — bringing institutional-grade systematic
             research to individual investors.
