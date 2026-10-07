@@ -61,11 +61,11 @@ export default function StrategiesSection() {
                         </span>
                         <h3 className="text-2xl font-medium">{card.title}</h3>
                       </div>
-                      <p className="mt-5 text-sm text-secondary">
+                      <p className="mt-5 text-sm text-foreground/85">
                         {card.description}
                       </p>
                       <hr className="my-5 border-t border-border" />
-                      <p className="mt-4 text-xs tracking-wide text-tertiary whitespace-nowrap overflow-hidden text-ellipsis">
+                      <p className="mt-4 text-xs tracking-wide text-foreground/70 whitespace-nowrap overflow-hidden text-ellipsis">
                         {card.tags.join(" · ")}
                       </p>
                       <div className="mt-5">
