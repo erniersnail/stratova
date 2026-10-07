@@ -276,6 +276,20 @@ function MultiSeriesChart({
           className="text-border"
         />
       ))}
+      {gridlines.map((g) => (
+        <text
+          key={`yl-${g}`}
+          x={PAD_LEFT + 2}
+          y={y(g) - 4}
+          fontSize={11}
+          fill="currentColor"
+          className="text-tertiary"
+        >
+          {Math.abs(g - Math.round(g)) < 0.05
+            ? String(Math.round(g))
+            : g.toFixed(1)}
+        </text>
+      ))}
       {series.map((s, si) => {
         const color = s.color ?? SERIES_COLORS[si % SERIES_COLORS.length];
         const d = s.points

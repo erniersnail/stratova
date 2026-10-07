@@ -85,20 +85,15 @@ export default async function PerformancePreviewSection() {
               Combined return across all active strategies, vs NIFTY 500.
             </p>
             <p className={`${typography.body} mt-4 text-secondary`}>
-              Performance should always be interpreted alongside methodology,
-              benchmark selection, assumptions, portfolio construction,
-              turnover, and risk characteristics.
-            </p>
-            <p className={`${typography.body} mt-3 text-secondary`}>
-              Our reporting framework is designed to emphasize transparency
-              over headline numbers.
+              Performance is best read alongside methodology, benchmark
+              selection, and portfolio construction. Our reporting favours
+              transparency over headline numbers.
             </p>
             <div className="mt-4">
               <Button href="/methodology" variant="secondary" size="md">
                 View Methodology
               </Button>
             </div>
-            <div className="mt-6 border-b border-border" />
           </div>
 
           {/* Right column */}
@@ -107,9 +102,9 @@ export default async function PerformancePreviewSection() {
               {/* Paper header */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-medium">Strategy performance</h3>
+                  <h3 className="text-lg font-medium">Combined portfolio</h3>
                   <p className="mt-1 text-sm text-secondary">
-                    Normalized to 100 at inception
+                    Rebased to 100 on 3 Aug 2026
                   </p>
                 </div>
                 <span className="shrink-0 text-xs text-secondary">
