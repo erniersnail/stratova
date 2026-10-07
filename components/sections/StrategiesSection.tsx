@@ -115,41 +115,19 @@ export default function StrategiesSection() {
               className="h-full transition-all duration-200 hover:border-foreground hover:shadow-sm"
             >
               <Link href={card.href} className="block h-full">
-                <Paper padding="none" hover className="h-full">
-                  <div className="flex h-full flex-col justify-between p-6 lg:p-7">
-                    <div>
-                      {/* Header row: region box + title left, image right */}
-                      <div className="flex min-h-[88px] items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
-                            {card.code}
-                          </span>
-                          <div>
-                            <h3 className="text-2xl font-medium">
-                              {card.title}
-                            </h3>
-                          </div>
-                        </div>
-                        <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center">
-                          <Image
-                            src={card.image}
-                            alt=""
-                            width={88}
-                            height={88}
-                            className="max-h-full max-w-full object-contain"
-                          />
-                        </div>
+                <Paper padding="none" hover className="h-full overflow-hidden">
+                  <div className="flex">
+                    <div className="relative z-10 flex-1 py-8 pr-4 pl-7">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
+                          {card.code}
+                        </span>
+                        <h3 className="text-2xl font-medium">{card.title}</h3>
                       </div>
-
-                      {/* Description */}
-                      <div className="mt-4">
-                        <p className={`${typography.body} text-secondary`}>
-                          {card.description}
-                        </p>
-                      </div>
-
-                      <hr className="my-4 border-t border-border" />
-
+                      <p className="mt-5 text-sm text-secondary">
+                        {card.description}
+                      </p>
+                      <hr className="my-5 border-t border-border" />
                       {/* Feature icon row — spread across full width */}
                       <ul className="flex w-full flex-wrap items-center justify-between gap-y-2">
                         {card.features.map((feature) => (
@@ -162,12 +140,26 @@ export default function StrategiesSection() {
                           </li>
                         ))}
                       </ul>
+                      <div className="mt-5">
+                        <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
+                          LEARN MORE &rarr;
+                        </span>
+                      </div>
                     </div>
-
-                    <div className="mt-4">
-                      <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
-                        LEARN MORE &rarr;
-                      </span>
+                    <div className="relative w-[40%] overflow-hidden">
+                      <Image
+                        src={card.image}
+                        alt=""
+                        fill
+                        className="object-cover object-center opacity-90"
+                        sizes="(max-width: 1024px) 40vw, 300px"
+                        style={{
+                          maskImage:
+                            "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                          WebkitMaskImage:
+                            "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                        }}
+                      />
                     </div>
                   </div>
                 </Paper>
