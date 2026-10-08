@@ -7,6 +7,13 @@ import { createClient } from "@/lib/supabase/server";
 export type ArticleFormState = {
   error?: string;
   success?: string;
+  fields?: {
+    slug?: string;
+    title?: string;
+    subtitle?: string;
+    body_md?: string;
+    category?: string;
+  };
 };
 
 /** Lowercase alphanumeric segments joined by single hyphens. */
@@ -48,17 +55,19 @@ function toNullable(value: string): string | null {
   return value === "" ? null : value;
 }
 
-function validate(
-  formData: FormData,
-): { ok: true; fields: ArticleFields } | { ok: false; error: string } {
-  const fields: ArticleFields = {
+function readFields(formData: FormData): ArticleFields {
+  return {
     slug: readString(formData, "slug"),
     title: readString(formData, "title"),
     subtitle: readString(formData, "subtitle"),
     body_md: readString(formData, "body_md"),
     category: readString(formData, "category"),
   };
+}
 
+function validate(
+  fields: ArticleFields,
+): { ok: true } | { ok: false; error: string } {
   if (!fields.title) return { ok: false, error: "Title is required." };
   if (!fields.body_md) return { ok: false, error: "Body is required." };
   if (!SLUG_RE.test(fields.slug)) {
@@ -67,7 +76,7 @@ function validate(
       error: "Slug must be lowercase letters, numbers, and hyphens.",
     };
   }
-  return { ok: true, fields };
+  return { ok: true };
 }
 
 function revalidateResearch(): void {
@@ -85,21 +94,22 @@ export async function createArticleAction(
   _prev: ArticleFormState,
   formData: FormData,
 ): Promise<ArticleFormState> {
+  const fields = readFields(formData);
   let newId = "";
 
   try {
     await requireAdmin();
 
-    const parsed = validate(formData);
-    if (!parsed.ok) return { error: parsed.error };
+    const parsed = validate(fields);
+    if (!parsed.ok) return { error: parsed.error, fields };
 
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("research_articles")
       .insert({
-        ...parsed.fields,
-        subtitle: toNullable(parsed.fields.subtitle),
-        category: toNullable(parsed.fields.category),
+        ...fields,
+        subtitle: toNullable(fields.subtitle),
+        category: toNullable(fields.category),
         author_name: readString(formData, "author_name") || "Stratova Quant",
         is_published: false,
         published_at: null,
@@ -109,13 +119,16 @@ export async function createArticleAction(
 
     if (error || !data) {
       if (error && isDuplicateSlug(error.code, error.message)) {
-        return { error: "That slug is already in use." };
+        return { error: "That slug is already in use.", fields };
       }
-      return { error: "Could not save the article. Please try again." };
+      return {
+        error: "Could not save the article. Please try again.",
+        fields,
+      };
     }
     newId = data.id;
   } catch {
-    return { error: "Could not save the article. Please try again." };
+    return { error: "Could not save the article. Please try again.", fields };
   }
 
   revalidateResearch();
@@ -126,14 +139,21 @@ export async function updateArticleAction(
   _prev: ArticleFormState,
   formData: FormData,
 ): Promise<ArticleFormState> {
+  const fields = readFields(formData);
+
   try {
     await requireAdmin();
 
     const id = readString(formData, "id");
-    if (!id) return { error: "Could not save the article. Please try again." };
+    if (!id) {
+      return {
+        error: "Could not save the article. Please try again.",
+        fields,
+      };
+    }
 
-    const parsed = validate(formData);
-    if (!parsed.ok) return { error: parsed.error };
+    const parsed = validate(fields);
+    if (!parsed.ok) return { error: parsed.error, fields };
 
     // is_published / published_at are intentionally untouched — publishing
     // has its own action.
@@ -141,22 +161,22 @@ export async function updateArticleAction(
     const { error } = await supabase
       .from("research_articles")
       .update({
-        slug: parsed.fields.slug,
-        title: parsed.fields.title,
-        subtitle: toNullable(parsed.fields.subtitle),
-        body_md: parsed.fields.body_md,
-        category: toNullable(parsed.fields.category),
+        slug: fields.slug,
+        title: fields.title,
+        subtitle: toNullable(fields.subtitle),
+        body_md: fields.body_md,
+        category: toNullable(fields.category),
       })
       .eq("id", id);
 
     if (error) {
       if (isDuplicateSlug(error.code, error.message)) {
-        return { error: "That slug is already in use." };
+        return { error: "That slug is already in use.", fields };
       }
-      return { error: "Could not save the article. Please try again." };
+      return { error: "Could not save the article. Please try again.", fields };
     }
   } catch {
-    return { error: "Could not save the article. Please try again." };
+    return { error: "Could not save the article. Please try again.", fields };
   }
 
   revalidateResearch();

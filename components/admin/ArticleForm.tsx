@@ -39,8 +39,18 @@ export function ArticleForm(props: ArticleFormProps) {
     FormData
   >(action, {});
 
+  // Server-returned fields win over article props so a failed submit shows
+  // what the user just typed. Uncontrolled + key remount keeps defaultValue
+  // fresh without setState-in-effect (same pattern as ContactForm).
+  const saved = state.fields;
+  const formKey = [
+    props.mode,
+    article?.id ?? "",
+    state.fields ? JSON.stringify(state.fields) : "initial",
+  ].join("|");
+
   return (
-    <form action={formAction} className="space-y-5">
+    <form key={formKey} action={formAction} className="space-y-5">
       {props.mode === "edit" ? (
         <input type="hidden" name="id" value={props.article.id} />
       ) : null}
@@ -54,9 +64,16 @@ export function ArticleForm(props: ArticleFormProps) {
           name="slug"
           type="text"
           required
-          defaultValue={article?.slug ?? ""}
+          defaultValue={saved?.slug ?? article?.slug ?? ""}
           placeholder="lowercase-with-hyphens"
           className={`${INPUT} font-mono`}
+          onChange={(event) => {
+            // Lowercase + sanitize live so typing never fails validation.
+            event.target.value = event.target.value
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, "");
+          }}
         />
         <p className="mt-1.5 text-xs text-secondary">lowercase-with-hyphens</p>
       </div>
@@ -70,7 +87,7 @@ export function ArticleForm(props: ArticleFormProps) {
           name="title"
           type="text"
           required
-          defaultValue={article?.title ?? ""}
+          defaultValue={saved?.title ?? article?.title ?? ""}
           className={INPUT}
           onBlur={(event) => {
             const slugInput = document.getElementById("slug");
@@ -93,7 +110,7 @@ export function ArticleForm(props: ArticleFormProps) {
           id="subtitle"
           name="subtitle"
           type="text"
-          defaultValue={article?.subtitle ?? ""}
+          defaultValue={saved?.subtitle ?? article?.subtitle ?? ""}
           className={INPUT}
         />
       </div>
@@ -107,7 +124,7 @@ export function ArticleForm(props: ArticleFormProps) {
           id="category"
           name="category"
           type="text"
-          defaultValue={article?.category ?? ""}
+          defaultValue={saved?.category ?? article?.category ?? ""}
           className={INPUT}
         />
       </div>
@@ -120,7 +137,7 @@ export function ArticleForm(props: ArticleFormProps) {
           id="body_md"
           name="body_md"
           required
-          defaultValue={article?.body_md ?? ""}
+          defaultValue={saved?.body_md ?? article?.body_md ?? ""}
           rows={16}
           className={`${INPUT} min-h-[400px] font-mono leading-relaxed`}
         />
