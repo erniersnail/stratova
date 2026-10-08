@@ -102,13 +102,15 @@ export default async function ArticlePage({ params }: Props) {
         </p>
 
         {article.cover_image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={article.cover_image_url}
-            alt=""
-            className="my-8 max-w-full rounded-md"
-            loading="lazy"
-          />
+          <div className="my-8 aspect-[16/9] w-full overflow-hidden rounded-md border border-border">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={article.cover_image_url}
+              alt=""
+              className="h-full w-full object-cover"
+              loading="eager"
+            />
+          </div>
         ) : null}
 
         <div className="mt-10">
