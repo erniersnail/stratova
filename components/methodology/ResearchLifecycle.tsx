@@ -18,7 +18,7 @@ const STEPS = [
     number: "03",
     title: "Portfolio Construction",
     description:
-      "Positions are equally weighted. Every position receives the same allocation. No conviction bets, no overweights. The number of positions per portfolio is fixed and published alongside each strategy.",
+      "Positions are equally weighted — every position receives the same allocation. The number of holdings is determined at each rebalance by how many securities pass the strategy's filter criteria. There is no fixed target count and no manual adjustment.",
   },
   {
     number: "04",

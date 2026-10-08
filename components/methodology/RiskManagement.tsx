@@ -12,7 +12,7 @@ const RISK_TOPICS = [
     number: "02",
     title: "Concentration",
     description:
-      "Strategies hold a concentrated set of positions by design. Risk level is published alongside each strategy.",
+      "Portfolios are concentrated by design. Position count varies with each rebalance, determined by how many securities pass the strategy's filter criteria. Risk level is published alongside every strategy.",
   },
   {
     number: "03",
