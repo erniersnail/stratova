@@ -16,7 +16,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: "Research",
     links: [
-      { label: "Research", href: "/research" },
+      { label: "Latest research", href: "/research" },
       { label: "Strategies", href: "/strategies" },
       { label: "Methodology", href: "/methodology" },
       { label: "Performance", href: "/performance" },
