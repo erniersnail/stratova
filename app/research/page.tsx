@@ -29,37 +29,46 @@ export default async function ResearchPage() {
               </p>
             </div>
           ) : (
-            articles.map((article) => (
-              <Link
-                key={article.id}
-                href={`/research/${article.slug}`}
-                className="block border-b border-border px-2 py-8 last:border-0"
-              >
-                {article.cover_image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={article.cover_image_url}
-                    alt=""
-                    className="mb-4 aspect-video w-full rounded-t-md object-cover"
-                    loading="lazy"
-                  />
-                ) : null}
-                <h3 className="serif text-2xl font-bold text-foreground">
-                  {article.title}
-                </h3>
-                {article.subtitle ? (
-                  <p className="mt-2 text-foreground/85">{article.subtitle}</p>
-                ) : null}
-                {article.category ? (
-                  <span className="mt-3 inline-flex items-center rounded-md bg-foreground/5 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-secondary">
-                    {article.category}
-                  </span>
-                ) : null}
-                <p className="mt-4 text-xs text-secondary">
-                  {formatIST(article.published_at)}
-                </p>
-              </Link>
-            ))
+            <ul className="divide-y divide-border border-y border-border">
+              {articles.map((a) => (
+                <li key={a.id}>
+                  <Link
+                    href={`/research/${a.slug}`}
+                    className="group flex gap-6 py-6 transition-colors"
+                  >
+                    {a.cover_image_url ? (
+                      <div className="aspect-video w-[200px] shrink-0 overflow-hidden rounded-md border border-border">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={a.cover_image_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : null}
+                    <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+                      {a.category ? (
+                        <span className="text-xs font-medium uppercase tracking-wider text-tertiary">
+                          {a.category}
+                        </span>
+                      ) : null}
+                      <h3 className="font-serif text-xl font-semibold tracking-tight text-foreground group-hover:underline">
+                        {a.title}
+                      </h3>
+                      {a.subtitle ? (
+                        <p className="line-clamp-2 text-sm text-secondary">
+                          {a.subtitle}
+                        </p>
+                      ) : null}
+                      <p className="mt-1 text-xs text-tertiary">
+                        {formatIST(a.published_at)}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </Container>
