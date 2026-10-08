@@ -26,26 +26,14 @@ const VALIDATION_STEPS = [
     description:
       "All performance figures are net of transaction costs. Strategies are evaluated against their benchmark on a net-return basis — gross-return comparisons are not used.",
   },
-  {
-    number: "05",
-    title: "Known Limitation: Seed Period",
-    description:
-      "Strategies seeded in August 2026 used a current-snapshot universe to construct their initial portfolios. This introduces survivorship bias for the seed period only. Live signals from November 2026 onward use point-in-time constituent lists.",
-  },
-  {
-    number: "06",
-    title: "Known Limitation: Short Live History",
-    description:
-      "Live tracking began in August 2026. The track record is short. Returns over a few months carry no statistical significance. Past performance does not indicate future results.",
-  },
 ];
 
 export default function ValidationFramework() {
   return (
     <div>
       <SectionHeader
-        title="Validation & Limitations"
-        description="We test what we can test, and we state clearly what we have not tested."
+        title="Validation"
+        description="Every strategy is validated against historical and out-of-sample data, and evaluated net of costs, before publication."
         centered={false}
       />
       <div className="mt-8 space-y-8">

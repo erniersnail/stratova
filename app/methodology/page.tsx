@@ -19,7 +19,7 @@ export const metadata = {
 export default function MethodologyPage() {
   return (
     <main>
-      <Container size="default" className="pt-16 pb-12">
+      <Container size="default" className="pt-16">
         <PageHeader
           title="Methodology"
           description="How we design, test, and operate systematic equity strategies."
@@ -69,8 +69,8 @@ export default function MethodologyPage() {
       <Section spacing="sm">
         <Container size="default">
           <SectionHeader
-            title="Frequently Asked Questions"
-            description="Answers to common questions about our research process and published strategies."
+            title="Investor FAQ"
+            description="Answers to common questions about subscribing to and following our strategies."
             centered={false}
           />
           <div className="mt-6">

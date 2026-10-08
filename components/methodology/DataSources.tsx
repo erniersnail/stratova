@@ -6,7 +6,7 @@ const DATA_CATEGORIES = [
     number: "01",
     title: "Market Data",
     description:
-      "Continuous ingestion of equity pricing and volume across NSE-listed securities. Data flows through validation, normalization, and corporate-action adjustment before entering the research pipeline.",
+      "Continuous ingestion of equity pricing and volume across NSE and NASDAQ-listed securities. Data flows through validation, normalization, and corporate-action adjustment before entering the research pipeline.",
   },
   {
     number: "02",
@@ -19,12 +19,6 @@ const DATA_CATEGORIES = [
     title: "Reference Data",
     description:
       "Index constituents, benchmark levels, and corporate-action records synchronized daily. Point-in-time snapshots preserve historical universe composition for backtesting.",
-  },
-  {
-    number: "04",
-    title: "What We Do Not Use",
-    description:
-      "No alternative data, no sentiment feeds, no private datasets, no third-party signals. Everything we use is publicly available and reproducible.",
   },
 ];
 
