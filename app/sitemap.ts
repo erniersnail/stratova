@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getPublishedArticles } from "@/lib/research/fetch";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://stratovaquant.com";
@@ -27,10 +28,20 @@ const STATIC_PATHS = [
   "/compliance/research-methodology",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
-  return STATIC_PATHS.map((path) => ({
-    url: `${SITE_URL}${path}`,
-    lastModified,
-  }));
+  const articleUrls = await Promise.all(
+    (await getPublishedArticles()).map(async (article) => ({
+      url: `${SITE_URL}/research/${article.slug}`,
+      lastModified: new Date(article.updated_at),
+    })),
+  );
+  return [
+    ...STATIC_PATHS.map((path) => ({
+      url: `${SITE_URL}${path}`,
+      lastModified,
+    })),
+    ...articleUrls,
+  ];
 }
+

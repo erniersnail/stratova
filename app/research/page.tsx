@@ -1,34 +1,58 @@
 import Container from "@/components/layout/Container";
-import { RESEARCH_ITEMS } from "@/lib/research";
+import { getPublishedArticles } from "@/lib/research/fetch";
+import { formatIST } from "@/lib/format/date";
 import PageHeader from "@/components/common/PageHeader";
-import Pagination from "@/components/common/Pagination";
-import ResearchFilters from "@/components/research/ResearchFilters";
-import ResearchGrid from "@/components/research/ResearchGrid";
+import Link from "next/link";
 
 export const metadata = {
   title: "Research — Stratova Quant",
   description:
-    "Browse research covering quantitative investing, factor models, portfolio construction, and market structure.",
+    "Systematic research on quantitative investing, portfolio construction, and market structure.",
 };
 
-export default function ResearchPage() {
+export default async function ResearchPage() {
+  const articles = await getPublishedArticles();
+
   return (
     <main>
       <Container className="py-20">
         <PageHeader
           title="Research"
-          description="Browse research covering quantitative investing, factor models, portfolio construction, and market structure."
+          description="Systematic research on quantitative investing, portfolio construction, and market structure."
         />
 
         <div className="mt-10">
-          <ResearchFilters />
+          {articles.length === 0 ? (
+            <div className="rounded-md border border-border bg-surface p-10 text-center">
+              <p className="text-sm text-secondary">
+                No articles published yet.
+              </p>
+            </div>
+          ) : (
+            articles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/research/${article.slug}`}
+                className="block border-b border-border px-2 py-8 last:border-0"
+              >
+                <h3 className="serif text-2xl font-bold text-foreground">
+                  {article.title}
+                </h3>
+                {article.subtitle ? (
+                  <p className="mt-2 text-foreground/85">{article.subtitle}</p>
+                ) : null}
+                {article.category ? (
+                  <span className="mt-3 inline-flex items-center rounded-md bg-foreground/5 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-secondary">
+                    {article.category}
+                  </span>
+                ) : null}
+                <p className="mt-4 text-xs text-secondary">
+                  {formatIST(article.published_at)}
+                </p>
+              </Link>
+            ))
+          )}
         </div>
-
-        <div className="mt-10">
-          <ResearchGrid items={RESEARCH_ITEMS} />
-        </div>
-
-        <Pagination className="mt-14" />
       </Container>
     </main>
   );

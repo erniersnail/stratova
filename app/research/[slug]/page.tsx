@@ -1,23 +1,63 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Container from "@/components/layout/Container";
-import { ARTICLE_CONTENT, getArticleContent } from "@/lib/article-content";
-import { RESEARCH_ITEMS } from "@/lib/research";
-import ArticleHeader from "@/components/research/ArticleHeader";
-import ArticleSidebar from "@/components/research/ArticleSidebar";
-import ArticleContent from "@/components/research/ArticleContent";
-import RelatedResearch from "@/components/research/RelatedResearch";
+import Link from "next/link";
+import { getArticleBySlug } from "@/lib/research/fetch";
+import { formatIST } from "@/lib/format/date";
+import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 
-export function generateStaticParams() {
-  return Object.keys(ARTICLE_CONTENT).map((slug) => ({ slug }));
-}
+/**
+ * Minimal prose-like class map for the markdown body (no plugins, per spec).
+ */
+const PROSE: Components = {
+  h1: (props) => (
+    <h1 className="serif text-4xl font-bold leading-tight mt-2" {...props} />
+  ),
+  h2: (props) => (
+    <h2 className="serif text-3xl font-bold leading-tight mt-10" {...props} />
+  ),
+  h3: (props) => (
+    <h3 className="serif text-2xl font-bold leading-tight mt-8" {...props} />
+  ),
+  p: (props) => <p className="my-4 text-foreground/85" {...props} />,
+  a: (props) => <a className="text-foreground underline underline-offset-4" {...props} />,
+  ul: (props) => <ul className="my-4 ml-6 list-disc space-y-3" {...props} />,
+  ol: (props) => <ol className="my-4 ml-6 list-decimal space-y-3" {...props} />,
+  li: (props) => <li className="text-foreground/85" {...props} />,
+  blockquote: (props) => (
+    <blockquote className="border-l-2 border-border pl-4 my-4 text-secondary italic" {...props} />
+  ),
+  code: (props) => (
+    <code className="rounded bg-foreground/10 px-1.5 py-0.5 font-mono text-sm" {...props} />
+  ),
+};
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
+  if (!article) {
+    return {
+      title: "Research",
+      description:
+        "Systematic research on quantitative investing, portfolio construction, and market structure.",
+    };
+  }
+  return {
+    title: article.title,
+    description: article.subtitle ?? article.body_md.slice(0, 160),
+  };
+}
+
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
-  const article = getArticleContent(slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     notFound();
@@ -25,29 +65,36 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <main>
-      <Container className="py-16">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_280px]">
-          <article className="max-w-[680px]">
-            <ArticleHeader article={article} />
-            <div className="mt-10">
-              <ArticleContent blocks={article.blocks} />
-            </div>
-          </article>
-          <div className="hidden lg:block">
-            <ArticleSidebar article={article} />
-          </div>
-        </div>
+      <Container size="reading" className="py-20">
+        <Link
+          href="/research"
+          className="text-sm text-secondary transition-colors hover:text-foreground"
+        >
+          ← Research
+        </Link>
 
-        <div className="lg:hidden">
-          <hr className="my-10 border-t border-border" />
-          <ArticleSidebar article={article} />
-        </div>
+        {article.category ? (
+          <span className="mt-4 inline-flex items-center rounded-md bg-foreground/5 px-2.5 py-1 text-xs font-medium uppercase tracking-wide text-secondary">
+            {article.category}
+          </span>
+        ) : null}
 
-        <RelatedResearch
-          currentSlug={slug}
-          category={article.category}
-          items={RESEARCH_ITEMS}
-        />
+        <h1 className="serif text-4xl font-bold leading-tight mt-8">
+          {article.title}
+        </h1>
+        {article.subtitle ? (
+          <p className="mt-3 text-lg leading-[1.75] text-foreground/85">
+            {article.subtitle}
+          </p>
+        ) : null}
+
+        <p className="mt-6 text-sm text-foreground/70">
+          By {article.author_name} · {formatIST(article.published_at)}
+        </p>
+
+        <div className="mt-10">
+          <ReactMarkdown components={PROSE}>{article.body_md}</ReactMarkdown>
+        </div>
       </Container>
     </main>
   );
