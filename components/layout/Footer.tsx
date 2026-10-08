@@ -16,9 +16,8 @@ const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: "Research",
     links: [
-      { label: "Latest Research", href: "/research" },
+      { label: "Research", href: "/research" },
       { label: "Strategies", href: "/strategies" },
-      { label: "U.S. Strategies", href: "/strategies/us" },
       { label: "Methodology", href: "/methodology" },
       { label: "Performance", href: "/performance" },
     ],
@@ -29,7 +28,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "About", href: "/about" },
       { label: "Contact", href: "/contact" },
       { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
+      { label: "Terms of Use", href: "/terms" },
     ],
   },
   {
@@ -43,8 +42,6 @@ const FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Refund Policy", href: "/compliance/refund" },
       { label: "Conflict of Interest", href: "/compliance/conflict-of-interest" },
       { label: "Research Methodology", href: "/compliance/research-methodology" },
-      { label: "Terms of Use", href: "/terms" },
-      { label: "Privacy Policy", href: "/privacy" },
     ],
   },
   {
@@ -74,9 +71,6 @@ export default function Footer() {
           <div>
             <span className="text-xl font-semibold tracking-wide text-foreground">
               STRATOVA
-            </span>
-            <span className="mt-2 block text-sm font-medium text-secondary">
-              Quantitative Research
             </span>
             <p className="mt-5 text-sm leading-[1.75] text-secondary">
               Systematic investing for individual investors. Built to

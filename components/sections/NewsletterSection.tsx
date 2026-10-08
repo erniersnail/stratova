@@ -9,8 +9,8 @@ export default function NewsletterSection() {
       <Container size="narrow" className="text-center">
         <SectionHeader
           label="UPDATES"
-          title="Receive New Research"
-          description="Receive notifications whenever new research papers, strategy updates, or methodology notes are published."
+          title="Research updates"
+          description="New papers, strategy notes, and methodology updates, straight to your inbox."
         />
 
         <NewsletterForm />
