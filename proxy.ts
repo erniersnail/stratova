@@ -6,6 +6,8 @@ import { createServerClient } from "@supabase/ssr";
  *
  * Refreshes the auth cookie on every matched request, then enforces:
  *   - protected routes (/account, /dashboard) require a session
+ *   - admin routes (/admin) require a session + profiles.role = 'admin'
+ *     (non-admins get a 404 rewrite so the route isn't revealed)
  *   - auth routes (/login, /signup) are redirected away once signed in
  *
  * All marketing routes stay public.
@@ -18,6 +20,9 @@ import { createServerClient } from "@supabase/ssr";
 
 /** Routes that require an authenticated session. Prefix-matched. */
 const PROTECTED_ROUTES = ["/account", "/dashboard"];
+
+/** Routes that require the admin profile role. Prefix-matched. */
+const ADMIN_ROUTES = ["/admin"];
 
 /** Routes a signed-in user should be redirected away from. */
 const AUTH_ROUTES = ["/login", "/signup"];
@@ -62,6 +67,10 @@ export default async function proxy(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 
+  const isAdminRoute = ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -73,6 +82,28 @@ export default async function proxy(request: NextRequest) {
     url.pathname = "/account";
     url.search = "";
     return NextResponse.redirect(url);
+  }
+
+  if (isAdminRoute) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile?.role !== "admin") {
+      // Rewrite to a non-existent route: renders the app not-found page
+      // (404 status), so the admin route isn't revealed with a 403.
+      const url = request.nextUrl.clone();
+      url.pathname = "/__not-found";
+      return NextResponse.rewrite(url);
+    }
   }
 
   return supabaseResponse;

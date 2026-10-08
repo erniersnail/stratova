@@ -197,6 +197,15 @@ export default async function AccountPage() {
           >
             View recommendation history →
           </Link>
+
+          {profile?.role === "admin" && (
+            <Link
+              href="/admin/research"
+              className="text-sm text-secondary underline hover:text-foreground"
+            >
+              Admin: Research →
+            </Link>
+          )}
         </section>
       </Container>
     </main>
