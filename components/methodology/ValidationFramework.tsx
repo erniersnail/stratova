@@ -6,37 +6,37 @@ const VALIDATION_STEPS = [
     number: "01",
     title: "Historical Backtesting",
     description:
-      "Strategies are tested against historical data to evaluate performance across multiple market cycles. Backtests account for survivorship bias, look-ahead bias, and incorporate realistic trading assumptions.",
+      "Strategies are validated against point-in-time historical data with survivorship-bias-free universes. Backtests incorporate realistic transaction costs and liquidity constraints. Results are reported net of costs.",
   },
   {
     number: "02",
-    title: "Walk-forward Testing",
+    title: "Out-of-Sample Testing",
     description:
-      "Walk-forward analysis evaluates strategy performance on out-of-sample data by repeatedly training on historical periods and testing on subsequent unseen periods. This reduces the risk of overfitting.",
+      "Performance is evaluated on data not used during strategy construction. Live results are compared against the strategy's benchmark on an ongoing basis.",
   },
   {
     number: "03",
-    title: "Robustness Checks",
+    title: "Regime and Robustness Testing",
     description:
-      "Strategies are tested across alternative parameter specifications, time periods, and market regimes to ensure results are not driven by specific methodological choices or data mining.",
+      "Strategies are tested across multiple time periods and market regimes to ensure results are not driven by a single favorable window.",
   },
   {
     number: "04",
-    title: "Sensitivity Analysis",
+    title: "Net-of-Cost Performance",
     description:
-      "We measure how strategy performance changes in response to variations in key assumptions including formation periods, holding periods, rebalancing frequency, and transaction cost estimates.",
+      "All performance figures are net of transaction costs. Strategies are evaluated against their benchmark on a net-return basis — gross-return comparisons are not used.",
   },
   {
     number: "05",
-    title: "Transaction Costs",
+    title: "Known Limitation: Seed Period",
     description:
-      "Realistic transaction cost models are applied including commissions, bid-ask spreads, market impact, and opportunity costs. Cost assumptions are validated against actual execution data where available.",
+      "Strategies seeded in August 2026 used a current-snapshot universe to construct their initial portfolios. This introduces survivorship bias for the seed period only. Live signals from November 2026 onward use point-in-time constituent lists.",
   },
   {
     number: "06",
-    title: "Liquidity Constraints",
+    title: "Known Limitation: Short Live History",
     description:
-      "Strategies are evaluated under realistic liquidity assumptions including position size limits, trading volume constraints, and market impact. Capacity estimates are provided for each published strategy.",
+      "Live tracking began in August 2026. The track record is short. Returns over a few months carry no statistical significance. Past performance does not indicate future results.",
   },
 ];
 
@@ -44,8 +44,8 @@ export default function ValidationFramework() {
   return (
     <div>
       <SectionHeader
-        title="Validation Framework"
-        description="Every strategy undergoes rigorous testing before publication. Our validation framework is designed to minimize overfitting and ensure robustness."
+        title="Validation & Limitations"
+        description="We test what we can test, and we state clearly what we have not tested."
         centered={false}
       />
       <div className="mt-8 space-y-8">

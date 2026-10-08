@@ -4,33 +4,21 @@ import { typography } from "@/lib/typography";
 const RISK_TOPICS = [
   {
     number: "01",
-    title: "Position Sizing",
+    title: "Position Weighting",
     description:
-      "Position sizes are determined by a systematic framework that accounts for volatility, correlation, concentration, and liquidity. No single position is permitted to exceed predefined risk limits relative to the total portfolio.",
+      "Positions are equally weighted. Every position receives the same allocation. No single position is larger than any other.",
   },
   {
     number: "02",
-    title: "Diversification",
+    title: "Concentration",
     description:
-      "Portfolios are constructed to achieve meaningful diversification across securities, sectors, and risk factors. Concentration limits are applied at the security, industry, and factor exposure levels.",
+      "Strategies hold a concentrated set of positions by design. Risk level is published alongside each strategy.",
   },
   {
     number: "03",
-    title: "Turnover",
-    description:
-      "Portfolio turnover is managed explicitly through rebalancing rules, trading thresholds, and cost-aware execution. Turnover is monitored and reported alongside performance metrics for every published strategy.",
-  },
-  {
-    number: "04",
-    title: "Capacity",
-    description:
-      "Each strategy includes an estimated capacity based on liquidity analysis, market impact modeling, and position size constraints. Capacity estimates are reviewed and updated as market conditions evolve.",
-  },
-  {
-    number: "05",
     title: "Portfolio Constraints",
     description:
-      "Strategies operate within defined constraints including leverage limits, sector exposure limits, minimum and maximum position sizes, and liquidity requirements. Constraints are documented and transparent.",
+      "Long-only. No leverage. No derivatives. No short positions.",
   },
 ];
 
@@ -38,8 +26,8 @@ export default function RiskManagement() {
   return (
     <div>
       <SectionHeader
-        title="Risk Management"
-        description="Risk management is embedded in every stage of the research process, from hypothesis formulation to portfolio construction."
+        title="Risk Controls"
+        description="Risk management is embedded in the strategy framework. It is not layered on after the fact."
         centered={false}
       />
       <div className="mt-8 space-y-8">

@@ -22,7 +22,7 @@ export default function MethodologyPage() {
       <Container size="default" className="pt-16 pb-12">
         <PageHeader
           title="Methodology"
-          description="Our research process transforms investment hypotheses into disciplined, evidence-based investment strategies through systematic testing and continuous validation."
+          description="How we design, test, and operate systematic equity strategies."
         />
       </Container>
 

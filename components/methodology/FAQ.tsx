@@ -9,29 +9,29 @@ type FAQItem = {
 
 const FAQ_ITEMS: FAQItem[] = [
   {
-    question: "How long does it take to develop a new investment strategy?",
+    question: "How long does it take to develop a new strategy?",
     answer:
-      "The timeline varies depending on the complexity of the hypothesis and the availability of data. A typical research cycle from hypothesis to published strategy takes between three and six months, including data collection, validation, documentation, and review.",
+      "Development timelines vary and are not publicised. A strategy is published only after it has been backtested, documented, and reviewed internally.",
   },
   {
     question: "What data sources does Stratova Quant use?",
     answer:
-      "We use a combination of market data, fundamental data, corporate actions, macroeconomic indicators, and select alternative data sources. All data is sourced from reputable providers and undergoes rigorous validation before being used in research.",
+      "End-of-day market data for NSE-listed equities, index constituents, and benchmark values. We do not use alternative or private datasets.",
   },
   {
-    question: "How are strategies validated before publication?",
+    question: "How are strategies validated?",
     answer:
-      "Every strategy undergoes a multi-stage validation process including historical backtesting, walk-forward analysis, robustness checks, sensitivity analysis, and transaction cost modeling. Strategies are reviewed internally before any research is published.",
+      "Through point-in-time backtesting with realistic transaction costs, out-of-sample testing, and ongoing comparison to the benchmark on a net-return basis. Known limitations are published alongside results.",
   },
   {
     question: "Does Stratova Quant manage client assets?",
     answer:
-      "No. Stratova Quant is an independent research firm. We develop systematic investment strategies and publish our research. We do not manage discretionary accounts or accept client assets.",
+      "No. Stratova Quant publishes research and recommendations. Subscribers receive strategy signals and target allocations; they execute trades themselves through their own broker. We do not hold client funds, manage discretionary accounts, or place orders on behalf of subscribers.",
   },
   {
     question: "How often is the methodology updated?",
     answer:
-      "Our research methodology is continuously refined as new data, techniques, and academic research become available. Significant methodology updates are documented and published in our research library alongside the relevant research papers.",
+      "The methodology is fixed by design. Strategy rules do not change. Data sources may be extended as new markets are added. Any material change to the framework is documented on this page.",
   },
 ];
 

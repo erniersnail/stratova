@@ -6,31 +6,25 @@ const DATA_CATEGORIES = [
     number: "01",
     title: "Market Data",
     description:
-      "Daily and intraday pricing, volume, and bid-ask spreads for equities listed on major exchanges. Data is sourced from reputable market data providers and validated against independent sources.",
+      "Continuous ingestion of equity pricing and volume across NSE-listed securities. Data flows through validation, normalization, and corporate-action adjustment before entering the research pipeline.",
   },
   {
     number: "02",
-    title: "Fundamental Data",
+    title: "Feature Construction",
     description:
-      "Financial statements, earnings reports, and accounting data including revenue, earnings, book value, cash flow, and segment-level disclosures. Historical data is adjusted for corporate actions and accounting changes.",
+      "Raw market data is transformed into normalized cross-sectional and time-series features through a defined feature engineering pipeline. Feature distributions are monitored for stability and consistency.",
   },
   {
     number: "03",
-    title: "Corporate Actions",
+    title: "Reference Data",
     description:
-      "Dividends, stock splits, mergers, acquisitions, spin-offs, and other corporate events that affect security pricing and portfolio construction. All actions are validated and applied consistently across the dataset.",
+      "Index constituents, benchmark levels, and corporate-action records synchronized daily. Point-in-time snapshots preserve historical universe composition for backtesting.",
   },
   {
     number: "04",
-    title: "Macroeconomic Data",
+    title: "What We Do Not Use",
     description:
-      "Interest rates, inflation, GDP, employment, and other macroeconomic indicators. Used for regime analysis and understanding the broader economic context in which strategies operate.",
-  },
-  {
-    number: "05",
-    title: "Alternative Data",
-    description:
-      "Selected non-traditional datasets including sentiment indicators, supply chain data, and industry-specific metrics. Alternative data is evaluated for incremental value before integration into the research process.",
+      "No alternative data, no sentiment feeds, no private datasets, no third-party signals. Everything we use is publicly available and reproducible.",
   },
 ];
 
@@ -38,8 +32,8 @@ export default function DataSources() {
   return (
     <div>
       <SectionHeader
-        title="Data Sources"
-        description="Research quality depends on data quality. We source data from established providers and validate it rigorously."
+        title="Data Infrastructure"
+        description="Our data pipeline ingests, validates, and normalizes market information into structured features for systematic signal construction."
         centered={false}
       />
       <div className="mt-8 space-y-8">

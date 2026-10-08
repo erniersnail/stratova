@@ -4,33 +4,27 @@ import { typography } from "@/lib/typography";
 const STEPS = [
   {
     number: "01",
-    title: "Hypothesis",
+    title: "Rules-Based",
     description:
-      "Every research project begins with a clearly defined, testable investment hypothesis. Hypotheses are drawn from academic literature, empirical observation, or market anomalies and must be falsifiable.",
+      "Every strategy is defined by a fixed set of rules. Rules are established before a strategy is published and are not adjusted based on recent performance or discretionary judgement.",
   },
   {
     number: "02",
-    title: "Data Collection",
+    title: "Systematic Selection",
     description:
-      "Relevant historical data is gathered from multiple sources, cleaned, and validated. We account for survivorship bias, look-ahead bias, and data quality issues before any analysis begins.",
+      "Securities are selected through a systematic process applied to a defined universe. The selection methodology is not disclosed.",
   },
   {
     number: "03",
-    title: "Validation",
+    title: "Portfolio Construction",
     description:
-      "Hypotheses are tested through statistical analysis, backtesting, and robustness checks. We evaluate performance across multiple time periods, market regimes, and parameter specifications.",
+      "Positions are equally weighted. Every position receives the same allocation. No conviction bets, no overweights. The number of positions per portfolio is fixed and published alongside each strategy.",
   },
   {
     number: "04",
-    title: "Portfolio Construction",
+    title: "Rebalancing",
     description:
-      "Validated ideas are translated into systematic portfolio rules with defined position sizing, rebalancing, and risk constraints. Transaction costs, liquidity, and capacity are modeled explicitly.",
-  },
-  {
-    number: "05",
-    title: "Monitoring",
-    description:
-      "Published strategies are continuously monitored for performance, risk, and structural changes. Findings — both positive and negative — are documented and published in our research library.",
+      "Each strategy rebalances on a fixed cadence. Rebalance dates are published in advance. Strategies do not deviate from their schedule.",
   },
 ];
 
@@ -38,8 +32,8 @@ export default function ResearchLifecycle() {
   return (
     <div>
       <SectionHeader
-        title="Research Lifecycle"
-        description="From hypothesis to publication, every strategy follows a structured research lifecycle."
+        title="Strategy Design"
+        description="Every strategy follows a fixed set of rules — decided in advance, applied consistently, and never overridden by discretion."
         centered={false}
       />
       <div className="mt-8 space-y-8">
