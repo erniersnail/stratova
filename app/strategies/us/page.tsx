@@ -6,7 +6,7 @@ import { getPublicStrategiesByRegion } from "@/lib/strategies/fetch";
 
 export const metadata: Metadata = {
   title: "U.S. Strategies — Stratova Quant",
-  description: "Systematic quantitative strategies for NASDAQ-listed equities.",
+  description: "Systematic NASDAQ large-cap research.",
 };
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function USStrategiesPage() {
       <Container className="py-20">
         <PageHeader
           title="U.S. Strategies"
-          description="Systematic quantitative strategies for NASDAQ-listed equities."
+          description="Systematic NASDAQ large-cap research."
         />
 
         <div className="mt-12">

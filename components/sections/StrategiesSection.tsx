@@ -19,9 +19,9 @@ const STRATEGY_CARDS: StrategyCard[] = [
     href: "/strategies/us",
     code: "US",
     title: "U.S. Strategies",
-    description: "Systematic strategies across America's full market-cap spectrum.",
+    description: "Systematic strategies across the NASDAQ 100.",
     image: "/images/statue_liberty.png",
-    tags: ["Systematic", "Nasdaq 100", "Benchmark Outperformer"],
+    tags: ["Systematic", "NASDAQ 100", "Benchmark Outperformer"],
   },
   {
     href: "/strategies/india",

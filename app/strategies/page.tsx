@@ -20,8 +20,7 @@ const REGION_CARDS = [
     href: "/strategies/us",
     label: "United States",
     title: "U.S. Strategies",
-    description:
-      "Systematic quantitative strategies for NASDAQ-listed equities.",
+    description: "Systematic strategies across the NASDAQ 100.",
   },
 ];
 
