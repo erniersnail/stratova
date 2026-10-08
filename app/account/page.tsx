@@ -57,15 +57,10 @@ export default async function AccountPage() {
         .eq("status", "ACTIVE"),
     ]);
 
-  const hasPreview = (subscriptions ?? []).some((s) => s.plan === "preview");
   const hasPaid = (subscriptions ?? []).some(
     (s) => s.strategy_id !== null && s.strategy_id !== "",
   );
-  const planLabel = hasPaid
-    ? "Subscribed"
-    : hasPreview
-      ? "Preview access (all strategies)"
-      : null;
+  const planLabel = hasPaid ? "Subscribed" : null;
 
   return (
     <main>
