@@ -11,7 +11,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Research", href: "/research" },
   { label: "Strategies", href: "/strategies" },
   { label: "Performance", href: "/performance" },
-  { label: "About", href: "/about" },
+  { label: "Dashboard", href: "/dashboard" },
 ];
 
 export default function Navbar() {
