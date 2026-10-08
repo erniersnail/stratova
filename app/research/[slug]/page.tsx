@@ -102,7 +102,7 @@ export default async function ArticlePage({ params }: Props) {
         </p>
 
         {article.cover_image_url ? (
-          <div className="my-8 aspect-[16/9] w-full overflow-hidden rounded-md border border-border">
+          <div className="my-6 aspect-[16/9] w-full overflow-hidden rounded-md border border-border">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={article.cover_image_url}
