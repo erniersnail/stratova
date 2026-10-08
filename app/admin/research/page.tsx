@@ -63,7 +63,19 @@ export default async function AdminResearchPage() {
                   key={article.id}
                   className="border-b border-border align-top"
                 >
-                  <td className="py-3 pr-4 font-medium">{article.title}</td>
+                  <td className="py-3 pr-4">
+                    <div className="flex items-center gap-3">
+                      {article.cover_image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={article.cover_image_url}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-sm border border-border object-cover"
+                        />
+                      ) : null}
+                      <span className="font-medium">{article.title}</span>
+                    </div>
+                  </td>
                   <td className="py-3 pr-4">
                     <span
                       className={`inline-flex rounded-sm px-2 py-0.5 text-xs font-medium ${

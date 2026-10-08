@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import Link from "next/link";
 import {
   createArticleAction,
@@ -8,6 +8,7 @@ import {
   type ArticleFormState,
 } from "@/lib/research/actions";
 import type { ResearchArticle } from "@/lib/research/fetch";
+import { uploadArticleMedia } from "@/lib/research/upload";
 import Button from "@/components/ui/Button";
 
 type ArticleFormProps =
@@ -72,6 +73,76 @@ export function ArticleForm(props: ArticleFormProps) {
     (article?.published_at
       ? datePartIST(article.published_at)
       : datePartIST(new Date()));
+
+  // Cover image: uploaded client-side BEFORE submit; hidden input carries
+  // the URL. Lives here (not in the keyed form) so it survives error remounts.
+  const [coverUrl, setCoverUrl] = useState(article?.cover_image_url ?? "");
+  const [coverName, setCoverName] = useState("");
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+
+  // Inline image: insert markdown at the caret of the uncontrolled textarea.
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  async function handleCoverSelect(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): Promise<void> {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setCoverError(null);
+    setCoverUploading(true);
+    const result = await uploadArticleMedia(file);
+    setCoverUploading(false);
+    if ("error" in result) {
+      setCoverError(result.error);
+      return;
+    }
+    setCoverUrl(result.url);
+    setCoverName(file.name);
+  }
+
+  function handleCoverRemove(): void {
+    setCoverUrl("");
+    setCoverName("");
+    setCoverError(null);
+    if (coverInputRef.current) coverInputRef.current.value = "";
+  }
+
+  function insertAtCursor(url: string): void {
+    const textarea = bodyRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? start;
+    const insertion = `![image](${url})\n`;
+    textarea.value =
+      textarea.value.slice(0, start) + insertion + textarea.value.slice(end);
+    const caret = start + insertion.length;
+    textarea.focus();
+    textarea.setSelectionRange(caret, caret);
+  }
+
+  async function handleInlineImageSelect(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): Promise<void> {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageError(null);
+      setImageUploading(true);
+      const result = await uploadArticleMedia(file);
+      setImageUploading(false);
+      if ("error" in result) {
+        setImageError(result.error);
+        return; // body untouched on error
+      }
+      insertAtCursor(result.url);
+    }
+    // Allow re-picking the same file later.
+    event.target.value = "";
+  }
 
   return (
     <form key={formKey} action={formAction} className="space-y-5">
@@ -157,14 +228,81 @@ export function ArticleForm(props: ArticleFormProps) {
         <label htmlFor="body_md" className={LABEL}>
           Body (markdown)
         </label>
+        <div className="mb-2">
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="hidden"
+            onChange={handleInlineImageSelect}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={imageUploading}
+            onClick={() => imageInputRef.current?.click()}
+          >
+            {imageUploading ? "Uploading…" : "Insert image"}
+          </Button>
+          {imageError ? (
+            <p className="mt-2 text-xs text-red-600">{imageError}</p>
+          ) : null}
+        </div>
         <textarea
           id="body_md"
           name="body_md"
+          ref={bodyRef}
           required
           defaultValue={saved?.body_md ?? article?.body_md ?? ""}
           rows={16}
           className={`${INPUT} min-h-[400px] font-mono leading-relaxed`}
         />
+      </div>
+
+      <div className="border-t border-border pt-4">
+        <p className={LABEL}>
+          Cover image <span className="font-normal text-secondary">(optional)</span>
+        </p>
+        <input type="hidden" name="cover_image_url" value={coverUrl} />
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="block text-sm text-secondary file:mr-3 file:cursor-pointer file:rounded-sm file:border file:border-border file:bg-surface file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-foreground file:transition-colors file:hover:border-foreground"
+            onChange={handleCoverSelect}
+          />
+          {coverName ? (
+            <span className="max-w-[240px] truncate text-xs text-secondary">
+              {coverName}
+            </span>
+          ) : null}
+          {coverUrl ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handleCoverRemove}
+            >
+              Remove
+            </Button>
+          ) : null}
+        </div>
+        {coverUploading ? (
+          <p className="mt-2 text-xs text-secondary">Uploading…</p>
+        ) : null}
+        {coverError ? (
+          <p className="mt-2 text-xs text-red-600">{coverError}</p>
+        ) : null}
+        {coverUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coverUrl}
+            alt="Cover preview"
+            className="mt-3 h-32 w-auto rounded-md border border-border object-cover"
+          />
+        ) : null}
       </div>
 
       <fieldset className="border-t border-border pt-4">

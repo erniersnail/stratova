@@ -35,6 +35,15 @@ export default async function ResearchPage() {
                 href={`/research/${article.slug}`}
                 className="block border-b border-border px-2 py-8 last:border-0"
               >
+                {article.cover_image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={article.cover_image_url}
+                    alt=""
+                    className="mb-4 aspect-video w-full rounded-t-md object-cover"
+                    loading="lazy"
+                  />
+                ) : null}
                 <h3 className="serif text-2xl font-bold text-foreground">
                   {article.title}
                 </h3>

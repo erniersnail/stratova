@@ -31,6 +31,15 @@ const PROSE: Components = {
   code: (props) => (
     <code className="rounded bg-foreground/10 px-1.5 py-0.5 font-mono text-sm" {...props} />
   ),
+  img: ({ src, alt }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt || ""}
+      className="my-8 max-w-full rounded-md border border-border"
+      loading="lazy"
+    />
+  ),
 };
 
 type Props = {
@@ -91,6 +100,16 @@ export default async function ArticlePage({ params }: Props) {
         <p className="mt-6 text-sm text-foreground/70">
           By {article.author_name} · {formatIST(article.published_at)}
         </p>
+
+        {article.cover_image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={article.cover_image_url}
+            alt=""
+            className="my-8 max-w-full rounded-md"
+            loading="lazy"
+          />
+        ) : null}
 
         <div className="mt-10">
           <ReactMarkdown components={PROSE}>{article.body_md}</ReactMarkdown>

@@ -14,6 +14,7 @@ export type ArticleFormState = {
     body_md?: string;
     category?: string;
     publish_date?: string;
+    cover_image_url?: string;
   };
 };
 
@@ -26,6 +27,7 @@ type ArticleFields = {
   subtitle: string;
   body_md: string;
   category: string;
+  cover_image_url: string;
 };
 
 /**
@@ -63,6 +65,7 @@ function readFields(formData: FormData): ArticleFields {
     subtitle: readString(formData, "subtitle"),
     body_md: readString(formData, "body_md"),
     category: readString(formData, "category"),
+    cover_image_url: readString(formData, "cover_image_url"),
   };
 }
 
@@ -145,6 +148,7 @@ export async function createArticleAction(
         body_md: fields.body_md,
         subtitle: toNullable(fields.subtitle),
         category: toNullable(fields.category),
+        cover_image_url: toNullable(fields.cover_image_url),
         author_name: readString(formData, "author_name") || "Stratova Quant",
         is_published: false,
         published_at: null,
@@ -208,6 +212,7 @@ export async function updateArticleAction(
       subtitle: toNullable(fields.subtitle),
       body_md: fields.body_md,
       category: toNullable(fields.category),
+      cover_image_url: toNullable(fields.cover_image_url),
       publish_date_override: publishDate.date,
     };
 

@@ -14,6 +14,8 @@ export type ResearchArticle = {
   published_at: string | null;
   /** Admin-chosen publish date (YYYY-MM-DD) while draft. Null = auto. */
   publish_date_override: string | null;
+  /** Optional cover image (public Storage URL). */
+  cover_image_url: string | null;
   created_at: string;
   updated_at: string;
 };
