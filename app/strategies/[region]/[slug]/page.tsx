@@ -8,10 +8,8 @@ import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
   getCurrentRecommendations,
-  getStrategyPerformance,
   type Recommendation,
 } from "@/lib/strategies/fetch";
-import EquityCurveChart from "@/components/strategies/EquityCurveChart";
 import { createClient } from "@/lib/supabase/server";
 import { formatIST } from "@/lib/format/date";
 import {
@@ -62,19 +60,6 @@ export default async function StrategyDetailPage({
   const picks: Recommendation[] = user
     ? await getCurrentRecommendations(strategy.id)
     : [];
-
-  // Public — no auth gate. Two points minimum to draw a curve.
-  const perf = await getStrategyPerformance(strategy.id);
-  const hasCurve = perf.length >= 2 && perf[0].total_value > 0;
-  const chartData = hasCurve
-    ? perf.map((p) => ({
-        date: p.date,
-        value: (100 * p.total_value) / perf[0].total_value,
-      }))
-    : [];
-  const returnPct = hasCurve
-    ? (((chartData[chartData.length - 1].value / 100 - 1) * 100).toFixed(2))
-    : null;
 
   // Current user's PENDING or ACTIVE subscription for this strategy.
   type ExistingSub = {
@@ -203,19 +188,24 @@ export default async function StrategyDetailPage({
           </dl>
         </div>
 
-        {hasCurve && returnPct !== null && (
-          <div className="mt-16">
-            <h2 className={`${typography.h3} text-foreground`}>
-              Performance since inception
-            </h2>
-            <div className="mt-4 rounded-md border border-border bg-surface p-5">
-              <EquityCurveChart data={chartData} />
-              <p className="mt-4 text-sm text-secondary">
-                Inception: {perf[0].date} · Return: {returnPct}%
-              </p>
-            </div>
+        <div className="mt-16">
+          <h2 className={`${typography.h3} text-foreground`}>
+            About this strategy
+          </h2>
+          <div className="mt-4 max-w-[720px] space-y-4">
+            {strategy.long_description
+              ? strategy.long_description.split("\n\n").map((para, i) => (
+                  <p key={i} className={`${typography.body} text-foreground/85`}>
+                    {para}
+                  </p>
+                ))
+              : (
+                  <p className={`${typography.body} text-foreground/85`}>
+                    {strategy.short_description ?? "Description coming soon."}
+                  </p>
+                )}
           </div>
-        )}
+        </div>
 
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>

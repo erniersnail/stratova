@@ -71,6 +71,12 @@ export default async function IndiaStrategiesPage() {
                         </div>
                       )}
                     </dl>
+
+                    {strategy.is_subscribable === false && (
+                      <span className="mt-2 inline-block text-xs tracking-wide text-tertiary">
+                        Not open to new subscriptions
+                      </span>
+                    )}
                   </Link>
                 </li>
               ))}

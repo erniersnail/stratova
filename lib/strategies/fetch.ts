@@ -13,6 +13,7 @@ export type Strategy = {
   fee_per_rebalance: number | null;
   returns_json: unknown | null;
   is_public: boolean;
+  is_subscribable: boolean;
   display_order: number;
   region: string | null;
 };
@@ -66,7 +67,7 @@ export async function getPublicStrategiesByRegion(
       .select("*")
       .eq("is_public", true)
       .eq("region", region)
-      .order("display_order", { ascending: true });
+      .order("name", { ascending: true });
 
     if (error) {
       console.error(
