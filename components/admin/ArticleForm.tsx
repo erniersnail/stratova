@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import {
   createArticleAction,
@@ -29,6 +29,17 @@ function slugify(value: string): string {
     .replace(/^-|-$/g, "");
 }
 
+/** Current date (or ISO instant) as YYYY-MM-DD in IST. */
+function datePartIST(value: Date | string): string {
+  const d = typeof value === "string" ? new Date(value) : value;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(d);
+}
+
 export function ArticleForm(props: ArticleFormProps) {
   const isEdit = props.mode === "edit";
   const article = isEdit ? props.article : null;
@@ -48,6 +59,19 @@ export function ArticleForm(props: ArticleFormProps) {
     article?.id ?? "",
     state.fields ? JSON.stringify(state.fields) : "initial",
   ].join("|");
+
+  // Fix 3: auto (now on publish) vs manual (backdated) publish date.
+  // Controlled radios only; the date input stays uncontrolled.
+  const [dateMode, setDateMode] = useState<"auto" | "manual">(
+    article?.publish_date_override ? "manual" : "auto",
+  );
+
+  const defaultPublishDate =
+    saved?.publish_date ||
+    article?.publish_date_override ||
+    (article?.published_at
+      ? datePartIST(article.published_at)
+      : datePartIST(new Date()));
 
   return (
     <form key={formKey} action={formAction} className="space-y-5">
@@ -142,6 +166,51 @@ export function ArticleForm(props: ArticleFormProps) {
           className={`${INPUT} min-h-[400px] font-mono leading-relaxed`}
         />
       </div>
+
+      <fieldset className="border-t border-border pt-4">
+        <legend className="sr-only">Publish date</legend>
+        <p className="mb-2 text-sm font-medium text-foreground">
+          Publish date
+        </p>
+        <div className="space-y-2">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+            <input
+              type="radio"
+              name="publish_date_mode"
+              value="auto"
+              checked={dateMode === "auto"}
+              onChange={() => setDateMode("auto")}
+              className="h-4 w-4 accent-foreground"
+            />
+            Use current date when published
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+            <input
+              type="radio"
+              name="publish_date_mode"
+              value="manual"
+              checked={dateMode === "manual"}
+              onChange={() => setDateMode("manual")}
+              className="h-4 w-4 accent-foreground"
+            />
+            Set a specific date
+          </label>
+          {dateMode === "manual" ? (
+            <input
+              type="date"
+              name="publish_date"
+              required
+              defaultValue={defaultPublishDate}
+              className={`${INPUT} max-w-[220px]`}
+            />
+          ) : null}
+        </div>
+        <p className="mt-2 text-xs text-secondary">
+          Manual dates backdate the article: publishing sets{" "}
+          <code className="font-mono">published_at</code> to midnight IST on
+          that date.
+        </p>
+      </fieldset>
 
       {state.error ? (
         <p className="text-sm text-red-600">{state.error}</p>

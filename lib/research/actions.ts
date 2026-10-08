@@ -13,6 +13,7 @@ export type ArticleFormState = {
     subtitle?: string;
     body_md?: string;
     category?: string;
+    publish_date?: string;
   };
 };
 
@@ -85,6 +86,31 @@ function revalidateResearch(): void {
   revalidatePath("/admin/research");
 }
 
+const PUBLISH_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Valid "YYYY-MM-DD" → that instant at 00:00 IST, as an ISO timestamptz. */
+function istMidnightIso(date: string): string {
+  return `${date}T00:00:00+05:30`;
+}
+
+/**
+ * Reads publish_date_mode / publish_date from the form.
+ * "auto" (or absent) → null. "manual" → a validated YYYY-MM-DD, or
+ * ok: false when the date is missing/malformed (client type=date +
+ * required normally prevents this).
+ */
+function parsePublishDate(
+  formData: FormData,
+): { ok: true; date: string | null } | { ok: false } {
+  if (readString(formData, "publish_date_mode") !== "manual") {
+    return { ok: true, date: null };
+  }
+  const date = readString(formData, "publish_date");
+  if (!PUBLISH_DATE_RE.test(date)) return { ok: false };
+  if (Number.isNaN(new Date(`${date}T00:00:00Z`).getTime())) return { ok: false };
+  return { ok: true, date };
+}
+
 /** Unique-violation (Postgres 23505) from the slug unique index. */
 function isDuplicateSlug(code: string | undefined, message: string): boolean {
   return code === "23505" || message.includes("duplicate key");
@@ -94,7 +120,11 @@ export async function createArticleAction(
   _prev: ArticleFormState,
   formData: FormData,
 ): Promise<ArticleFormState> {
-  const fields = readFields(formData);
+  const fields = {
+    ...readFields(formData),
+    publish_date: readString(formData, "publish_date"),
+  };
+  const publishDate = parsePublishDate(formData);
   let newId = "";
 
   try {
@@ -102,17 +132,23 @@ export async function createArticleAction(
 
     const parsed = validate(fields);
     if (!parsed.ok) return { error: parsed.error, fields };
+    if (!publishDate.ok) {
+      return { error: "Please pick a valid publish date.", fields };
+    }
 
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("research_articles")
       .insert({
-        ...fields,
+        slug: fields.slug,
+        title: fields.title,
+        body_md: fields.body_md,
         subtitle: toNullable(fields.subtitle),
         category: toNullable(fields.category),
         author_name: readString(formData, "author_name") || "Stratova Quant",
         is_published: false,
         published_at: null,
+        publish_date_override: publishDate.date,
       })
       .select("id")
       .single();
@@ -139,7 +175,11 @@ export async function updateArticleAction(
   _prev: ArticleFormState,
   formData: FormData,
 ): Promise<ArticleFormState> {
-  const fields = readFields(formData);
+  const fields = {
+    ...readFields(formData),
+    publish_date: readString(formData, "publish_date"),
+  };
+  const publishDate = parsePublishDate(formData);
 
   try {
     await requireAdmin();
@@ -154,19 +194,37 @@ export async function updateArticleAction(
 
     const parsed = validate(fields);
     if (!parsed.ok) return { error: parsed.error, fields };
+    if (!publishDate.ok) {
+      return { error: "Please pick a valid publish date.", fields };
+    }
 
-    // is_published / published_at are intentionally untouched — publishing
-    // has its own action.
+    // is_published is intentionally untouched — publishing has its own
+    // action. publish_date_override is always rewritten (auto → null).
     const supabase = await createClient();
+
+    const updatePayload: Record<string, unknown> = {
+      slug: fields.slug,
+      title: fields.title,
+      subtitle: toNullable(fields.subtitle),
+      body_md: fields.body_md,
+      category: toNullable(fields.category),
+      publish_date_override: publishDate.date,
+    };
+
+    // Rule 4: editing an already-published article with a manual date also
+    // moves published_at, so the displayed date updates immediately.
+    const { data: current } = await supabase
+      .from("research_articles")
+      .select("is_published")
+      .eq("id", id)
+      .maybeSingle();
+    if (current?.is_published && publishDate.date) {
+      updatePayload.published_at = istMidnightIso(publishDate.date);
+    }
+
     const { error } = await supabase
       .from("research_articles")
-      .update({
-        slug: fields.slug,
-        title: fields.title,
-        subtitle: toNullable(fields.subtitle),
-        body_md: fields.body_md,
-        category: toNullable(fields.category),
-      })
+      .update(updatePayload)
       .eq("id", id);
 
     if (error) {
@@ -190,15 +248,21 @@ export async function publishArticleAction(id: string): Promise<void> {
     const supabase = await createClient();
     const { data: row } = await supabase
       .from("research_articles")
-      .select("published_at")
+      .select("published_at, publish_date_override")
       .eq("id", id)
       .maybeSingle();
+
+    // Manual override → that date at 00:00 IST; auto → existing published_at
+    // (republish case) or now().
+    const publishedAt = row?.publish_date_override
+      ? istMidnightIso(row.publish_date_override)
+      : (row?.published_at ?? new Date().toISOString());
 
     const { error } = await supabase
       .from("research_articles")
       .update({
         is_published: true,
-        published_at: row?.published_at ?? new Date().toISOString(),
+        published_at: publishedAt,
       })
       .eq("id", id);
     if (error) throw error;

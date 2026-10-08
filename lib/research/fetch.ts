@@ -12,11 +12,13 @@ export type ResearchArticle = {
   author_name: string;
   is_published: boolean;
   published_at: string | null;
+  /** Admin-chosen publish date (YYYY-MM-DD) while draft. Null = auto. */
+  publish_date_override: string | null;
   created_at: string;
   updated_at: string;
 };
 
-/** Listing shape (same as article minus the body). */
+/** Listing shape (same as article minus the body; inherits publish_date_override). */
 export type ResearchListItem = Omit<ResearchArticle, "body_md">;
 
 /** Published articles, newest first (public read). */

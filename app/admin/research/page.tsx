@@ -10,7 +10,7 @@ import {
 import ConfirmActionForm from "@/components/admin/ConfirmActionForm";
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
-import { formatIST } from "@/lib/format/date";
+import { formatIST, formatDateIST } from "@/lib/format/date";
 
 async function requireAdminInPage(): Promise<void> {
   const supabase = await createClient();
@@ -52,6 +52,7 @@ export default async function AdminResearchPage() {
                 <th className="py-2 pr-4">Title</th>
                 <th className="py-2 pr-4">Status</th>
                 <th className="py-2 pr-4">Category</th>
+                <th className="py-2 pr-4">Date</th>
                 <th className="py-2 pr-4">Updated</th>
                 <th className="py-2">Actions</th>
               </tr>
@@ -76,6 +77,17 @@ export default async function AdminResearchPage() {
                   </td>
                   <td className="py-3 pr-4 text-secondary">
                     {article.category ?? "—"}
+                  </td>
+                  <td className="py-3 pr-4 text-secondary">
+                    {article.is_published ? (
+                      formatDateIST(article.published_at)
+                    ) : article.publish_date_override ? (
+                      <span className="text-tertiary">
+                        (intended: {formatDateIST(article.publish_date_override)})
+                      </span>
+                    ) : (
+                      "—"
+                    )}
                   </td>
                   <td className="py-3 pr-4 text-secondary">
                     {formatIST(article.updated_at)}
