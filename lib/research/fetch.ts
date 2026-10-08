@@ -28,7 +28,8 @@ export async function getPublishedArticles(): Promise<ResearchListItem[]> {
     .eq("is_published", true)
     .order("published_at", { ascending: false, nullsFirst: false });
   return (data ?? []).map((row: ResearchArticle) => {
-    const { body_md: _bodyMd, ...rest } = row;
+    const { body_md: _omitBody, ...rest } = row;
+    void _omitBody;
     return rest as Omit<ResearchArticle, "body_md">;
   });
 }
@@ -53,7 +54,8 @@ export async function getAdminArticles(): Promise<ResearchListItem[]> {
     .select("*")
     .order("updated_at", { ascending: false, nullsFirst: false });
   return (data ?? []).map((row: ResearchArticle) => {
-    const { body_md: _bodyMd, ...rest } = row;
+    const { body_md: _omitBody, ...rest } = row;
+    void _omitBody;
     return rest as Omit<ResearchArticle, "body_md">;
   });
 }
