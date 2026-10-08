@@ -36,7 +36,7 @@ const PROSE: Components = {
     <img
       src={src}
       alt={alt || ""}
-      className="my-8 max-w-full rounded-md border border-border"
+      className="my-8 max-h-[70vh] w-auto max-w-full rounded-md border border-border"
       loading="lazy"
     />
   ),
