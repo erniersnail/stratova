@@ -178,7 +178,7 @@ export default async function PerformancePage() {
                     <EquityCurveChart series={cardSeries} height={280} />
                   </div>
                   {sReturn !== null && bReturn !== null && alpha !== null && (
-                    <div className="mt-4 flex items-center justify-between text-xs">
+                    <div className="mt-4 flex items-center justify-between gap-4 text-xs">
                       <span className="text-secondary">
                         {strategy.name}{" "}
                         <strong className="text-foreground">{fmt(sReturn)}</strong>

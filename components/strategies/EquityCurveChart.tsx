@@ -289,7 +289,7 @@ export default function EquityCurveChart({
             textAnchor={anchor(k)}
             fontSize={11}
             fill="currentColor"
-            className="text-foreground/70"
+            className="text-foreground/90"
           >
             {points[i].date}
           </text>
@@ -473,7 +473,7 @@ function MultiSeriesChart({
           textAnchor={anchor(k)}
           fontSize={11}
           fill="currentColor"
-          className="text-foreground/70"
+          className="text-foreground/90"
         >
           {allDates[pos]}
         </text>
