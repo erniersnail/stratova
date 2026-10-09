@@ -99,33 +99,6 @@ export default async function PerformancePreviewSection() {
             >
               View Methodology
             </Button>
-
-            {/* Stats block below the button */}
-            <div className="mt-10 border-t border-border pt-6">
-              <p className="mb-4 text-xs tracking-[0.15em] text-tertiary uppercase">
-                Since 3 Aug 2026
-              </p>
-              <dl className="space-y-3">
-                <div className="flex justify-between">
-                  <dt className="text-sm text-secondary">
-                    Combined portfolio
-                  </dt>
-                  <dd className="text-sm font-medium text-foreground">
-                    {combinedReturn !== null
-                      ? `${combinedReturn >= 0 ? "+" : ""}${combinedReturn.toFixed(2)}%`
-                      : "—"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-secondary">NIFTY 500</dt>
-                  <dd className="text-sm font-medium text-foreground">
-                    {niftyReturn !== null
-                      ? `${niftyReturn >= 0 ? "+" : ""}${niftyReturn.toFixed(2)}%`
-                      : "—"}
-                  </dd>
-                </div>
-              </dl>
-            </div>
           </div>
 
           {/* RIGHT: 3 columns of 5 — chart card only */}
@@ -141,9 +114,47 @@ export default async function PerformancePreviewSection() {
               </div>
 
               {series.length > 0 ? (
-                <div className="mt-6">
-                  <EquityCurveChart series={series} height={280} />
-                </div>
+                <>
+                  <div className="mt-6">
+                    <EquityCurveChart series={series} height={280} />
+                  </div>
+                  {combinedReturn !== null && niftyReturn !== null && (
+                    <>
+                      <div className="mt-4 flex items-center justify-between gap-4 text-xs">
+                        <span className="text-secondary">
+                          Combined Portfolio{" "}
+                          <strong className="text-foreground">
+                            {combinedReturn >= 0 ? "+" : ""}
+                            {combinedReturn.toFixed(2)}%
+                          </strong>
+                        </span>
+                        <span className="text-secondary">
+                          NIFTY 500{" "}
+                          <strong className="text-foreground">
+                            {niftyReturn >= 0 ? "+" : ""}
+                            {niftyReturn.toFixed(2)}%
+                          </strong>
+                        </span>
+                        <span className="text-secondary">
+                          <strong className="text-foreground">
+                            {combinedReturn - niftyReturn >= 0 ? "+" : ""}
+                            {(combinedReturn - niftyReturn).toFixed(2)}% alpha
+                          </strong>
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-center gap-4 text-xs text-secondary">
+                        <span className="flex items-center gap-1.5">
+                          <span className="inline-block h-0.5 w-4 bg-foreground" />
+                          Strategy
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <span className="inline-block h-0.5 w-4 bg-[#b08900]" />
+                          Benchmark
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </>
               ) : (
                 /* Original empty placeholder — shown until strategies publish data */
                 <div
