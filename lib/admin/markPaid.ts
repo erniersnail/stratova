@@ -42,5 +42,6 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
   }
 
   revalidatePath("/dashboard");
+  revalidatePath("/admin/payments");
   revalidatePath("/strategies", "layout");
 }
