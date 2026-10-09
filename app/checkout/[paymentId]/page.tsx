@@ -63,10 +63,11 @@ export default async function CheckoutPage({
               </p>
             </>
           ) : (
-            <div className="rounded-md border border-border bg-surface px-6 py-6">
-              <p className="text-sm font-medium text-foreground">
-                Complete your payment
-              </p>
+            <>
+              <div className="rounded-md border border-border bg-surface px-6 py-6">
+                <p className="text-sm font-medium text-foreground">
+                  Complete your payment
+                </p>
 
               <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -125,6 +126,13 @@ export default async function CheckoutPage({
                 </p>
               </div>
             </div>
+            <p className="mt-6 text-xs leading-[1.7] text-tertiary">
+              Note: This payment method is temporary. Once Stratova&apos;s
+              SEBI-validated UPI handle is issued, all payments will route
+              through our designated @valid UPI ID in accordance with
+              SEBI&apos;s Research Analyst guidelines.
+            </p>
+            </>
           )}
         </div>
 
