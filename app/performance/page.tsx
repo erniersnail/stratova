@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Performance — Stratova Quant",
   description:
-    "Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index.",
+    "Live results for every Stratova strategy.",
 };
 
 // Refresh the rendered data every 5 minutes instead of freezing at build.
@@ -102,7 +102,7 @@ export default async function PerformancePage() {
       <Container size="default" className="py-20">
         <PageHeader
           title="Performance"
-          description="Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index."
+          description="Live results for every Stratova strategy."
         />
 
         {/* Combined portfolio vs NIFTY 500 */}
@@ -111,10 +111,6 @@ export default async function PerformancePage() {
             <h2 className={`${typography.h3} text-foreground`}>
               Combined portfolio vs NIFTY 500
             </h2>
-            <p className="mt-1 text-sm text-tertiary">
-              Equal-weighted across all active India strategies. Rebased to 100 on 3 Aug
-              2026.
-            </p>
             <div className="mt-6">
               <EquityCurveChart series={combinedChart} height={400} />
             </div>
@@ -177,7 +173,6 @@ export default async function PerformancePage() {
                   </div>
                   {sReturn !== null && bReturn !== null && alpha !== null && (
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-secondary">
-                      <span>Since 3 Aug 2026</span>
                       <span>
                         {strategy.name}{" "}
                         <strong className="text-foreground">{fmt(sReturn)}</strong>
@@ -197,9 +192,7 @@ export default async function PerformancePage() {
 
         {/* Disclaimer */}
         <p className="mt-12 text-sm text-tertiary">
-          Past performance does not indicate future results. All returns are normalized to
-          100 at 3 August 2026 and are net of transaction costs. Live tracking began August
-          2026 — the track record is short and not statistically significant.
+          Past performance does not indicate future results.
         </p>
       </Container>
     </main>

@@ -69,13 +69,6 @@ function niceTicks(min: number, max: number): number[] {
   return ticks;
 }
 
-/** Format a tick value: whole numbers bare, otherwise one decimal. */
-function tickLabel(v: number): string {
-  return Math.abs(v - Math.round(v)) < 1e-6
-    ? String(Math.round(v))
-    : v.toFixed(1);
-}
-
 /** End-of-line value label: percent change from the 100 baseline, signed. */
 function endLabel(value: number): string {
   const delta = value - 100;
@@ -246,18 +239,6 @@ export default function EquityCurveChart({
           />
         );
       })}
-      {gridlines.map((g) => (
-        <text
-          key={`yl-${g}`}
-          x={PAD_LEFT + 2}
-          y={y(g) - 4}
-          fontSize={11}
-          fill="currentColor"
-          className="text-foreground/70"
-        >
-          {tickLabel(g)}
-        </text>
-      ))}
       {/* Area fill under the (primary) strategy line */}
       <path
         d={`${d} L${x(n - 1).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} L${x(0).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} Z`}
@@ -432,18 +413,6 @@ function MultiSeriesChart({
           />
         );
       })}
-      {gridlines.map((g) => (
-        <text
-          key={`yl-${g}`}
-          x={PAD_LEFT + 2}
-          y={y(g) - 4}
-          fontSize={11}
-          fill="currentColor"
-          className="text-foreground/70"
-        >
-          {tickLabel(g)}
-        </text>
-      ))}
       {series.map((s, si) => {
         const color = s.color ?? SERIES_COLORS[si % SERIES_COLORS.length];
         const isPrimary = s.emphasis !== "secondary";
