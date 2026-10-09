@@ -104,8 +104,8 @@ export default async function PerformancePreviewSection() {
           {/* RIGHT: 3 columns of 5 — chart card only */}
           <div className="lg:col-span-3">
             <div className="rounded-md border border-border bg-surface px-6 py-6">
-              <div className="flex items-center justify-end">
-                <p className="text-sm text-tertiary">
+              <div className="flex items-center justify-start">
+                <p className="text-sm text-foreground/70">
                   Live from daily snapshots.
                 </p>
               </div>
@@ -244,11 +244,6 @@ export default async function PerformancePreviewSection() {
             </div>
           </div>
         </div>
-
-        <p className="mt-8 text-sm text-secondary">
-          Historical performance includes benchmark comparisons and full
-          methodology notes.
-        </p>
       </Container>
     </Section>
   );
