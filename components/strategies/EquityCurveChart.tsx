@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 export type ChartPoint = {
   date: string; // YYYY-MM-DD
   value: number; // already normalized (e.g. 100 at inception)
@@ -7,6 +9,8 @@ export type ChartSeries = {
   name: string;
   data: ChartPoint[];
   color?: string;
+  /** Visual weight. Primary = thick solid line + area fill; secondary = thin, faded. Defaults to primary for the first series. */
+  emphasis?: "primary" | "secondary";
 };
 
 type EquityCurveChartProps = {
@@ -17,6 +21,88 @@ type EquityCurveChartProps = {
 
 /** Line colors for multi-series mode, darkest first. */
 export const SERIES_COLORS = ["#111111", "#2f6fdb", "#6e6c67", "#a8a29a"];
+
+/**
+ * Compute "nice" y-axis ticks within a padded data range.
+ * Picks a step from {1,2,2.5,5,10} × 10^n so the span divides into ~3–5
+ * ticks, emits multiples of that step inside [min, max], and always
+ * includes 100 when it lies in range (rebased-to-100 charts). Returns
+ * ascending values; callers format them as ints or one decimal.
+ */
+function niceTicks(min: number, max: number): number[] {
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) {
+    return [];
+  }
+  const range = max - min;
+  const rawStep = range / 4; // aim for ~4 intervals → 3–5 ticks
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const norm = rawStep / magnitude;
+  let base: number;
+  if (norm <= 1) base = 1;
+  else if (norm <= 2) base = 2;
+  else if (norm <= 2.5) base = 2.5;
+  else if (norm <= 5) base = 5;
+  else base = 10;
+
+  // Sparse-tick guard: if the chosen step yields <3 ticks, halve it (up to
+  // 2 retries) so wide ranges still show 3+ gridlines.
+  const emitTicks = (step: number): number[] => {
+    const out: number[] = [];
+    const start = Math.ceil(min / step) * step;
+    for (let t = start; t <= max + step * 1e-6; t += step) {
+      out.push(Math.round(t / step) * step);
+    }
+    return out;
+  };
+  let step = base * magnitude;
+  let ticks = emitTicks(step);
+  for (let i = 0; i < 2 && ticks.length < 3; i++) {
+    step = step / 2;
+    ticks = emitTicks(step);
+  }
+
+  const hasBaseline = ticks.some((t) => Math.abs(t - 100) < step * 1e-6);
+  if (!hasBaseline && 100 >= min && 100 <= max) {
+    ticks.push(100);
+    ticks.sort((a, b) => a - b);
+  }
+  return ticks;
+}
+
+/** Format a tick value: whole numbers bare, otherwise one decimal. */
+function tickLabel(v: number): string {
+  return Math.abs(v - Math.round(v)) < 1e-6
+    ? String(Math.round(v))
+    : v.toFixed(1);
+}
+
+/** End-of-line value label: percent change from the 100 baseline, signed. */
+function endLabel(value: number): string {
+  const delta = value - 100;
+  return `${delta >= 0 ? "+" : ""}${delta.toFixed(2)}%`;
+}
+
+/**
+ * Stagger label y-positions so nearby endpoints don't overlap. Items whose
+ * y is within `minGap` of a previously-placed label are nudged down by
+ * `stagger` until clear (or a small cap is hit).
+ */
+function staggerLabels(
+  entries: { key: string; y: number }[],
+  minGap = 13,
+  stagger = 12,
+): Map<string, number> {
+  const sorted = [...entries].sort((a, b) => a.y - b.y);
+  const result = new Map<string, number>();
+  let lastY = -Infinity;
+  for (const e of sorted) {
+    let y = e.y;
+    if (y - lastY < minGap) y = lastY + stagger;
+    result.set(e.key, y);
+    lastY = y;
+  }
+  return result;
+}
 
 function isValidPoint(p: ChartPoint): boolean {
   return !!p && typeof p.date === "string" && Number.isFinite(p.value);
@@ -35,7 +121,7 @@ function ChartPlaceholder({ height }: { height: number }) {
 
 const VIEW_W = 600;
 const PAD_LEFT = 8;
-const PAD_RIGHT = 14;
+const PAD_RIGHT = 56; // room for end-of-line value labels
 const PAD_TOP = 10;
 const LABEL_H = 20;
 
@@ -43,6 +129,7 @@ export type MultiSeriesEntry = {
   name: string;
   points: ChartPoint[];
   color?: string;
+  emphasis?: "primary" | "secondary";
 };
 
 /**
@@ -59,6 +146,8 @@ export default function EquityCurveChart({
   series,
   height = 280,
 }: EquityCurveChartProps) {
+  const gradId = `area-${useId()}`;
+
   // Multi-series mode takes precedence when the prop is provided.
   if (series !== undefined) {
     const cleaned: MultiSeriesEntry[] = series
@@ -66,6 +155,7 @@ export default function EquityCurveChart({
         name: s.name,
         points: (s.data ?? []).filter(isValidPoint),
         color: s.color ?? SERIES_COLORS[si % SERIES_COLORS.length],
+        emphasis: s.emphasis ?? (si === 0 ? "primary" : "secondary"),
       }))
       .filter((s) => s.points.length >= 2);
     if (cleaned.length === 0) return <ChartPlaceholder height={height} />;
@@ -107,13 +197,12 @@ export default function EquityCurveChart({
     .map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(2)},${y(p.value).toFixed(2)}`)
     .join(" ");
 
-  // Y gridlines at fixed fractions of the padded domain — purely visual,
-  // never affect scaling.
-  const gridlines = Array.from(
-    new Set(
-      [0.25, 0.5, 0.75].map((f) => Math.round((min + span * f) * 100) / 100),
-    ),
-  );
+  // Y gridlines at nice round values within the padded domain � purely
+  // visual, never affect scaling.
+  const gridlines = niceTicks(min, max);
+
+
+
 
   // X labels: first, middle, last — deduped (3 max, fewer for tiny series).
   const labelIdx = Array.from(
@@ -134,24 +223,52 @@ export default function EquityCurveChart({
       aria-label={`Equity curve, ${points[0].date} to ${last.date}`}
     >
       <title>{`Equity curve from ${points[0].date} to ${last.date}`}</title>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#111111" stopOpacity={0.12} />
+          <stop offset="100%" stopColor="#111111" stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      {gridlines.map((g) => {
+        const isBaseline = Math.abs(g - 100) < 1e-6;
+        return (
+          <line
+            key={g}
+            x1={PAD_LEFT}
+            x2={VIEW_W - PAD_RIGHT}
+            y1={y(g)}
+            y2={y(g)}
+            stroke="currentColor"
+            strokeWidth={isBaseline ? 1.5 : 1}
+            strokeDasharray={isBaseline ? "2 4" : undefined}
+            vectorEffect="non-scaling-stroke"
+            className={isBaseline ? "text-foreground/20" : "text-border"}
+          />
+        );
+      })}
       {gridlines.map((g) => (
-        <line
-          key={g}
-          x1={PAD_LEFT}
-          x2={VIEW_W - PAD_RIGHT}
-          y1={y(g)}
-          y2={y(g)}
-          stroke="currentColor"
-          strokeWidth={1}
-          vectorEffect="non-scaling-stroke"
-          className="text-border"
-        />
+        <text
+          key={`yl-${g}`}
+          x={PAD_LEFT + 2}
+          y={y(g) - 4}
+          fontSize={11}
+          fill="currentColor"
+          className="text-foreground/70"
+        >
+          {tickLabel(g)}
+        </text>
       ))}
+      {/* Area fill under the (primary) strategy line */}
+      <path
+        d={`${d} L${x(n - 1).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} L${x(0).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} Z`}
+        fill={`url(#${gradId})`}
+        stroke="none"
+      />
       <path
         d={d}
         fill="none"
         stroke="currentColor"
-        strokeWidth={2}
+        strokeWidth={2.5}
         strokeLinejoin="round"
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
@@ -164,6 +281,17 @@ export default function EquityCurveChart({
         fill="currentColor"
         className="text-foreground"
       />
+      {/* End-of-line value label */}
+      <text
+        x={x(n - 1) + 8}
+        y={y(last.value) + 4}
+        fontSize={11}
+        fontWeight={500}
+        fill="currentColor"
+        className="text-foreground"
+      >
+        {endLabel(last.value)}
+      </text>
       {labelIdx.map((pos, k) => {
         const i = pos;
         return (
@@ -188,6 +316,7 @@ type CleanSeries = {
   name: string;
   points: ChartPoint[];
   color?: string;
+  emphasis?: "primary" | "secondary";
 };
 
 /**
@@ -236,13 +365,12 @@ function MultiSeriesChart({
   };
   const y = (v: number) => PAD_TOP + (1 - (v - min) / span) * plotH;
 
-  // Y gridlines at fixed fractions of the padded domain — purely visual,
-  // never affect scaling.
-  const gridlines = Array.from(
-    new Set(
-      [0.25, 0.5, 0.75].map((f) => Math.round((min + span * f) * 100) / 100),
-    ),
-  );
+  // Y gridlines at nice round values within the padded domain � purely
+  // visual, never affect scaling.
+  const gridlines = niceTicks(min, max);
+
+
+
 
   // X labels: first, middle, last of the shared date axis.
   const labelIdx = Array.from(
@@ -252,6 +380,16 @@ function MultiSeriesChart({
     pos === 0 ? "start" : pos === labelIdx.length - 1 ? "end" : "middle";
 
   const names = series.map((s) => s.name).join(", ");
+  const gradId = `area-${useId()}`;
+  const primary = series.find((s) => s.emphasis !== "secondary") ?? series[0];
+
+  // Pre-compute staggered end-label y-positions so nearby endpoints don't overlap.
+  const labelPositions = staggerLabels(
+    series.map((s) => ({
+      key: s.name,
+      y: y(s.points[s.points.length - 1].value),
+    })),
+  );
 
   return (
     <svg
@@ -263,19 +401,37 @@ function MultiSeriesChart({
       aria-label={`Equity curves, ${allDates[0]} to ${allDates[m - 1]}: ${names}`}
     >
       <title>{`Equity curves for ${names}, ${allDates[0]} to ${allDates[m - 1]}`}</title>
-      {gridlines.map((g) => (
-        <line
-          key={g}
-          x1={PAD_LEFT}
-          x2={VIEW_W - PAD_RIGHT}
-          y1={y(g)}
-          y2={y(g)}
-          stroke="currentColor"
-          strokeWidth={1}
-          vectorEffect="non-scaling-stroke"
-          className="text-border"
-        />
-      ))}
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop
+            offset="0%"
+            stopColor={primary.color ?? "#111111"}
+            stopOpacity={0.12}
+          />
+          <stop
+            offset="100%"
+            stopColor={primary.color ?? "#111111"}
+            stopOpacity={0}
+          />
+        </linearGradient>
+      </defs>
+      {gridlines.map((g) => {
+        const isBaseline = Math.abs(g - 100) < 1e-6;
+        return (
+          <line
+            key={g}
+            x1={PAD_LEFT}
+            x2={VIEW_W - PAD_RIGHT}
+            y1={y(g)}
+            y2={y(g)}
+            stroke="currentColor"
+            strokeWidth={isBaseline ? 1.5 : 1}
+            strokeDasharray={isBaseline ? "2 4" : undefined}
+            vectorEffect="non-scaling-stroke"
+            className={isBaseline ? "text-foreground/20" : "text-border"}
+          />
+        );
+      })}
       {gridlines.map((g) => (
         <text
           key={`yl-${g}`}
@@ -285,30 +441,31 @@ function MultiSeriesChart({
           fill="currentColor"
           className="text-foreground/70"
         >
-          {Math.abs(g - Math.round(g)) < 0.05
-            ? String(Math.round(g))
-            : g.toFixed(1)}
+          {tickLabel(g)}
         </text>
       ))}
       {series.map((s, si) => {
         const color = s.color ?? SERIES_COLORS[si % SERIES_COLORS.length];
+        const isPrimary = s.emphasis !== "secondary";
         const d = s.points
-          .map(
-            (p, i) =>
-              `${i === 0 ? "M" : "L"}${xDate(p.date).toFixed(2)},${y(p.value).toFixed(2)}`,
-          )
+          .map((p, i) => `${i === 0 ? "M" : "L"}${xDate(p.date).toFixed(2)},${y(p.value).toFixed(2)}`)
           .join(" ");
         const lastPt = s.points[s.points.length - 1];
+        const areaD = `${d} L${xDate(lastPt.date).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} L${xDate(s.points[0].date).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} Z`;
         return (
           <g key={`${si}-${s.name}`}>
+            {isPrimary && (
+              <path d={areaD} fill={`url(#${gradId})`} stroke="none" />
+            )}
             <path
               d={d}
               fill="none"
               stroke={color}
-              strokeWidth={2}
+              strokeWidth={isPrimary ? 2.5 : 1.5}
               strokeLinejoin="round"
               strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
+              opacity={isPrimary ? 1 : 0.8}
             />
             <circle
               cx={xDate(lastPt.date)}
@@ -316,6 +473,15 @@ function MultiSeriesChart({
               r={3.5}
               fill={color}
             />
+            <text
+              x={xDate(lastPt.date) + 8}
+              y={(labelPositions.get(s.name) ?? y(lastPt.value)) + 4}
+              fontSize={11}
+              fontWeight={500}
+              fill={color}
+            >
+              {endLabel(lastPt.value)}
+            </text>
           </g>
         );
       })}

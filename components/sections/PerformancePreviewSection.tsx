@@ -59,8 +59,8 @@ export default async function PerformancePreviewSection() {
   const series: ChartSeries[] =
     combined.length >= 2 && bmCurve.length >= 2
       ? [
-          { name: "Combined Portfolio", color: "#111111", data: combined },
-          { name: "NIFTY 500", color: "#b08900", data: bmCurve },
+          { name: "Combined Portfolio", color: "#111111", data: combined, emphasis: "primary" },
+          { name: "NIFTY 500", color: "#b08900", data: bmCurve, emphasis: "secondary" },
         ]
       : [];
   // Headline returns for the stats block (same math as the chart series).

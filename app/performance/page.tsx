@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     "Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index.",
 };
 
+// Refresh the rendered data every 5 minutes instead of freezing at build.
+export const revalidate = 300;
+
 const START_DATE = "2026-08-03";
 
 type NormPoint = { date: string; value: number };
@@ -90,8 +93,8 @@ export default async function PerformancePage() {
   const showCombined = combinedSeries.length >= 2 && nifty500Series.length >= 2;
 
   const combinedChart: ChartSeries[] = [
-    { name: "Combined Portfolio", color: "#111111", data: combinedSeries },
-    { name: "NIFTY 500", color: "#b08900", data: nifty500Series },
+    { name: "Combined Portfolio", color: "#111111", data: combinedSeries, emphasis: "primary" },
+    { name: "NIFTY 500", color: "#b08900", data: nifty500Series, emphasis: "secondary" },
   ];
 
   return (
@@ -141,13 +144,14 @@ export default async function PerformancePage() {
               const alpha =
                 sReturn !== null && bReturn !== null ? sReturn - bReturn : null;
               const cardSeries: ChartSeries[] = [
-                { name: strategy.name, color: "#111111", data: strategySeries },
+                { name: strategy.name, color: "#111111", data: strategySeries, emphasis: "primary" },
                 ...(benchmarkSymbol
                   ? [
                       {
                         name: benchmarkSymbol,
                         color: "#b08900",
                         data: benchmarkSeries,
+                        emphasis: "secondary" as const,
                       },
                     ]
                   : []),
