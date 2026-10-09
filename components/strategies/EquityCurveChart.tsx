@@ -81,6 +81,17 @@ function pctLabel(t: number): string {
   return p > 0 ? `+${p}%` : `${p}%`;
 }
 
+/** Short x-axis date: "2026-08-03" → "Aug 3" (month + day, no year). */
+function shortDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00Z");
+  if (Number.isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(d);
+}
+
 /**
  * Stagger label y-positions so nearby endpoints don't overlap. Items whose
  * y is within `minGap` of a previously-placed label are nudged down by
@@ -291,7 +302,7 @@ export default function EquityCurveChart({
             fill="currentColor"
             className="text-foreground/90"
           >
-            {points[i].date}
+            {shortDate(points[i].date)}
           </text>
         );
       })}
@@ -475,7 +486,7 @@ function MultiSeriesChart({
           fill="currentColor"
           className="text-foreground/90"
         >
-          {allDates[pos]}
+          {shortDate(allDates[pos])}
         </text>
       ))}
       </svg>
