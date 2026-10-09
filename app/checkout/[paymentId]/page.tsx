@@ -41,7 +41,6 @@ export default async function CheckoutPage({
     : { data: null };
 
   const isPaid = payment.status === "PAID";
-  const amountStr = `₹${Number(payment.amount).toLocaleString("en-IN")}`;
 
   return (
     <main>
@@ -64,30 +63,68 @@ export default async function CheckoutPage({
               </p>
             </>
           ) : (
-            <>
-              <p className={`${typography.body} text-foreground font-medium`}>
-                Payment integration coming soon
+            <div className="rounded-md border border-border bg-surface px-6 py-6">
+              <p className="text-sm font-medium text-foreground">
+                Complete your payment
               </p>
-              <dl className="mt-4 space-y-2 text-sm">
+
+              <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-secondary">Amount</dt>
-                  <dd className="text-foreground">{amountStr}</dd>
+                  <dd className="font-medium text-foreground">
+                    ₹{Number(payment.amount).toLocaleString("en-IN")}
+                  </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-secondary">Next rebalance</dt>
-                  <dd className="text-foreground">{payment.rebalance_date}</dd>
+                  <dt className="text-secondary">Strategy</dt>
+                  <dd className="text-foreground">
+                    {strategy?.name ?? "Strategy"}
+                  </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-secondary">Payment ID</dt>
-                  <dd className="text-foreground font-mono text-xs">{payment.id}</dd>
+                  <dt className="text-secondary">Reference ID</dt>
+                  <dd className="font-mono text-xs text-foreground">
+                    {payment.id.slice(0, 8).toUpperCase()}
+                  </dd>
                 </div>
               </dl>
-              <p className={`${typography.body} mt-6 text-secondary`}>
-                To complete payment, email info@stratovaquant.com.
-                An admin will confirm and your subscription activates
-                at the next rebalance.
-              </p>
-            </>
+
+              <div className="mt-6 border-t border-border pt-6">
+                <p className="text-sm font-medium text-foreground">
+                  Step 1 — Pay via UPI
+                </p>
+                <p className="mt-2 text-sm text-secondary">
+                  Send ₹{Number(payment.amount).toLocaleString("en-IN")} to:
+                </p>
+                <p className="mt-3 font-mono text-base text-foreground">
+                  {process.env.NEXT_PUBLIC_UPI_ID ?? "UPI ID not configured"}
+                </p>
+
+                <p className="mt-6 text-sm font-medium text-foreground">
+                  Step 2 — Send us the receipt
+                </p>
+                <p className="mt-2 text-sm text-secondary">
+                  WhatsApp the payment screenshot to{" "}
+                  <span className="text-foreground">
+                    {process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ??
+                      "support number not configured"}
+                  </span>{" "}
+                  with the reference ID{" "}
+                  <span className="font-mono text-foreground">
+                    {payment.id.slice(0, 8).toUpperCase()}
+                  </span>
+                  .
+                </p>
+
+                <p className="mt-6 text-sm font-medium text-foreground">
+                  Step 3 — We activate your subscription
+                </p>
+                <p className="mt-2 text-sm text-secondary">
+                  Once we verify your payment, your subscription will be
+                  active for the next rebalance on {payment.rebalance_date}.
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
