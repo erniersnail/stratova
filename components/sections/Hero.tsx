@@ -22,8 +22,11 @@ export default function Hero() {
         />
       </div>
 
-      {/* Gradient overlay - light on left for text legibility, fades to transparent */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[#faf8f4] from-25% via-[#faf8f4]/90 via-55% to-transparent to-85%" />
+      {/* Mobile overlay - solid cream fading down so text sits on cream */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-[#faf8f4] via-[#faf8f4]/95 to-transparent md:hidden" />
+
+      {/* Desktop overlay - light on left, fades to transparent right */}
+      <div className="absolute inset-0 z-[1] hidden bg-gradient-to-r from-[#faf8f4] from-25% via-[#faf8f4]/90 via-55% to-transparent to-85% md:block" />
 
       {/* Text content */}
       <Container size="default" className="relative z-10">

@@ -37,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full scroll-smooth`}>
-      <body className="flex h-full flex-col font-sans antialiased">
+      <body className="flex h-full flex-col overflow-x-clip font-sans antialiased">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

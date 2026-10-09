@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/layout/Logo";
 import AuthLinks from "@/components/layout/AuthLinks";
+import MobileNav from "@/components/layout/MobileNav";
 
 type NavItem = {
   label: string;
@@ -22,7 +23,8 @@ export default function Navbar() {
     >
       <div className="mx-auto w-full max-w-[1200px] px-6 h-full flex items-center justify-between">
         <Logo />
-        <ul className="flex items-center gap-10">
+        {/* Desktop: inline nav + auth. Hidden below md. */}
+        <ul className="hidden items-center gap-10 md:flex">
           {NAV_ITEMS.map((item) => (
             <li key={item.href}>
               <Link
@@ -37,6 +39,8 @@ export default function Navbar() {
             <AuthLinks />
           </li>
         </ul>
+        {/* Mobile: hamburger + slide-down menu. Hidden at md and above. */}
+        <MobileNav />
       </div>
     </nav>
   );

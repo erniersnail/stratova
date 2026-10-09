@@ -65,9 +65,9 @@ export default function StrategiesSection() {
                         {card.description}
                       </p>
                       <hr className="my-5 border-t border-border" />
-                      <p className="mt-4 text-xs tracking-wide text-foreground/85 whitespace-nowrap overflow-hidden text-ellipsis">
+                      <div className="mt-4 flex flex-wrap gap-x-2 gap-y-1 text-xs tracking-wide text-foreground/85">
                         {card.tags.join(" · ")}
-                      </p>
+                      </div>
                       <div className="mt-5">
                         <span className="block text-xs font-semibold tracking-wide text-foreground uppercase">
                           LEARN MORE &rarr;
