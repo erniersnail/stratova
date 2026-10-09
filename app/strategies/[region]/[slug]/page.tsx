@@ -267,7 +267,7 @@ export default async function StrategyDetailPage({
                     </p>
                   )}
                 </div>
-              ) : (
+              ) : strategy.is_subscribable ? (
                 <div className="rounded-md border border-border bg-surface px-4 py-4">
                   <p className="text-sm font-medium text-foreground">
                     Subscribe to {strategy.name}
@@ -285,6 +285,23 @@ export default async function StrategyDetailPage({
                     fee={fee}
                     feeStr={feeStr}
                   />
+                </div>
+              ) : (
+                <div className="rounded-md border border-border bg-surface px-4 py-4">
+                  <p className="text-sm font-medium text-foreground">
+                    Not open to new subscriptions
+                  </p>
+                  <p className="mt-2 text-sm text-secondary">
+                    {strategy.name} is currently not accepting new subscribers.
+                    Subscribe to one of our other strategies, or contact us for
+                    more information.
+                  </p>
+                  <Link
+                    href={`/strategies/${region}`}
+                    className="mt-3 inline-block text-sm text-foreground underline"
+                  >
+                    View other strategies →
+                  </Link>
                 </div>
               )}
 
