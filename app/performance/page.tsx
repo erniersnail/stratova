@@ -96,7 +96,7 @@ export default async function PerformancePage() {
 
   return (
     <main>
-      <Container className="py-20">
+      <Container size="default" className="py-20">
         <PageHeader
           title="Performance"
           description="Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index."
@@ -113,7 +113,7 @@ export default async function PerformancePage() {
               2026.
             </p>
             <div className="mt-6">
-              <EquityCurveChart series={combinedChart} height={320} />
+              <EquityCurveChart series={combinedChart} height={400} />
             </div>
             {showCombined && combinedReturn !== null && niftyReturn !== null && (
               <div className="mt-6 flex flex-wrap items-center justify-between gap-x-8 gap-y-2 text-sm">
@@ -133,7 +133,7 @@ export default async function PerformancePage() {
         </section>
 
         {/* Per-strategy cards */}
-        <div className="mt-8 grid grid-cols-1 gap-8">
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {cards.map(
             ({ strategy, strategySeries, benchmarkSymbol, benchmarkSeries }) => {
               const sReturn = returnPct(strategySeries);
@@ -169,7 +169,7 @@ export default async function PerformancePage() {
                     {strategy.short_description}
                   </p>
                   <div className="mt-6">
-                    <EquityCurveChart series={cardSeries} height={200} />
+                    <EquityCurveChart series={cardSeries} height={280} />
                   </div>
                   {sReturn !== null && bReturn !== null && alpha !== null && (
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-secondary">
