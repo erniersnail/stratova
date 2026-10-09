@@ -75,6 +75,12 @@ function endLabel(value: number): string {
   return `${delta >= 0 ? "+" : ""}${delta.toFixed(2)}%`;
 }
 
+/** Y-axis label: tick value T → signed integer percent vs the 100 baseline. */
+function pctLabel(t: number): string {
+  const p = Math.round(t - 100);
+  return p > 0 ? `+${p}%` : `${p}%`;
+}
+
 /**
  * Stagger label y-positions so nearby endpoints don't overlap. Items whose
  * y is within `minGap` of a previously-placed label are nudged down by
@@ -113,7 +119,7 @@ function ChartPlaceholder({ height }: { height: number }) {
 }
 
 const VIEW_W = 600;
-const PAD_LEFT = 8;
+const PAD_LEFT = 38; // room for right-aligned percentage y-axis labels
 const PAD_RIGHT = 56; // room for end-of-line value labels
 const PAD_TOP = 10;
 const LABEL_H = 20;
@@ -411,6 +417,24 @@ function MultiSeriesChart({
             vectorEffect="non-scaling-stroke"
             className={isBaseline ? "text-foreground/20" : "text-border"}
           />
+        );
+      })}
+      {/* Percentage y-axis labels (multi-series only) */}
+      {Array.from(new Set(gridlines.map(pctLabel))).map((label) => {
+        const g = gridlines.find((t) => pctLabel(t) === label);
+        if (g === undefined) return null;
+        return (
+          <text
+            key={`yp-${label}`}
+            x={PAD_LEFT - 4}
+            y={y(g) + 4}
+            textAnchor="end"
+            fontSize={11}
+            fill="currentColor"
+            className="text-tertiary"
+          >
+            {label}
+          </text>
         );
       })}
       {series.map((s, si) => {

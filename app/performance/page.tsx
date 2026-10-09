@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Performance — Stratova Quant",
   description:
-    "Live results for every Stratova strategy.",
+    "Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index.",
 };
 
 // Refresh the rendered data every 5 minutes instead of freezing at build.
@@ -102,7 +102,7 @@ export default async function PerformancePage() {
       <Container size="default" className="py-20">
         <PageHeader
           title="Performance"
-          description="Live results for every Stratova strategy."
+          description="Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index."
         />
 
         {/* Combined portfolio vs NIFTY 500 */}
@@ -192,7 +192,8 @@ export default async function PerformancePage() {
 
         {/* Disclaimer */}
         <p className="mt-12 text-sm text-tertiary">
-          Past performance does not indicate future results.
+          Past performance does not indicate future results. Track record is
+          short and not statistically significant.
         </p>
       </Container>
     </main>
