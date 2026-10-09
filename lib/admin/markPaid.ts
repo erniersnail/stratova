@@ -3,6 +3,62 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
+export type StrategyAdminState = {
+  error?: string;
+  success?: string;
+};
+
+/**
+ * Admin-only update of a strategy's subscription fee and availability.
+ * Bound to a strategyId by the caller, so the form action signature is the
+ * standard (prevState, formData) shape for useActionState.
+ */
+export async function updateStrategyAdmin(
+  strategyId: string,
+  _prev: StrategyAdminState,
+  formData: FormData,
+): Promise<StrategyAdminState> {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (profile?.role !== "admin") return { error: "Not authorized" };
+
+    const fee = Number(formData.get("fee_per_rebalance"));
+    if (!Number.isInteger(fee) || fee < 100 || fee > 1000000) {
+      return { error: "Fee must be a whole number between 100 and 1,000,000." };
+    }
+
+    const isSubscribable = formData.get("is_subscribable") === "on";
+
+    const { error: dbError } = await supabase
+      .from("strategies")
+      .update({ fee_per_rebalance: fee, is_subscribable: isSubscribable })
+      .eq("id", strategyId);
+
+    if (dbError) {
+      console.error("[admin] updateStrategyAdmin failed:", dbError.message);
+      return { error: "Could not save changes. Please try again." };
+    }
+
+    revalidatePath("/admin/strategies");
+    revalidatePath("/strategies", "layout");
+    return { success: "Saved." };
+  } catch (err) {
+    console.error("[admin] updateStrategyAdmin threw:", err);
+    return { error: "Could not save changes. Please try again." };
+  }
+}
+
 export async function markPaymentPaid(paymentId: string): Promise<void> {
   const supabase = await createClient();
 

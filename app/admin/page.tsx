@@ -49,6 +49,18 @@ export default async function AdminPage() {
             Review pending subscriptions and mark payments received.
           </p>
         </Link>
+
+        <Link
+          href="/admin/strategies"
+          className="rounded-md border border-border bg-surface px-6 py-6 transition-colors hover:border-foreground"
+        >
+          <h2 className="font-serif text-xl font-semibold text-foreground">
+            Strategies
+          </h2>
+          <p className="mt-2 text-sm text-secondary">
+            Edit rebalance fees and subscription availability.
+          </p>
+        </Link>
       </div>
     </Container>
   );

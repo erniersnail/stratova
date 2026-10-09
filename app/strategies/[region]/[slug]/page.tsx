@@ -310,11 +310,13 @@ export default async function StrategyDetailPage({
                 rows={picks}
                 rowKey={(r) => r.id}
                 emptyState={
-                  <div className="rounded-md border border-border bg-surface px-4 py-6">
-                    <p className={`${typography.body} text-secondary`}>
-                      No active picks. Next rebalance publishes shortly.
-                    </p>
-                  </div>
+                  strategy.is_subscribable ? (
+                    <div className="rounded-md border border-border bg-surface px-4 py-6">
+                      <p className={`${typography.body} text-secondary`}>
+                        No active picks. Next rebalance publishes shortly.
+                      </p>
+                    </div>
+                  ) : null
                 }
               />
             </div>
