@@ -128,6 +128,17 @@ export default async function PerformancePage() {
                 </span>
               </div>
             )}
+            {/* Legend */}
+            <div className="mt-3 flex items-center gap-4 text-xs text-secondary">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-4 bg-foreground" />
+                Strategy
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-4 bg-[#b08900]" />
+                Benchmark
+              </span>
+            </div>
           </div>
         </section>
 
@@ -157,14 +168,9 @@ export default async function PerformancePage() {
                   key={strategy.id}
                   className="rounded-md border border-border bg-surface px-6 py-6"
                 >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="font-serif text-xl font-semibold tracking-tight text-foreground">
-                      {strategy.name}
-                    </h3>
-                    <span className="text-xs uppercase tracking-wider text-tertiary">
-                      {strategy.risk_level} risk
-                    </span>
-                  </div>
+                  <h3 className="font-serif text-xl font-semibold tracking-tight text-foreground">
+                    {strategy.name}
+                  </h3>
                   <p className="mt-1 text-sm text-secondary">
                     {strategy.short_description}
                   </p>
@@ -172,15 +178,20 @@ export default async function PerformancePage() {
                     <EquityCurveChart series={cardSeries} height={280} />
                   </div>
                   {sReturn !== null && bReturn !== null && alpha !== null && (
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-secondary">
-                      <span>
+                    <div className="mt-4 flex items-center justify-between text-xs">
+                      <span className="text-secondary">
                         {strategy.name}{" "}
                         <strong className="text-foreground">{fmt(sReturn)}</strong>
-                        &nbsp;·&nbsp;
+                      </span>
+                      <span className="text-secondary">
                         {benchmarkSymbol}{" "}
                         <strong className="text-foreground">{fmt(bReturn)}</strong>
-                        &nbsp;·&nbsp;
-                        <strong className="text-foreground">{fmt(alpha)} alpha</strong>
+                      </span>
+                      <span className="text-secondary">
+                        <strong className="text-foreground">
+                          {alpha >= 0 ? "+" : ""}
+                          {alpha.toFixed(2)}% alpha
+                        </strong>
                       </span>
                     </div>
                   )}

@@ -289,7 +289,7 @@ export default function EquityCurveChart({
             textAnchor={anchor(k)}
             fontSize={11}
             fill="currentColor"
-            className="text-tertiary"
+            className="text-foreground/70"
           >
             {points[i].date}
           </text>
@@ -379,14 +379,15 @@ function MultiSeriesChart({
   );
 
   return (
-    <svg
-      width="100%"
-      height={height}
-      viewBox={`0 0 ${VIEW_W} ${height}`}
-      preserveAspectRatio="none"
-      role="img"
-      aria-label={`Equity curves, ${allDates[0]} to ${allDates[m - 1]}: ${names}`}
-    >
+    <div className="relative w-full" style={{ height }}>
+      <svg
+        width="100%"
+        height={height}
+        viewBox={`0 0 ${VIEW_W} ${height}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={`Equity curves, ${allDates[0]} to ${allDates[m - 1]}: ${names}`}
+      >
       <title>{`Equity curves for ${names}, ${allDates[0]} to ${allDates[m - 1]}`}</title>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
@@ -417,24 +418,6 @@ function MultiSeriesChart({
             vectorEffect="non-scaling-stroke"
             className={isBaseline ? "text-foreground/20" : "text-border"}
           />
-        );
-      })}
-      {/* Percentage y-axis labels (multi-series only) */}
-      {Array.from(new Set(gridlines.map(pctLabel))).map((label) => {
-        const g = gridlines.find((t) => pctLabel(t) === label);
-        if (g === undefined) return null;
-        return (
-          <text
-            key={`yp-${label}`}
-            x={PAD_LEFT - 4}
-            y={y(g) + 4}
-            textAnchor="end"
-            fontSize={11}
-            fill="currentColor"
-            className="text-tertiary"
-          >
-            {label}
-          </text>
         );
       })}
       {series.map((s, si) => {
@@ -490,11 +473,30 @@ function MultiSeriesChart({
           textAnchor={anchor(k)}
           fontSize={11}
           fill="currentColor"
-          className="text-tertiary"
+          className="text-foreground/70"
         >
           {allDates[pos]}
         </text>
       ))}
-    </svg>
+      </svg>
+      {/* Percentage y-axis labels as HTML overlay (immune to SVG stretch) */}
+      {Array.from(new Set(gridlines.map(pctLabel))).map((label) => {
+        const g = gridlines.find((t) => pctLabel(t) === label);
+        if (g === undefined) return null;
+        return (
+          <span
+            key={`yp-${label}`}
+            className="absolute -translate-y-1/2 text-[11px] leading-none text-tertiary"
+            style={{
+              top: `${y(g)}px`,
+              left: `calc(${(PAD_LEFT / VIEW_W) * 100}% - 6px)`,
+              transform: "translateX(-100%) translateY(-50%)",
+            }}
+          >
+            {label}
+          </span>
+        );
+      })}
+    </div>
   );
 }
