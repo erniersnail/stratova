@@ -61,6 +61,18 @@ export default async function AdminPage() {
             Edit rebalance fees and subscription availability.
           </p>
         </Link>
+
+        <Link
+          href="/admin/recommendations"
+          className="rounded-md border border-border bg-surface px-6 py-6 transition-colors hover:border-foreground"
+        >
+          <h2 className="font-serif text-xl font-semibold text-foreground">
+            Recommendations
+          </h2>
+          <p className="mt-2 text-sm text-secondary">
+            Insert manual recommendations and expire stale picks.
+          </p>
+        </Link>
       </div>
     </Container>
   );
