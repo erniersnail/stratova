@@ -195,10 +195,10 @@ export default async function AccountPage() {
 
           {profile?.role === "admin" && (
             <Link
-              href="/admin/research"
+              href="/admin"
               className="text-sm text-secondary underline hover:text-foreground"
             >
-              Admin: Research →
+              Admin Panel →
             </Link>
           )}
         </section>
