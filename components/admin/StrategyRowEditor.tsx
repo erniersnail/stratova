@@ -5,30 +5,37 @@ import { updateStrategyAdmin } from "@/lib/admin/markPaid";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
-type StrategyAdminRow = {
-  id: string;
-  fee_per_rebalance: number | null;
-  is_subscribable: boolean;
+type StrategyRowEditorProps = {
+  strategy: {
+    id: string;
+    name: string;
+    fee_per_rebalance: number | null;
+    is_subscribable: boolean;
+  };
 };
 
 /**
- * One table row per strategy: fee input, subscribable checkbox, Save.
- * Binds the strategy id to the shared updateStrategyAdmin action so each
- * row gets its own (prevState, formData) useActionState instance.
+ * Fee / Subscribable / Save cells for one /admin/strategies table row.
+ *
+ * A <form> cannot wrap <td>s (a form inside <tr> is invalid HTML — the
+ * browser parser mangles it, which is why the inputs never rendered).
+ * Instead the form sits inside the last cell and the fee input + checkbox
+ * join it via the HTML5 form="" attribute, so a submit still collects all
+ * three fields into a single FormData for updateStrategyAdmin.
  */
-export default function StrategyAdminRowForm({
+export default function StrategyRowEditor({
   strategy,
-}: {
-  strategy: StrategyAdminRow;
-}) {
+}: StrategyRowEditorProps) {
+  const formId = `strategy-edit-${strategy.id}`;
   const boundUpdate = updateStrategyAdmin.bind(null, strategy.id);
   const [state, formAction, pending] = useActionState(boundUpdate, {});
 
   return (
-    <form action={formAction} className="contents">
+    <>
       <td className="py-3 pr-4">
         <Input
           id={`fee-${strategy.id}`}
+          form={formId}
           name="fee_per_rebalance"
           type="number"
           min={100}
@@ -36,6 +43,7 @@ export default function StrategyAdminRowForm({
           step={1}
           defaultValue={strategy.fee_per_rebalance ?? 5000}
           className="h-9 w-32"
+          aria-label={`${strategy.name} fee (₹)`}
         />
       </td>
       <td className="py-3 pr-4">
@@ -43,6 +51,7 @@ export default function StrategyAdminRowForm({
           <input
             type="checkbox"
             name="is_subscribable"
+            form={formId}
             defaultChecked={strategy.is_subscribable}
             className="h-4 w-4 accent-[#111111]"
           />
@@ -50,8 +59,17 @@ export default function StrategyAdminRowForm({
         </label>
       </td>
       <td className="py-3">
-        <div className="flex items-center gap-3">
-          <Button type="submit" variant="secondary" size="sm" disabled={pending}>
+        <form
+          id={formId}
+          action={formAction}
+          className="flex items-center gap-3"
+        >
+          <Button
+            type="submit"
+            variant="secondary"
+            size="sm"
+            disabled={pending}
+          >
             {pending ? "Saving…" : "Save"}
           </Button>
           {state.error ? (
@@ -59,8 +77,8 @@ export default function StrategyAdminRowForm({
           ) : state.success ? (
             <span className="text-xs text-green-700">{state.success}</span>
           ) : null}
-        </div>
+        </form>
       </td>
-    </form>
+    </>
   );
 }

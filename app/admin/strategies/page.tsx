@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Container from "@/components/layout/Container";
 import { createClient } from "@/lib/supabase/server";
-import StrategyAdminRowForm from "@/components/admin/StrategyAdminRowForm";
+import StrategyRowEditor from "@/components/admin/StrategyRowEditor";
 
 export const metadata: Metadata = {
   title: "Strategies — Admin",
@@ -82,7 +82,7 @@ export default async function AdminStrategiesPage() {
                 <tr key={strategy.id} className="border-b border-border">
                   <td className="py-3 pr-4 font-medium">{strategy.name}</td>
                   <td className="py-3 pr-4 text-secondary">{strategy.slug}</td>
-                  <StrategyAdminRowForm strategy={strategy} />
+                  <StrategyRowEditor strategy={strategy} />
                 </tr>
               ))
             )}
