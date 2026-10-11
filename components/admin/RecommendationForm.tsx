@@ -16,8 +16,11 @@ const fieldGap = "space-y-4";
  */
 export default function RecommendationForm({
   strategies,
+  defaultStrategyId,
 }: {
   strategies: AdminStrategyOption[];
+  /** When set, the strategy select renders pre-selected (per-strategy admin forms). */
+  defaultStrategyId?: string;
 }) {
   const [state, action, pending] = useActionState(
     insertManualRecommendation,
@@ -47,7 +50,7 @@ export default function RecommendationForm({
             name="strategy_id"
             required
             className={`${inputClass} mt-1`}
-            defaultValue=""
+            defaultValue={defaultStrategyId ?? ""}
           >
             <option value="" disabled>
               Select a strategy…
