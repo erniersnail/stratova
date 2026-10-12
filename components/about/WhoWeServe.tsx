@@ -4,18 +4,18 @@ import { typography } from "@/lib/typography";
 const AUDIENCES = [
   {
     number: "01",
+    title: "Individual Investors",
+    desc: "Retail investors seeking systematic, rules-based exposure to Indian and U.S. equity markets without discretionary bias.",
+  },
+  {
+    number: "02",
     title: "Institutional Investors",
     desc: "Pension funds, endowments, and family offices seeking systematic investment strategies and rigorous research.",
   },
   {
-    number: "02",
+    number: "03",
     title: "Asset Managers",
     desc: "Professional investment managers evaluating quantitative approaches to complement existing portfolio construction processes.",
-  },
-  {
-    number: "03",
-    title: "Researchers",
-    desc: "Academics and quantitative researchers interested in empirical evidence, methodology, and reproducible results.",
   },
   {
     number: "04",
@@ -29,23 +29,20 @@ export default function WhoWeServe() {
     <div>
       <SectionHeader
         title="Who We Serve"
-        description="Our research is designed for sophisticated investors who value evidence, transparency, and methodological rigor."
+        description="Our research is designed for investors who want a systematic, evidence-based approach to equity markets — whether managing personal capital or institutional portfolios."
         centered={false}
       />
-      <div className="mt-8 space-y-8">
-        {AUDIENCES.map((a, index) => (
-          <div key={a.number}>
-            {index > 0 && <hr className="mb-8 border-t border-border" />}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-[80px_1fr]">
-              <span className="text-4xl font-light leading-none text-tertiary">
-                {a.number}
-              </span>
-              <div>
-                <h3 className="text-xl font-medium">{a.title}</h3>
-                <p className={`${typography.body} mt-2 text-secondary`}>
-                  {a.desc}
-                </p>
-              </div>
+      <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 md:grid-cols-2">
+        {AUDIENCES.map((a) => (
+          <div key={a.number} className="grid grid-cols-[64px_1fr] gap-4">
+            <span className="text-3xl font-light leading-none text-tertiary">
+              {a.number}
+            </span>
+            <div>
+              <h3 className="text-lg font-medium text-foreground">{a.title}</h3>
+              <p className={`${typography.body} mt-2 text-secondary`}>
+                {a.desc}
+              </p>
             </div>
           </div>
         ))}

@@ -32,20 +32,17 @@ export default function Values() {
         description="The principles that define how we work and what we produce."
         centered={false}
       />
-      <div className="mt-8 space-y-8">
-        {VALUES.map((v, index) => (
-          <div key={v.number}>
-            {index > 0 && <hr className="mb-8 border-t border-border" />}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-[80px_1fr]">
-              <span className="text-4xl font-light leading-none text-tertiary">
-                {v.number}
-              </span>
-              <div>
-                <h3 className="text-xl font-medium">{v.title}</h3>
-                <p className={`${typography.body} mt-2 text-secondary`}>
-                  {v.desc}
-                </p>
-              </div>
+      <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 md:grid-cols-2">
+        {VALUES.map((v) => (
+          <div key={v.number} className="grid grid-cols-[64px_1fr] gap-4">
+            <span className="text-3xl font-light leading-none text-tertiary">
+              {v.number}
+            </span>
+            <div>
+              <h3 className="text-lg font-medium text-foreground">{v.title}</h3>
+              <p className={`${typography.body} mt-2 text-secondary`}>
+                {v.desc}
+              </p>
             </div>
           </div>
         ))}

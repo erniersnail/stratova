@@ -32,20 +32,17 @@ export default function InvestmentPhilosophy() {
         description="The convictions that shape how we approach markets and research."
         centered={false}
       />
-      <div className="mt-8 space-y-8">
-        {BELIEFS.map((b, index) => (
-          <div key={b.number}>
-            {index > 0 && <hr className="mb-8 border-t border-border" />}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-[80px_1fr]">
-              <span className="text-4xl font-light leading-none text-tertiary">
-                {b.number}
-              </span>
-              <div>
-                <h3 className="text-xl font-medium">{b.title}</h3>
-                <p className={`${typography.body} mt-2 text-secondary`}>
-                  {b.desc}
-                </p>
-              </div>
+      <div className="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 md:grid-cols-2">
+        {BELIEFS.map((b) => (
+          <div key={b.number} className="grid grid-cols-[64px_1fr] gap-4">
+            <span className="text-3xl font-light leading-none text-tertiary">
+              {b.number}
+            </span>
+            <div>
+              <h3 className="text-lg font-medium text-foreground">{b.title}</h3>
+              <p className={`${typography.body} mt-2 text-secondary`}>
+                {b.desc}
+              </p>
             </div>
           </div>
         ))}
