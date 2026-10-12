@@ -22,7 +22,7 @@ export default function ComplianceLayout({
     <main>
       <Section spacing="sm">
         <Container size="narrow">
-          <nav aria-label="Compliance pages" className="mt-8">
+          <nav aria-label="Compliance pages">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {COMPLIANCE_PAGES.map((page) => (
                 <li key={page.slug}>

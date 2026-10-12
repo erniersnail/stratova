@@ -14,11 +14,11 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <main>
-      <Container className="py-20">
+      <Container className="pt-16 pb-0">
         <PageHeader title="Contact" description="Contact Stratova Quant for research inquiries, business development, media requests, and general questions." />
       </Container>
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="default">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             <ContactForm />
@@ -29,7 +29,7 @@ export default function ContactPage() {
 
       <Divider spacing="none" className="my-0" />
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="narrow">
           <h2 className="text-2xl font-semibold tracking-tight text-center">Frequently Asked Questions</h2>
           <div className="mt-8"><ContactFAQ /></div>

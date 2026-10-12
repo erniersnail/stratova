@@ -11,11 +11,11 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <main>
-      <Container className="py-20">
+      <Container className="pt-16 pb-0">
         <PageHeader title="Privacy Policy" description="How we collect, use, and protect your personal information." />
       </Container>
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="reading">
           <div className="space-y-8">
             <section>

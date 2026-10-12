@@ -12,11 +12,11 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <main>
-      <Container className="py-20">
+      <Container className="pt-16 pb-0">
         <PageHeader title="Terms of Use" description="By accessing this website, you agree to the following terms and conditions." />
       </Container>
 
-      <Section spacing="lg">
+      <Section spacing="sm">
         <Container size="reading">
           <div className="space-y-8">
             <section>
