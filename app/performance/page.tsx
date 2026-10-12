@@ -1,207 +1,227 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/common/PageHeader";
 import Container from "@/components/layout/Container";
-import EquityCurveChart, { type ChartSeries } from "@/components/strategies/EquityCurveChart";
+import EquityCurveChart, {
+  type ChartSeries,
+} from "@/components/strategies/EquityCurveChart";
+import IndividualChartsToggle, {
+  type IndividualCardData,
+} from "@/components/sections/IndividualChartsToggle";
 import { typography } from "@/lib/typography";
 import {
   getPublicStrategies,
   getStrategyPerformance,
   getBenchmark,
+  type Strategy,
 } from "@/lib/strategies/fetch";
+import {
+  buildCombinedCurve,
+  type CombinedResult,
+} from "@/lib/strategies/combined";
 
 export const metadata: Metadata = {
   title: "Performance — Stratova Quant",
   description:
-    "Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index.",
+    "Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding regional index.",
 };
 
-// Refresh the rendered data every 5 minutes instead of freezing at build.
 export const revalidate = 300;
 
 const START_DATE = "2026-08-03";
-
-type NormPoint = { date: string; value: number };
-
-/** Normalize points to 100 at the first point on/after START_DATE.
- *  Returns [] if fewer than 2 points or base is falsy. */
-function normalize(points: { date: string; value: number }[]): NormPoint[] {
-  const filtered = points.filter((p) => p.date >= START_DATE);
-  if (filtered.length < 2) return [];
-  const base = filtered[0].value;
-  if (!base) return [];
-  return filtered.map((p) => ({ date: p.date, value: (100 * p.value) / base }));
-}
-
-function returnPct(series: NormPoint[]): number | null {
-  if (series.length === 0) return null;
-  return series[series.length - 1].value - 100;
-}
 
 function fmt(v: number): string {
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 
-export default async function PerformancePage() {
-  const strategies = (await getPublicStrategies()).filter((s) => s.region === "india");
+function normalize(
+  points: { date: string; value: number }[],
+): { date: string; value: number }[] {
+  const filtered = points.filter((p) => p.date >= START_DATE);
+  if (filtered.length < 2) return [];
+  const base = filtered[0].value;
+  if (!base) return [];
+  return filtered.map((p) => ({
+    date: p.date,
+    value: (100 * p.value) / base,
+  }));
+}
 
-  const strategyData = await Promise.all(
+async function buildIndividualCards(
+  strategies: Strategy[],
+): Promise<IndividualCardData[]> {
+  const data = await Promise.all(
     strategies.map(async (s) => {
       const [perf, bench] = await Promise.all([
         getStrategyPerformance(s.id),
-        s.benchmark ? getBenchmark(s.benchmark, START_DATE) : Promise.resolve([]),
+        s.benchmark
+          ? getBenchmark(s.benchmark, START_DATE)
+          : Promise.resolve([]),
       ]);
-      return { strategy: s, perf, bench };
-    }),
-  );
-
-  const cards = strategyData
-    .map(({ strategy, perf, bench }) => {
       const strategySeries = normalize(
         perf.map((p) => ({ date: p.date, value: p.total_value })),
       );
-      const benchmarkSymbol = strategy.benchmark;
+      const benchmarkSymbol = s.benchmark;
       const benchmarkSeries = benchmarkSymbol
         ? normalize(bench.map((p) => ({ date: p.date, value: p.close })))
         : [];
-      return { strategy, strategySeries, benchmarkSymbol, benchmarkSeries };
-    })
-    .filter((c) => c.strategySeries.length >= 2 && c.benchmarkSeries.length >= 2);
-
-  // Combined equal-weighted portfolio: per-date average of normalized values.
-  const dateMap = new Map<string, { sum: number; count: number }>();
-  for (const { strategySeries } of cards) {
-    for (const pt of strategySeries) {
-      const entry = dateMap.get(pt.date) ?? { sum: 0, count: 0 };
-      entry.sum += pt.value;
-      entry.count += 1;
-      dateMap.set(pt.date, entry);
-    }
-  }
-  const combinedSeries: NormPoint[] = [...dateMap.entries()]
-    .sort((a, b) => (a[0] < b[0] ? -1 : 1))
-    .map(([date, { sum, count }]) => ({ date, value: sum / count }));
-
-  const nifty500Series = normalize(
-    (await getBenchmark("NIFTY 500", START_DATE)).map((p) => ({
-      date: p.date,
-      value: p.close,
-    })),
+      return { strategy: s, strategySeries, benchmarkSymbol, benchmarkSeries };
+    }),
   );
 
-  const combinedReturn = returnPct(combinedSeries);
-  const niftyReturn = returnPct(nifty500Series);
-  const showCombined = combinedSeries.length >= 2 && nifty500Series.length >= 2;
+  return data
+    .filter((d) => d.strategySeries.length >= 2)
+    .map(({ strategy, strategySeries, benchmarkSymbol, benchmarkSeries }) => {
+      const sReturn =
+        strategySeries.length > 0
+          ? strategySeries[strategySeries.length - 1].value - 100
+          : null;
+      const hasBenchmark = benchmarkSeries.length >= 2;
+      const bReturn = hasBenchmark
+        ? benchmarkSeries[benchmarkSeries.length - 1].value - 100
+        : null;
+      const series: ChartSeries[] = [
+        {
+          name: strategy.name,
+          color: "#111111",
+          data: strategySeries,
+          emphasis: "primary",
+        },
+        ...(hasBenchmark && benchmarkSymbol
+          ? [
+              {
+                name: benchmarkSymbol,
+                color: "#b08900",
+                data: benchmarkSeries,
+                emphasis: "secondary" as const,
+              },
+            ]
+          : []),
+      ];
+      return {
+        id: strategy.id,
+        name: strategy.name,
+        shortDescription: strategy.short_description,
+        benchmarkSymbol: hasBenchmark ? benchmarkSymbol : null,
+        series,
+        strategyReturn: sReturn,
+        benchmarkReturn: bReturn,
+      };
+    });
+}
 
-  const combinedChart: ChartSeries[] = [
-    { name: "Combined Portfolio", color: "#111111", data: combinedSeries, emphasis: "primary" },
-    { name: "NIFTY 500", color: "#b08900", data: nifty500Series, emphasis: "secondary" },
-  ];
+function CombinedCard({
+  title,
+  result,
+  height,
+}: {
+  title: string;
+  result: CombinedResult;
+  height: number;
+}) {
+  const hasData = result.series.length > 0;
+  const showStats = result.combinedReturn !== null;
+  const showAlpha =
+    result.combinedReturn !== null && result.benchmarkReturn !== null;
+  const showLegend = result.benchmarkLabel !== null;
+
+  return (
+    <div className="rounded-md border border-border bg-surface px-6 py-8">
+      <h2 className={`${typography.h3} text-foreground`}>{title}</h2>
+      <div className="mt-6">
+        {hasData ? (
+          <EquityCurveChart series={result.series} height={height} />
+        ) : (
+          <div
+            style={{ height }}
+            className="flex items-center justify-center rounded-md border border-border"
+          >
+            <p className="text-sm text-tertiary">No performance data yet.</p>
+          </div>
+        )}
+      </div>
+      {showStats && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-x-8 gap-y-2 text-sm">
+          <span className="text-secondary">
+            Combined Portfolio{" "}
+            <strong className="text-foreground">
+              {fmt(result.combinedReturn!)}
+            </strong>
+          </span>
+          {result.benchmarkReturn !== null && result.benchmarkLabel && (
+            <span className="text-secondary">
+              {result.benchmarkLabel}{" "}
+              <strong className="text-foreground">
+                {fmt(result.benchmarkReturn)}
+              </strong>
+            </span>
+          )}
+          {showAlpha && (
+            <span className="text-foreground">
+              <strong>
+                {fmt(result.combinedReturn! - result.benchmarkReturn!)} alpha
+              </strong>
+            </span>
+          )}
+        </div>
+      )}
+      {showLegend && (
+        <div className="mt-3 flex items-center gap-4 text-xs text-secondary">
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-0.5 w-4 bg-foreground" />
+            Strategy
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-0.5 w-4 bg-[#b08900]" />
+            Benchmark
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default async function PerformancePage() {
+  const allStrategies = await getPublicStrategies();
+  const india = allStrategies.filter((s) => s.region === "india");
+  const us = allStrategies.filter((s) => s.region === "us");
+
+  const [combinedNse, combinedUs, nseCards, usCards] = await Promise.all([
+    buildCombinedCurve(india, START_DATE, "NIFTY 500", "NIFTY 500"),
+    buildCombinedCurve(us, START_DATE, "QQQ", "Nasdaq-100"),
+    buildIndividualCards(india),
+    buildIndividualCards(us),
+  ]);
 
   return (
     <main>
       <Container size="default" className="py-20">
         <PageHeader
           title="Performance"
-          description="Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding NSE cap-segment index."
+          description="Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding regional index."
         />
 
-        {/* Combined portfolio vs NIFTY 500 */}
+        <section className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <CombinedCard
+            title="Combined portfolio vs NIFTY 500"
+            result={combinedNse}
+            height={400}
+          />
+          <CombinedCard
+            title="Combined portfolio vs Nasdaq-100"
+            result={combinedUs}
+            height={400}
+          />
+        </section>
+
         <section className="mt-16">
-          <div className="rounded-md border border-border bg-surface px-6 py-8">
-            <h2 className={`${typography.h3} text-foreground`}>
-              Combined portfolio vs NIFTY 500
-            </h2>
-            <div className="mt-6">
-              <EquityCurveChart series={combinedChart} height={400} />
-            </div>
-            {showCombined && combinedReturn !== null && niftyReturn !== null && (
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-x-8 gap-y-2 text-sm">
-                <span className="text-secondary">
-                  Combined Portfolio{" "}
-                  <strong className="text-foreground">{fmt(combinedReturn)}</strong>
-                </span>
-                <span className="text-secondary">
-                  NIFTY 500 <strong className="text-foreground">{fmt(niftyReturn)}</strong>
-                </span>
-                <span className="text-foreground">
-                  <strong>{fmt(combinedReturn - niftyReturn)} alpha</strong>
-                </span>
-              </div>
-            )}
-            {/* Legend */}
-            <div className="mt-3 flex items-center gap-4 text-xs text-secondary">
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block h-0.5 w-4 bg-foreground" />
-                Strategy
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block h-0.5 w-4 bg-[#b08900]" />
-                Benchmark
-              </span>
-            </div>
+          <h2 className={`${typography.h3} text-foreground`}>
+            Individual strategies
+          </h2>
+          <div className="mt-6">
+            <IndividualChartsToggle nse={nseCards} us={usCards} />
           </div>
         </section>
 
-        {/* Per-strategy cards */}
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {cards.map(
-            ({ strategy, strategySeries, benchmarkSymbol, benchmarkSeries }) => {
-              const sReturn = returnPct(strategySeries);
-              const bReturn = returnPct(benchmarkSeries);
-              const alpha =
-                sReturn !== null && bReturn !== null ? sReturn - bReturn : null;
-              const cardSeries: ChartSeries[] = [
-                { name: strategy.name, color: "#111111", data: strategySeries, emphasis: "primary" },
-                ...(benchmarkSymbol
-                  ? [
-                      {
-                        name: benchmarkSymbol,
-                        color: "#b08900",
-                        data: benchmarkSeries,
-                        emphasis: "secondary" as const,
-                      },
-                    ]
-                  : []),
-              ];
-              return (
-                <section
-                  key={strategy.id}
-                  className="rounded-md border border-border bg-surface px-6 py-6"
-                >
-                  <h3 className="font-serif text-xl font-semibold tracking-tight text-foreground">
-                    {strategy.name}
-                  </h3>
-                  <p className="mt-1 text-sm text-secondary">
-                    {strategy.short_description}
-                  </p>
-                  <div className="mt-6">
-                    <EquityCurveChart series={cardSeries} height={280} />
-                  </div>
-                  {sReturn !== null && bReturn !== null && alpha !== null && (
-                    <div className="mt-4 flex items-center justify-between gap-4 text-xs">
-                      <span className="text-secondary">
-                        {strategy.name}{" "}
-                        <strong className="text-foreground">{fmt(sReturn)}</strong>
-                      </span>
-                      <span className="text-secondary">
-                        {benchmarkSymbol}{" "}
-                        <strong className="text-foreground">{fmt(bReturn)}</strong>
-                      </span>
-                      <span className="text-secondary">
-                        <strong className="text-foreground">
-                          {alpha >= 0 ? "+" : ""}
-                          {alpha.toFixed(2)}% alpha
-                        </strong>
-                      </span>
-                    </div>
-                  )}
-                </section>
-              );
-            },
-          )}
-        </div>
-
-        {/* Disclaimer */}
         <p className="mt-12 text-sm text-tertiary">
           Past performance does not indicate future results. Track record is
           short and not statistically significant.
