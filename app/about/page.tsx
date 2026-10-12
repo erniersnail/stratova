@@ -1,6 +1,7 @@
 import Container from "@/components/layout/Container";
 import Section from "@/components/layout/Section";
 import PageHeader from "@/components/common/PageHeader";
+import Divider from "@/components/ui/Divider";
 import Mission from "@/components/about/Mission";
 import InvestmentPhilosophy from "@/components/about/InvestmentPhilosophy";
 import WhoWeServe from "@/components/about/WhoWeServe";
@@ -14,7 +15,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main>
-      <Container size="default" className="pt-16 pb-12">
+      <Container size="default" className="pt-16 pb-0">
         <PageHeader title="About" description="We apply the same rigor quant funds use to build systematic strategies for individual investors." />
       </Container>
 
@@ -22,13 +23,19 @@ export default function AboutPage() {
         <Container size="default"><Mission /></Container>
       </Section>
 
+      <Divider spacing="none" className="my-0" />
+
       <Section spacing="sm">
         <Container size="default"><InvestmentPhilosophy /></Container>
       </Section>
 
+      <Divider spacing="none" className="my-0" />
+
       <Section spacing="sm">
         <Container size="default"><WhoWeServe /></Container>
       </Section>
+
+      <Divider spacing="none" className="my-0" />
 
       <Section spacing="sm">
         <Container size="default"><Values /></Container>
