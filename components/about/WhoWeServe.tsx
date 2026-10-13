@@ -4,7 +4,7 @@ import { typography } from "@/lib/typography";
 const AUDIENCES = [
   {
     number: "01",
-    title: "Individual Investors",
+    title: "Investors",
     desc: "Retail investors seeking systematic, rules-based exposure to Indian and U.S. equity markets without discretionary bias.",
   },
   {

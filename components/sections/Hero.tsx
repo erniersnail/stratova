@@ -39,7 +39,7 @@ export default function Hero() {
           <p className="mt-8 max-w-[560px] text-lg leading-[1.7] text-foreground/85">
             Simplical Capital applies the same rigor quant funds use — algorithms,
             data, discipline — bringing institutional-grade systematic
-            research to individual investors.
+            research to investors.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="/strategies" variant="primary" size="md">

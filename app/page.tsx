@@ -8,7 +8,7 @@ import NewsletterSection from "@/components/sections/NewsletterSection";
 export const metadata = {
   title: "Simplical Capital — Systematic Investing",
   description:
-    "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
+    "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to investors.",
 };
 
 export default function Home() {

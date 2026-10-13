@@ -463,7 +463,7 @@ A: We generate revenue through research subscriptions and institutional consulti
 
 A: We publish research on an ongoing basis. Publication frequency varies depending on the nature of the research. Our research library contains all current and historical publications.
 
-**Q: Can individual investors access your research?**
+**Q: Can investors access your research?**
 
 A: Our research is primarily intended for institutional investors, registered investment advisers, and family offices. Individual investors interested in our research should contact us to discuss access options.
 

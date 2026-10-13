@@ -9,14 +9,14 @@ import Values from "@/components/about/Values";
 
 export const metadata = {
   title: "About — Simplical Capital",
-  description: "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
+  description: "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to investors.",
 };
 
 export default function AboutPage() {
   return (
     <main>
       <Container size="default" className="pt-16 pb-0">
-        <PageHeader title="About" description="We apply the same rigor quant funds use to build systematic strategies for individual investors." />
+        <PageHeader title="About" description="We apply the same rigor quant funds use to build systematic strategies for investors." />
       </Container>
 
       <Section spacing="sm">

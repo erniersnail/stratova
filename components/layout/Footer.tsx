@@ -28,7 +28,7 @@ export default function Footer() {
               SIMPLICAL CAPITAL
             </span>
             <p className="mt-4 text-sm leading-[1.75] text-secondary">
-              Systematic investing for individual investors. Built to compound.
+              Systematic investing for investors. Built to compound.
             </p>
           </div>
           {RA_REGISTRATION_NUMBER && (
