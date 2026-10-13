@@ -59,6 +59,22 @@ export async function updateStrategyAdmin(
   }
 }
 
+/**
+ * Compute the last instant of the current month in IST (23:59:59.999 +05:30),
+ * returned as an ISO UTC string. Used as `expires_at` on activation so the
+ * subscription runs to calendar month-end, matching the per-rebalance billing
+ * model (each payment covers one calendar month of picks).
+ */
+function endOfCurrentMonthIst(): string {
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  const nowIst = new Date(Date.now() + IST_OFFSET_MS);
+  const year = nowIst.getUTCFullYear();
+  const month = nowIst.getUTCMonth(); // 0-indexed
+  // Date.UTC(year, month+1, 0, ...) → day 0 of next month = last day of current month
+  const expiresAtMs = Date.UTC(year, month + 1, 0, 18, 29, 59, 999);
+  return new Date(expiresAtMs).toISOString();
+}
+
 export async function markPaymentPaid(paymentId: string): Promise<void> {
   const supabase = await createClient();
 
@@ -83,19 +99,24 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
     .maybeSingle();
   if (!payment) throw new Error("Payment not found");
 
+  // 1. Mark the payment PAID.
   await supabase
     .from("subscription_payments")
     .update({ status: "PAID", paid_at: nowIso })
     .eq("id", paymentId);
 
-  const rebalanceDate = new Date(payment.rebalance_date + "T00:00:00+05:30");
-  if (rebalanceDate <= new Date()) {
-    await supabase
-      .from("subscriptions")
-      .update({ status: "ACTIVE", started_at: payment.rebalance_date })
-      .eq("id", payment.subscription_id)
-      .eq("status", "PENDING");
-  }
+  // 2. Activate the subscription immediately — no waiting for the daily VM
+  //    cron. Expires at end of current month (IST). Only touches PENDING subs
+  //    so a double-click on "Mark paid" can't clobber an already-ACTIVE sub.
+  await supabase
+    .from("subscriptions")
+    .update({
+      status: "ACTIVE",
+      started_at: payment.rebalance_date,
+      expires_at: endOfCurrentMonthIst(),
+    })
+    .eq("id", payment.subscription_id)
+    .eq("status", "PENDING");
 
   revalidatePath("/dashboard");
   revalidatePath("/admin/payments");
