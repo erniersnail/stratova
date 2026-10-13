@@ -13,10 +13,9 @@ export const metadata: Metadata = {
 };
 
 function RoleCard({ role }: { role: Role }) {
-  const subject = encodeURIComponent(`Application: ${role.title}`);
   return (
     <Link
-      href={`mailto:careers@simplicalcapital.com?subject=${subject}`}
+      href={`/careers/${role.slug}`}
       className="group flex flex-col justify-between rounded-md border border-border bg-surface p-6 transition-colors duration-200 hover:border-foreground/40"
     >
       <div>
@@ -31,7 +30,7 @@ function RoleCard({ role }: { role: Role }) {
         </p>
       </div>
       <span className="mt-6 inline-flex items-center text-sm font-medium text-foreground">
-        Apply
+        View role
         <span
           aria-hidden
           className="ml-2 inline-block transition-transform duration-200 group-hover:translate-x-1"
@@ -54,7 +53,7 @@ export default function CareersPage() {
         <Container size="default">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {ROLES.map((role) => (
-              <RoleCard key={role.title} role={role} />
+              <RoleCard key={role.slug} role={role} />
             ))}
           </div>
 
