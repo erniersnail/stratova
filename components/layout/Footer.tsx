@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Container from "@/components/layout/Container";
-import { IS_PRE_LAUNCH, RA_REGISTRATION_NUMBER } from "@/lib/site";
+import { RA_REGISTRATION_NUMBER } from "@/lib/site";
 
 const BOTTOM_LINKS = [
   { label: "Careers", href: "/careers" },
@@ -12,15 +12,6 @@ const BOTTOM_LINKS = [
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
-      {IS_PRE_LAUNCH && (
-        <div className="border-b border-border bg-foreground px-6 py-2.5">
-          <div className="mx-auto w-full max-w-[1200px]">
-            <p className="text-center text-xs font-medium tracking-wide text-white">
-              Pre-launch — not for public distribution.
-            </p>
-          </div>
-        </div>
-      )}
       <Container className="py-12">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-md">
