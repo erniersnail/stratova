@@ -7,7 +7,9 @@ import { markPaymentPaid } from "@/lib/admin/markPaid";
 import {
   getPendingPayments,
   getRecentPaidPayments,
+  getRecentCancellations,
   type PendingPayment,
+  type Cancellation,
 } from "@/lib/admin/payments";
 import { formatIST } from "@/lib/format/date";
 
@@ -91,11 +93,33 @@ function PaidRow({ payment }: { payment: PendingPayment }) {
   );
 }
 
+function CancelledRow({ sub }: { sub: Cancellation }) {
+  return (
+    <tr className="border-b border-border">
+      <td className="px-4 py-3 text-sm text-secondary">
+        {sub.cancelled_at ? formatIST(sub.cancelled_at) : "—"}
+      </td>
+      <td className="px-4 py-3 text-sm text-foreground">{sub.client_email}</td>
+      <td className="px-4 py-3 text-sm text-foreground">{sub.strategy_name}</td>
+      <td className="px-4 py-3 text-sm text-foreground">
+        {sub.capital_allocated !== null
+          ? `₹${sub.capital_allocated.toLocaleString("en-IN")}`
+          : "—"}
+      </td>
+      <td className="px-4 py-3 text-sm text-secondary">
+        {sub.started_at ? formatIST(sub.started_at) : "—"}
+      </td>
+      <td className="px-4 py-3 font-mono text-xs text-secondary">{refId(sub.id)}</td>
+    </tr>
+  );
+}
+
 export default async function AdminPaymentsPage() {
   await requireAdminInPage();
-  const [pending, recent] = await Promise.all([
+  const [pending, recent, cancelled] = await Promise.all([
     getPendingPayments(),
     getRecentPaidPayments(),
+    getRecentCancellations(),
   ]);
 
   return (
@@ -109,7 +133,6 @@ export default async function AdminPaymentsPage() {
           ← Admin
         </Link>
       </div>
-
       <section>
         <h2 className="text-lg font-semibold text-foreground">Pending payments</h2>
         {pending.length === 0 ? (
@@ -153,6 +176,37 @@ export default async function AdminPaymentsPage() {
               <tbody>
                 {recent.map((p) => (
                   <PaidRow key={p.id} payment={p} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="mt-12">
+        <h2 className="text-lg font-semibold text-foreground">
+          Recently cancelled (last 30)
+        </h2>
+        {cancelled.length === 0 ? (
+          <p className="mt-4 border border-border bg-surface px-6 py-10 text-center text-sm text-secondary">
+            No recent cancellations.
+          </p>
+        ) : (
+          <div className="mt-4 overflow-x-auto border border-border bg-surface">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-border text-left text-xs uppercase tracking-wider text-tertiary">
+                  <th className="px-4 py-3 font-medium">Cancelled on</th>
+                  <th className="px-4 py-3 font-medium">Client</th>
+                  <th className="px-4 py-3 font-medium">Strategy</th>
+                  <th className="px-4 py-3 font-medium">Capital</th>
+                  <th className="px-4 py-3 font-medium">Started</th>
+                  <th className="px-4 py-3 font-medium">Ref Id</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cancelled.map((c) => (
+                  <CancelledRow key={c.id} sub={c} />
                 ))}
               </tbody>
             </table>

@@ -110,3 +110,75 @@ export async function getRecentPaidPayments(): Promise<PendingPayment[]> {
     return [];
   }
 }
+
+export type Cancellation = {
+  id: string;
+  strategy_name: string;
+  client_email: string;
+  capital_allocated: number | null;
+  started_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
+};
+
+type RawCancelledSub = {
+  id: string;
+  user_id: string;
+  strategy_id: string | null;
+  capital_allocated: number | null;
+  started_at: string | null;
+  expires_at: string | null;
+  cancelled_at: string | null;
+};
+
+export async function getRecentCancellations(): Promise<Cancellation[]> {
+  try {
+    const supabase = createServiceClient();
+
+    const { data: subs, error } = await supabase
+      .from("subscriptions")
+      .select(
+        "id, user_id, strategy_id, capital_allocated, started_at, expires_at, cancelled_at",
+      )
+      .eq("status", "CANCELLED")
+      .order("cancelled_at", { ascending: false, nullsFirst: false })
+      .limit(30);
+
+    if (error || !subs || subs.length === 0) return [];
+    const rows = subs as RawCancelledSub[];
+
+    const stratIds = [
+      ...new Set(rows.map((r) => r.strategy_id).filter((x): x is string => !!x)),
+    ];
+    const { data: strategies } = await supabase
+      .from("strategies")
+      .select("id, name")
+      .in("id", stratIds);
+    const strategyById = new Map<string, string>(
+      (strategies ?? []).map((s) => [s.id as string, s.name as string]),
+    );
+
+    const userIds = [...new Set(rows.map((r) => r.user_id))];
+    const emailById = new Map<string, string>();
+    await Promise.all(
+      userIds.map(async (uid) => {
+        const { data } = await supabase.auth.admin.getUserById(uid);
+        if (data?.user?.email) emailById.set(uid, data.user.email);
+      }),
+    );
+
+    return rows.map((r) => ({
+      id: r.id,
+      strategy_name: r.strategy_id
+        ? (strategyById.get(r.strategy_id) ?? "Strategy")
+        : "—",
+      client_email: emailById.get(r.user_id) ?? "—",
+      capital_allocated: r.capital_allocated,
+      started_at: r.started_at,
+      expires_at: r.expires_at,
+      cancelled_at: r.cancelled_at,
+    }));
+  } catch {
+    return [];
+  }
+}
