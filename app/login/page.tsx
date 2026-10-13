@@ -4,8 +4,8 @@ import PageHeader from "@/components/common/PageHeader";
 import LoginForm from "@/components/auth/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Log in — Stratova Quant",
-  description: "Log in to your Stratova Quant account.",
+  title: "Log in — Simplical Capital",
+  description: "Log in to your Simplical Capital account.",
 };
 
 /**

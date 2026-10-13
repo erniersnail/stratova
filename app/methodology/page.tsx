@@ -11,7 +11,7 @@ import RiskManagement from "@/components/methodology/RiskManagement";
 import FAQ from "@/components/methodology/FAQ";
 
 export const metadata = {
-  title: "Methodology — Stratova Quant",
+  title: "Methodology — Simplical Capital",
   description:
     "Our research process transforms investment hypotheses into disciplined, evidence-based investment strategies through systematic testing and continuous validation.",
 };

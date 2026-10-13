@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Grievance Redressal — Stratova",
+  title: "Grievance Redressal — Simplical Capital",
   description:
-    "The procedure and escalation matrix for resolving investor complaints against Stratova.",
+    "The procedure and escalation matrix for resolving investor complaints against Simplical Capital.",
 };
 
 export default function GrievancePage() {
@@ -13,11 +13,11 @@ export default function GrievancePage() {
       <h1 className={typography.h1}>Grievance Redressal</h1>
       <p className={`${typography.body} mt-5 text-secondary`}>
         The procedure and escalation matrix for resolving investor complaints
-        against Stratova.
+        against Simplical Capital.
       </p>
 
       <h2 className={`${typography.h2} mt-10`}>
-        Level 1 — Direct Resolution with Stratova
+        Level 1 — Direct Resolution with Simplical Capital
       </h2>
       <p className={`${typography.body} mt-4 text-secondary`}>
         An investor shall first take up their grievance by lodging a

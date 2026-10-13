@@ -24,7 +24,7 @@ const FAQ_ITEMS: FAQItem[] = [
       "Each strategy rebalances on a fixed schedule — monthly for large-cap and broad-market strategies, quarterly for midcap and smallcap. Between rebalances, your dashboard shows your current positions and their performance. We do not issue intraday or off-cycle signals.",
   },
   {
-    question: "How does Stratova make money — and do you manage my assets?",
+    question: "How does Simplical Capital make money — and do you manage my assets?",
     answer:
       "Subscriptions only. We do not manage client assets, hold client funds, or place orders on behalf of subscribers. You execute trades yourself through your own broker. Our revenue comes entirely from subscription fees — no commissions, no performance fees, no conflicts of interest.",
   },

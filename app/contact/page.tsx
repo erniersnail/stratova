@@ -7,15 +7,15 @@ import ContactInformation from "@/components/contact/ContactInformation";
 import ContactFAQ from "@/components/contact/ContactFAQ";
 
 export const metadata = {
-  title: "Contact — Stratova Quant",
-  description: "Contact Stratova Quant for research inquiries, business development, media requests, and general questions.",
+  title: "Contact — Simplical Capital",
+  description: "Contact Simplical Capital for research inquiries, business development, media requests, and general questions.",
 };
 
 export default function ContactPage() {
   return (
     <main>
       <Container className="pt-16 pb-0">
-        <PageHeader title="Contact" description="Contact Stratova Quant for research inquiries, business development, media requests, and general questions." />
+        <PageHeader title="Contact" description="Contact Simplical Capital for research inquiries, business development, media requests, and general questions." />
       </Container>
 
       <Section spacing="sm">

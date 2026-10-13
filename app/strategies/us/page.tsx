@@ -5,7 +5,7 @@ import Container from "@/components/layout/Container";
 import { getPublicStrategiesByRegion } from "@/lib/strategies/fetch";
 
 export const metadata: Metadata = {
-  title: "U.S. Strategies — Stratova Quant",
+  title: "U.S. Strategies — Simplical Capital",
   description: "Systematic NASDAQ large-cap research.",
 };
 

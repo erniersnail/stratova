@@ -8,8 +8,8 @@ import WhoWeServe from "@/components/about/WhoWeServe";
 import Values from "@/components/about/Values";
 
 export const metadata = {
-  title: "About — Stratova Quant",
-  description: "Stratova applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
+  title: "About — Simplical Capital",
+  description: "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
 };
 
 export default function AboutPage() {

@@ -15,7 +15,7 @@ import {
 import { formatIST } from "@/lib/format/date";
 
 export const metadata: Metadata = {
-  title: "Dashboard — Stratova Quant",
+  title: "Dashboard — Simplical Capital",
   description: "Your subscriptions and latest recommendations.",
 };
 

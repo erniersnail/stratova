@@ -20,9 +20,9 @@ import {
 } from "@/lib/strategies/combined";
 
 export const metadata: Metadata = {
-  title: "Performance — Stratova Quant",
+  title: "Performance — Simplical Capital",
   description:
-    "Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding regional index.",
+    "Live results for every Simplical Capital strategy. Net of costs. Benchmarked against the corresponding regional index.",
 };
 
 export const revalidate = 300;
@@ -197,7 +197,7 @@ export default async function PerformancePage() {
       <Container size="default" className="py-20">
         <PageHeader
           title="Performance"
-          description="Live results for every Stratova strategy. Net of costs. Benchmarked against the corresponding regional index."
+          description="Live results for every Simplical Capital strategy. Net of costs. Benchmarked against the corresponding regional index."
         />
 
         <section className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2">

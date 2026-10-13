@@ -5,7 +5,7 @@ import PageHeader from "@/components/common/PageHeader";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Research — Stratova Quant",
+  title: "Research — Simplical Capital",
   description:
     "Systematic research on quantitative investing, portfolio construction, and market structure.",
 };

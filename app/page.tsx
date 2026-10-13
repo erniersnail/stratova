@@ -6,9 +6,9 @@ import PerformancePreviewSection from "@/components/sections/PerformancePreviewS
 import NewsletterSection from "@/components/sections/NewsletterSection";
 
 export const metadata = {
-  title: "Stratova Quant — Systematic Investing",
+  title: "Simplical Capital — Systematic Investing",
   description:
-    "Stratova applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
+    "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to individual investors.",
 };
 
 export default function Home() {

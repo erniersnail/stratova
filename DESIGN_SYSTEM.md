@@ -1,4 +1,4 @@
-# Stratova Quant — Design System
+# Simplical Capital — Design System
 
 > Version 1.0
 > Lead Product Designer
@@ -30,7 +30,7 @@
 
 ### 1.1 Core Identity
 
-Stratova Quant is a quantitative investment research platform built for institutions, allocators, and serious researchers. Every design decision must reinforce the following attributes:
+Simplical Capital is a quantitative investment research platform built for institutions, allocators, and serious researchers. Every design decision must reinforce the following attributes:
 
 | Attribute | Design Implication |
 |-----------|-------------------|
@@ -809,7 +809,7 @@ Motion is functional, not decorative. It serves to orient the user, provide feed
 
 ### 15.1 Standards
 
-Stratova Quant must meet **WCAG 2.2 Level AA** as a minimum. Level AAA is the target where feasible.
+Simplical Capital must meet **WCAG 2.2 Level AA** as a minimum. Level AAA is the target where feasible.
 
 ### 15.2 Color Contrast
 

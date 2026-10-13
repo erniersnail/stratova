@@ -7,7 +7,7 @@ import { typography } from "@/lib/typography";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Checkout — Stratova Quant",
+  title: "Checkout — Simplical Capital",
 };
 
 export default async function CheckoutPage({
@@ -50,7 +50,7 @@ export default async function CheckoutPage({
           description={
             strategy
               ? `For ${strategy.name}`
-              : "Stratova Quant subscription"
+              : "Simplical Capital subscription"
           }
         />
 
@@ -127,7 +127,7 @@ export default async function CheckoutPage({
               </div>
             </div>
             <p className="mt-6 text-xs leading-[1.7] text-tertiary">
-              Note: This payment method is temporary. Once Stratova&apos;s
+              Note: This payment method is temporary. Once Simplical Capital&apos;s
               SEBI-validated UPI handle is issued, all payments will route
               through our designated @valid UPI ID in accordance with
               SEBI&apos;s Research Analyst guidelines.

@@ -35,10 +35,10 @@ export async function generateMetadata({
   if (!strategy || strategy.region !== region)
     return { title: "Strategy not found" };
   return {
-    title: `${strategy.name} — Stratova`,
+    title: `${strategy.name} — Simplical Capital`,
     description:
       strategy.short_description ??
-      `${strategy.name} — quantitative strategy from Stratova.`,
+      `${strategy.name} — quantitative strategy from Simplical Capital.`,
   };
 }
 

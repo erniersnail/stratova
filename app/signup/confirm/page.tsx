@@ -5,7 +5,7 @@ import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Confirm your email — Stratova Quant",
+  title: "Confirm your email — Simplical Capital",
   description: "Check your inbox to confirm your email address.",
 };
 

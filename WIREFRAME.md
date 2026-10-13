@@ -1,4 +1,4 @@
-# Stratova Quant — Homepage Wireframe
+# Simplical Capital — Homepage Wireframe
 
 > Low-Fidelity ASCII Wireframe
 > 1440px Page Width · 1200px Content Width
@@ -13,7 +13,7 @@
 │                                                                                      │
 │   ┌──────────────────────────────────────────────────────────────────────────────┐   │
 │   │                                                                              │   │
-│   │   [Stratova Quant]              Home  Strategies  Research  Philosophy  About  │   │
+│   │   [Simplical Capital]              Home  Strategies  Research  Philosophy  About  │   │
 │   │                                                                              │   │
 │   └──────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                      │
@@ -234,10 +234,10 @@
 │   │                                                                              │   │
 │   │   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌────────────┐  │   │
 │   │   │              │    │              │    │              │    │            │  │   │
-│   │   │   Stratova   │    │   Research   │    │    Legal     │    │  Contact   │  │   │
+│   │   │   Simplical Capital   │    │   Research   │    │    Legal     │    │  Contact   │  │   │
 │   │   │   Quant      │    │              │    │              │    │            │  │   │
 │   │   │              │    │   Strategies │    │   Terms of   │    │  hello@    │  │   │
-│   │   │   Independent│    │   Philosophy │    │   Use        │    │  stratova  │  │   │
+│   │   │   Independent│    │   Philosophy │    │   Use        │    │  simplicalcapital  │  │   │
 │   │   │   research   │    │   Process    │    │              │    │  .com      │  │   │
 │   │   │   firm.      │    │   Library    │    │   Privacy    │    │            │  │   │
 │   │   │              │    │              │    │   Policy     │    │  New York  │  │   │
@@ -248,7 +248,7 @@
 │   │                                                                              │   │
 │   │   ─────────────────────────────────────────────────────────────────────────   │   │
 │   │                                                                              │   │
-│   │   © 2026 Stratova Quant. All rights reserved.                                │   │
+│   │   © 2026 Simplical Capital. All rights reserved.                                │   │
 │   │                                                                              │   │
 │   └──────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                      │

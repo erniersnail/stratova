@@ -1,3 +1,3 @@
-# Stratova Quant
+# Simplical Capital
 
 Quantitative Investment Research Platform.

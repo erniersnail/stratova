@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Stratova Quant",
+  title: "Simplical Capital",
   description: "Quantitative Investment Research Platform",
   // Public-mode gate: every page inherits noindex,nofollow from this root
   // metadata unless a page overrides it. In public mode

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Conflict of Interest Policy — Stratova",
+  title: "Conflict of Interest Policy — Simplical Capital",
   description:
     "Policies and disclosures regarding potential or actual conflicts of interest that could affect the objectivity of research.",
 };

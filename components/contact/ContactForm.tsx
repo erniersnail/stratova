@@ -61,8 +61,8 @@ export default function ContactForm() {
 
       <p className="text-sm text-secondary">
         Prefer email?{" "}
-        <a href="mailto:info@stratovaquant.com" className="underline hover:text-foreground">
-          info@stratovaquant.com
+        <a href="mailto:info@simplicalcapital.com" className="underline hover:text-foreground">
+          info@simplicalcapital.com
         </a>
       </p>
     </form>

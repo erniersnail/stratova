@@ -70,7 +70,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
           <div>
             <span className="text-xl font-semibold tracking-wide text-foreground">
-              STRATOVA
+              SIMPLICAL CAPITAL
             </span>
             <p className="mt-5 text-sm leading-[1.75] text-secondary">
               Systematic investing for individual investors. Built to
@@ -102,7 +102,7 @@ export default function Footer() {
         <div className="mt-14 border-t border-border pt-8">
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <span className="text-sm text-secondary">
-              &copy; 2026 Stratova Quant.
+              &copy; 2026 Simplical Capital.
             </span>
             <span className="text-sm text-secondary">
               {RA_REGISTRATION_NUMBER

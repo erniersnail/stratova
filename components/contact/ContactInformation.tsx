@@ -2,10 +2,10 @@ import SectionHeader from "@/components/common/SectionHeader";
 import { typography } from "@/lib/typography";
 
 const CONTACTS = [
-  { title: "Business Email", desc: "For general business inquiries and partnership discussions.", email: "business@stratovaquant.com" },
-  { title: "Research Inquiries", desc: "For questions about our research, methodology, or data.", email: "research@stratovaquant.com" },
-  { title: "Media", desc: "For press inquiries, interviews, and media requests.", email: "media@stratovaquant.com" },
-  { title: "General Questions", desc: "For all other questions about Stratova Quant.", email: "info@stratovaquant.com" },
+  { title: "Business Email", desc: "For general business inquiries and partnership discussions.", email: "business@simplicalcapital.com" },
+  { title: "Research Inquiries", desc: "For questions about our research, methodology, or data.", email: "research@simplicalcapital.com" },
+  { title: "Media", desc: "For press inquiries, interviews, and media requests.", email: "media@simplicalcapital.com" },
+  { title: "General Questions", desc: "For all other questions about Simplical Capital.", email: "info@simplicalcapital.com" },
 ];
 
 export default function ContactInformation() {

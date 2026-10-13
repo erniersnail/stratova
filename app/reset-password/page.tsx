@@ -6,8 +6,8 @@ import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Choose a new password — Stratova Quant",
-  description: "Set a new password for your Stratova Quant account.",
+  title: "Choose a new password — Simplical Capital",
+  description: "Set a new password for your Simplical Capital account.",
 };
 
 /**
