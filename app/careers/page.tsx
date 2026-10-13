@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const ROLES = [
   {
     title: "Quantitative Researcher",
-    location: "Remote · India",
+    location: "Bangalore, India",
     type: "Full-time",
     description:
       "Design, backtest, and deploy systematic equity strategies across Indian and U.S. markets. Work spans signal construction, factor modeling, portfolio construction, and out-of-sample validation.",
@@ -26,7 +26,7 @@ const ROLES = [
   },
   {
     title: "Quantitative Trader",
-    location: "Remote · India",
+    location: "Bangalore, India",
     type: "Full-time",
     description:
       "Own the daily signal-to-order workflow. Execute and monitor systematic rebalances across client portfolios, and refine the execution layer over time.",
@@ -39,7 +39,7 @@ const ROLES = [
   },
   {
     title: "Quantitative Developer",
-    location: "Remote · India",
+    location: "Bangalore, India",
     type: "Full-time",
     description:
       "Build and maintain the research infrastructure that powers strategy development, backtesting, and daily production pipelines.",
@@ -52,7 +52,7 @@ const ROLES = [
   },
   {
     title: "Research Analyst",
-    location: "Remote · India",
+    location: "Bangalore, India",
     type: "Full-time",
     description:
       "Support the research process with data gathering, validation, and writing. Help translate strategy outputs into clear, SEBI-compliant research notes.",
@@ -71,7 +71,7 @@ export default function CareersPage() {
       <Container className="pt-16 pb-0">
         <PageHeader
           title="Careers"
-          description="We are a small, fully remote team building systematic equity research. We hire slowly and expect a lot."
+          description="We are a small team building systematic equity research. We hire slowly and expect a lot."
         />
       </Container>
 
