@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Container from "@/components/layout/Container";
 import PageHeader from "@/components/common/PageHeader";
 import DataTable from "@/components/ui/data-table";
+import CancelSubscriptionButton from "@/components/dashboard/CancelSubscriptionButton";
 import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import {
@@ -94,9 +95,6 @@ export default async function DashboardPage() {
   const strategyNames = new Map<string, string>();
   const strategySlugs = new Map<string, string>();
   const strategyRegions = new Map<string, string>();
-  // Always fetch the full public catalog — the user may see recommendations
-  // for strategies they are not subscribed to (e.g. admin RLS bypass), and
-  // those must resolve to names, never raw UUIDs.
   const { data: stratData, error: stratError } = await supabase
     .from("strategies")
     .select("id,name,slug,region")
@@ -115,7 +113,6 @@ export default async function DashboardPage() {
   const recommendations: Recommendation[] =
     await getCurrentRecommendationsForUser(user.id);
 
-  // Capital allocated per strategy — feeds the Target Shares column.
   const capitalByStrategy = new Map<string, number>();
   for (const s of subscriptions) {
     if (s.strategy_id && s.capital_allocated !== null) {
@@ -123,10 +120,6 @@ export default async function DashboardPage() {
     }
   }
 
-  // Client-window returns: value of the allocated capital from the
-  // subscription start date to the latest snapshot. One line per
-  // subscription; skipped when started_at is null or the window has
-  // fewer than 2 snapshots.
   type ClientWindow = {
     subscriptionId: string;
     name: string;
@@ -235,6 +228,14 @@ export default async function DashboardPage() {
                           View strategy
                         </Link>
                       );
+                    },
+                  },
+                  {
+                    key: "actions",
+                    header: "",
+                    render: (row) => {
+                      if (row.status !== "ACTIVE") return null;
+                      return <CancelSubscriptionButton subscriptionId={row.id} />;
                     },
                   },
                 ]}
