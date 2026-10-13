@@ -11,8 +11,8 @@ import { typography } from "@/lib/typography";
 import ProfileForm from "@/components/account/ProfileForm";
 
 export const metadata: Metadata = {
-  title: "Your account — Simplical Capital",
-  description: "Your Simplical Capital account, profile, and consent history.",
+  title: "Your account — Simplicial Capital",
+  description: "Your Simplicial Capital account, profile, and consent history.",
 };
 
 function formatDate(iso: string | null): string {

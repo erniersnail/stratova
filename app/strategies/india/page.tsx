@@ -5,7 +5,7 @@ import Container from "@/components/layout/Container";
 import { getPublicStrategiesByRegion } from "@/lib/strategies/fetch";
 
 export const metadata: Metadata = {
-  title: "India Strategies — Simplical Capital",
+  title: "India Strategies — Simplicial Capital",
   description: "Systematic quantitative strategies for NSE-listed equities.",
 };
 

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Disclaimer — Simplical Capital",
+  title: "Disclaimer — Simplicial Capital",
   description:
-    "This disclaimer outlines the limitations of liability and the nature of research services provided by Simplical Capital as a SEBI-registered Research Analyst.",
+    "This disclaimer outlines the limitations of liability and the nature of research services provided by Simplicial Capital as a SEBI-registered Research Analyst.",
 };
 
 export default function DisclaimerPage() {
@@ -13,14 +13,14 @@ export default function DisclaimerPage() {
       <h1 className={typography.h1}>Disclaimer</h1>
       <p className={`${typography.body} mt-5 text-secondary`}>
         This disclaimer outlines the limitations of liability and the nature
-        of research services provided by Simplical Capital as a SEBI-registered
+        of research services provided by Simplicial Capital as a SEBI-registered
         Research Analyst.
       </p>
 
       <h2 className={`${typography.h2} mt-10`}>General Disclaimer</h2>
       <p className={`${typography.body} mt-4 text-secondary`}>
         The research reports, recommendations, and any other information
-        provided by Simplical Capital (&quot;the RA&quot;) are for informational
+        provided by Simplicial Capital (&quot;the RA&quot;) are for informational
         purposes only and do not constitute an offer or solicitation for the
         purchase or sale of any security. The RA is a SEBI-registered
         Research Analyst (Registration No: [RA Registration Number]).

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Investor Charter — Simplical Capital",
+  title: "Investor Charter — Simplicial Capital",
   description:
-    "The charter detailing the vision, mission, services, rights, and responsibilities applicable to investors availing research services from Simplical Capital, in accordance with SEBI guidelines.",
+    "The charter detailing the vision, mission, services, rights, and responsibilities applicable to investors availing research services from Simplicial Capital, in accordance with SEBI guidelines.",
 };
 
 export default function InvestorCharterPage() {
@@ -14,7 +14,7 @@ export default function InvestorCharterPage() {
       <p className={`${typography.body} mt-5 text-secondary`}>
         The charter detailing the vision, mission, services, rights, and
         responsibilities applicable to investors availing research services
-        from Simplical Capital, in accordance with SEBI guidelines.
+        from Simplicial Capital, in accordance with SEBI guidelines.
       </p>
 
       <h2 className={`${typography.h2} mt-10`}>

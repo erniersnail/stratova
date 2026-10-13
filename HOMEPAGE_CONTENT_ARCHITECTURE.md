@@ -1,4 +1,4 @@
-# Simplical Capital — Homepage Content Architecture
+# Simplicial Capital — Homepage Content Architecture
 
 > Version 1.0
 > Senior UX Writer & Information Architect
@@ -52,9 +52,9 @@ The page never demands trust. It earns it, section by section, through demonstra
 
 ## Single Most Important Message
 
-> **"Simplical Capital builds systematic investment strategies through disciplined, evidence-based research — not intuition, not hype, not luck."**
+> **"Simplicial Capital builds systematic investment strategies through disciplined, evidence-based research — not intuition, not hype, not luck."**
 
-Every section of the homepage should reinforce this message. If a visitor remembers nothing else, they should remember that Simplical Capital is a research-first firm where process precedes outcome.
+Every section of the homepage should reinforce this message. If a visitor remembers nothing else, they should remember that Simplicial Capital is a research-first firm where process precedes outcome.
 
 ---
 
@@ -68,7 +68,7 @@ No statement on the homepage should be unsupported. If the page says "rigorous r
 
 ### Principle 2: Transparency as a Differentiator
 
-The homepage should reveal more than a typical asset manager's website. Show the research process. Show the thinking. Show the philosophy. The willingness to be transparent is itself a trust signal. The visitor should feel they understand *how* Simplical Capital thinks, not just *that* they think.
+The homepage should reveal more than a typical asset manager's website. Show the research process. Show the thinking. Show the philosophy. The willingness to be transparent is itself a trust signal. The visitor should feel they understand *how* Simplicial Capital thinks, not just *that* they think.
 
 ### Principle 3: Institutional Restraint
 
@@ -101,7 +101,7 @@ Contact
 ### Information Hierarchy
 
 ```
-[Simplical Capital logo / wordmark]          Home | Strategies | Research | About | Contact
+[Simplicial Capital logo / wordmark]          Home | Strategies | Research | About | Contact
 ```
 
 - **Primary links:** Home, Strategies, Research, About, Contact
@@ -131,7 +131,7 @@ The hero is the visitor's first impression. It must communicate that this is a s
 
 ### Supporting Copy
 
-Simplical Capital develops disciplined, data-driven investment strategies for long-term investors. We cover United States equities and Indian equities — two of the world's most liquid and transparent markets.
+Simplicial Capital develops disciplined, data-driven investment strategies for long-term investors. We cover United States equities and Indian equities — two of the world's most liquid and transparent markets.
 
 *No subheadline. No CTA button. No tagline. The headline and the supporting paragraph are sufficient.*
 
@@ -169,7 +169,7 @@ Skepticism is the default emotional state of a sophisticated investor evaluating
 
 ### Supporting Copy
 
-Simplical Capital is an independent quantitative investment research firm. We are not a broker-dealer. We are not a fund manager. We are a research firm that develops systematic investment strategies grounded in academic rigor and empirical evidence.
+Simplicial Capital is an independent quantitative investment research firm. We are not a broker-dealer. We are not a fund manager. We are a research firm that develops systematic investment strategies grounded in academic rigor and empirical evidence.
 
 Our research covers two of the world's most extensively studied equity markets: the United States and India. We focus on markets where data is available, liquid, and reliable — because research is only as good as the data it uses.
 
@@ -191,7 +191,7 @@ Our research covers two of the world's most extensively studied equity markets: 
 
 ### User Action
 
-Absorb the three pillars. Begin to associate Simplical Capital with rigor and independence.
+Absorb the three pillars. Begin to associate Simplicial Capital with rigor and independence.
 
 ---
 
@@ -199,7 +199,7 @@ Absorb the three pillars. Begin to associate Simplical Capital with rigor and in
 
 ### Objective
 
-Articulate the intellectual framework that guides all research and strategy development at Simplical Capital.
+Articulate the intellectual framework that guides all research and strategy development at Simplicial Capital.
 
 ### Why it exists
 
@@ -249,7 +249,7 @@ Read and reflect. The visitor should feel intellectual alignment — or not. If 
 
 ### Objective
 
-Describe what Simplical Capital produces without over-promising or using technical jargon.
+Describe what Simplicial Capital produces without over-promising or using technical jargon.
 
 ### Why it exists
 
@@ -299,7 +299,7 @@ Demonstrate the rigor of the research methodology without revealing proprietary 
 
 ### Why it exists
 
-This is the section that separates Simplical Capital from marketing-driven asset managers. Showing *how* research is done — not just claiming it's rigorous — builds genuine trust.
+This is the section that separates Simplicial Capital from marketing-driven asset managers. Showing *how* research is done — not just claiming it's rigorous — builds genuine trust.
 
 ### Exact Headline
 
@@ -393,7 +393,7 @@ Demonstrate intellectual output by showing that the firm publishes research. Thi
 
 ### Why it exists
 
-A firm that publishes research is a firm that is confident in its thinking. The research library is proof that Simplical Capital is a genuine research operation — not a marketing website pretending to be a research firm.
+A firm that publishes research is a firm that is confident in its thinking. The research library is proof that Simplicial Capital is a genuine research operation — not a marketing website pretending to be a research firm.
 
 ### Exact Headline
 
@@ -447,9 +447,9 @@ FAQ sections are often afterthoughts. Here, they are strategic. The questions sh
 
 ### Supporting Copy
 
-**Q: Is Simplical Capital a registered investment adviser?**
+**Q: Is Simplicial Capital a registered investment adviser?**
 
-A: Simplical Capital is an independent quantitative investment research firm. We are not a registered investment adviser, broker-dealer, or fund manager. We produce research that may be used by registered investment advisers and institutional investors as part of their investment process.
+A: Simplicial Capital is an independent quantitative investment research firm. We are not a registered investment adviser, broker-dealer, or fund manager. We produce research that may be used by registered investment advisers and institutional investors as part of their investment process.
 
 **Q: Do you manage client assets?**
 
@@ -499,7 +499,7 @@ Read the question most relevant to their concern. Find a direct, honest answer. 
 
 ### Objective
 
-Offer a low-friction way for visitors to stay connected with Simplical Capital's research.
+Offer a low-friction way for visitors to stay connected with Simplicial Capital's research.
 
 ### Why it exists
 
@@ -550,7 +550,7 @@ The footer is where the visitor lands when they have finished reading. It should
 ### Supporting Copy
 
 **Company**
-Simplical Capital is an independent quantitative investment research firm.
+Simplicial Capital is an independent quantitative investment research firm.
 
 **Markets Covered**
 United States Equities
@@ -566,7 +566,7 @@ Privacy Policy
 Disclaimers
 
 **Copyright**
-© 2026 Simplical Capital. All rights reserved.
+© 2026 Simplicial Capital. All rights reserved.
 
 ### Information Hierarchy
 
@@ -580,7 +580,7 @@ Bottom row:
 Legal links (Terms, Privacy, Disclaimers) | Copyright notice
 ```
 
-- No social media icons. No LinkedIn, Twitter, or YouTube. Simplical Capital is a research firm, not a content creator.
+- No social media icons. No LinkedIn, Twitter, or YouTube. Simplicial Capital is a research firm, not a content creator.
 - No "back to top" link. The page is not that long.
 - The footer should be visually minimal — thin borders, small text, generous spacing.
 - Legal links are standard but important. They signal that the firm takes its regulatory obligations seriously.

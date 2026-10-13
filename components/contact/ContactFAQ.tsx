@@ -3,8 +3,8 @@
 import { useState } from "react";
 
 const FAQ_ITEMS = [
-  { question: "Do you accept research collaborations?", answer: "We occasionally collaborate with academic institutions and other research firms on specific projects. Collaboration inquiries should be directed to research@simplicalcapital.com." },
-  { question: "Can I license your research?", answer: "Research licensing is available for institutional investors on a case-by-case basis. Please contact business@simplicalcapital.com to discuss your requirements." },
+  { question: "Do you accept research collaborations?", answer: "We occasionally collaborate with academic institutions and other research firms on specific projects. Collaboration inquiries should be directed to research@simplicialcapital.com." },
+  { question: "Can I license your research?", answer: "Research licensing is available for institutional investors on a case-by-case basis. Please contact business@simplicialcapital.com to discuss your requirements." },
   { question: "Do you offer consulting services?", answer: "We do not offer consulting services. Our focus is on developing and publishing independent quantitative research." },
   { question: "How quickly will I receive a response?", answer: "We aim to respond to all inquiries within two business days. For time-sensitive matters, please indicate the urgency in your message." },
 ];

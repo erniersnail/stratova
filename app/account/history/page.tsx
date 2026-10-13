@@ -12,7 +12,7 @@ import {
 import { formatIST } from "@/lib/format/date";
 
 export const metadata: Metadata = {
-  title: "Recommendation History — Simplical Capital",
+  title: "Recommendation History — Simplicial Capital",
   description: "Your full recommendation history, including expired picks.",
 };
 

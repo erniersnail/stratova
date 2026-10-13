@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Most Important Terms and Conditions — Simplical Capital",
+  title: "Most Important Terms and Conditions — Simplicial Capital",
   description:
-    "The standardized key terms and conditions governing the research services provided by Simplical Capital, as mandated by SEBI.",
+    "The standardized key terms and conditions governing the research services provided by Simplicial Capital, as mandated by SEBI.",
 };
 
 export default function MitcPage() {
@@ -13,7 +13,7 @@ export default function MitcPage() {
       <h1 className={typography.h1}>Most Important Terms and Conditions</h1>
       <p className={`${typography.body} mt-5 text-secondary`}>
         The standardized key terms and conditions governing the research
-        services provided by Simplical Capital, as mandated by SEBI.
+        services provided by Simplicial Capital, as mandated by SEBI.
       </p>
 
       <h2 className={`${typography.h2} mt-10`}>

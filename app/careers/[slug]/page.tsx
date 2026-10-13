@@ -15,8 +15,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const role = ROLES.find((r) => r.slug === slug);
-  if (!role) return { title: "Role not found — Simplical Capital" };
-  return { title: `${role.title} — Simplical Capital`, description: role.blurb };
+  if (!role) return { title: "Role not found — Simplicial Capital" };
+  return { title: `${role.title} — Simplicial Capital`, description: role.blurb };
 }
 
 function Label({ children }: { children: React.ReactNode }) {
@@ -32,7 +32,7 @@ export default async function RolePage({ params }: PageProps) {
   const role = ROLES.find((r) => r.slug === slug);
   if (!role) notFound();
   const subject = encodeURIComponent(`Application: ${role.title}`);
-  const mailto = `mailto:careers@simplicalcapital.com?subject=${subject}`;
+  const mailto = `mailto:careers@simplicialcapital.com?subject=${subject}`;
   return (
     <main>
       <Container size="default" className="pt-16 pb-0">
@@ -82,7 +82,7 @@ export default async function RolePage({ params }: PageProps) {
               <p className={`${typography.body} max-w-[680px] text-secondary`}>
                 Send your CV and a short note about what you want to work on to{" "}
                 <a href={mailto} className="text-foreground underline hover:no-underline">
-                  careers@simplicalcapital.com
+                  careers@simplicialcapital.com
                 </a>
                 .
               </p>

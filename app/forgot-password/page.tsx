@@ -4,7 +4,7 @@ import PageHeader from "@/components/common/PageHeader";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 export const metadata: Metadata = {
-  title: "Reset your password — Simplical Capital",
+  title: "Reset your password — Simplicial Capital",
   description: "We'll email you a link to reset your password.",
 };
 

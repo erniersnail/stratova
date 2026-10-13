@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getPublishedArticles } from "@/lib/research/fetch";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://simplicalcapital.com";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://simplicialcapital.com";
 
 const STATIC_PATHS = [
   "/",

@@ -1,4 +1,4 @@
-# Simplical Capital — Homepage Wireframe
+# Simplicial Capital — Homepage Wireframe
 
 > Low-Fidelity ASCII Wireframe
 > 1440px Page Width · 1200px Content Width
@@ -13,7 +13,7 @@
 │                                                                                      │
 │   ┌──────────────────────────────────────────────────────────────────────────────┐   │
 │   │                                                                              │   │
-│   │   [Simplical Capital]              Home  Strategies  Research  Philosophy  About  │   │
+│   │   [Simplicial Capital]              Home  Strategies  Research  Philosophy  About  │   │
 │   │                                                                              │   │
 │   └──────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                      │
@@ -234,10 +234,10 @@
 │   │                                                                              │   │
 │   │   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌────────────┐  │   │
 │   │   │              │    │              │    │              │    │            │  │   │
-│   │   │   Simplical Capital   │    │   Research   │    │    Legal     │    │  Contact   │  │   │
+│   │   │   Simplicial Capital   │    │   Research   │    │    Legal     │    │  Contact   │  │   │
 │   │   │   Quant      │    │              │    │              │    │            │  │   │
 │   │   │              │    │   Strategies │    │   Terms of   │    │  hello@    │  │   │
-│   │   │   Independent│    │   Philosophy │    │   Use        │    │  simplicalcapital  │  │   │
+│   │   │   Independent│    │   Philosophy │    │   Use        │    │  simplicialcapital  │  │   │
 │   │   │   research   │    │   Process    │    │              │    │  .com      │  │   │
 │   │   │   firm.      │    │   Library    │    │   Privacy    │    │            │  │   │
 │   │   │              │    │              │    │   Policy     │    │  New York  │  │   │
@@ -248,7 +248,7 @@
 │   │                                                                              │   │
 │   │   ─────────────────────────────────────────────────────────────────────────   │   │
 │   │                                                                              │   │
-│   │   © 2026 Simplical Capital. All rights reserved.                                │   │
+│   │   © 2026 Simplicial Capital. All rights reserved.                                │   │
 │   │                                                                              │   │
 │   └──────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                      │

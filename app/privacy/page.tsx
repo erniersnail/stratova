@@ -4,8 +4,8 @@ import PageHeader from "@/components/common/PageHeader";
 import { typography } from "@/lib/typography";
 
 export const metadata = {
-  title: "Privacy Policy — Simplical Capital",
-  description: "Privacy policy for Simplical Capital. How we collect, use, and protect your personal information.",
+  title: "Privacy Policy — Simplicial Capital",
+  description: "Privacy policy for Simplicial Capital. How we collect, use, and protect your personal information.",
 };
 
 export default function PrivacyPage() {
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-2xl font-semibold tracking-tight">Contact Us</h2>
-              <p className={`${typography.body} mt-4 text-secondary`}>If you have questions about this privacy policy, please contact us at privacy@simplicalcapital.com.</p>
+              <p className={`${typography.body} mt-4 text-secondary`}>If you have questions about this privacy policy, please contact us at privacy@simplicialcapital.com.</p>
             </section>
           </div>
         </Container>

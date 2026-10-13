@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Risk Disclosure — Simplical Capital",
+  title: "Risk Disclosure — Simplicial Capital",
   description:
     "A statement of the various risks associated with investing in securities markets based on research recommendations.",
 };

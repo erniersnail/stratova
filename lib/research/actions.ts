@@ -149,7 +149,7 @@ export async function createArticleAction(
         subtitle: toNullable(fields.subtitle),
         category: toNullable(fields.category),
         cover_image_url: toNullable(fields.cover_image_url),
-        author_name: readString(formData, "author_name") || "Simplical Capital",
+        author_name: readString(formData, "author_name") || "Simplicial Capital",
         is_published: false,
         published_at: null,
         publish_date_override: publishDate.date,

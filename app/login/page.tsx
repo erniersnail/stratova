@@ -4,8 +4,8 @@ import PageHeader from "@/components/common/PageHeader";
 import LoginForm from "@/components/auth/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Log in — Simplical Capital",
-  description: "Log in to your Simplical Capital account.",
+  title: "Log in — Simplicial Capital",
+  description: "Log in to your Simplicial Capital account.",
 };
 
 /**

@@ -216,7 +216,7 @@ export const ROLES: Role[] = [
     blurb:
       "Own brand, positioning, and growth across digital and institutional channels.",
     about: [
-      "You will own how Simplical Capital is seen by the market — brand, positioning, messaging, and the channels we use to reach investors and institutional allocators.",
+      "You will own how Simplicial Capital is seen by the market — brand, positioning, messaging, and the channels we use to reach investors and institutional allocators.",
       "The role is both strategic and hands-on: you will set direction, but you will also write the copy and run the campaigns.",
     ],
     responsibilities: [
@@ -296,7 +296,7 @@ export const ROLES: Role[] = [
     responsibilities: [
       "Build and manage a pipeline of institutional prospects",
       "Run the full sales cycle from first meeting to onboarding",
-      "Represent Simplical Capital at industry events and conferences",
+      "Represent Simplicial Capital at industry events and conferences",
       "Work with research to tailor pitches to specific allocator needs",
     ],
     requirements: [

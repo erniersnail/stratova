@@ -8,8 +8,8 @@ import WhoWeServe from "@/components/about/WhoWeServe";
 import Values from "@/components/about/Values";
 
 export const metadata = {
-  title: "About — Simplical Capital",
-  description: "Simplical Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to investors.",
+  title: "About — Simplicial Capital",
+  description: "Simplicial Capital applies the same rigor quant funds use — algorithms, data, discipline — bringing institutional-grade systematic research to investors.",
 };
 
 export default function AboutPage() {

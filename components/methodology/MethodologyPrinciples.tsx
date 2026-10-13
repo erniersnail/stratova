@@ -33,7 +33,7 @@ export default function MethodologyPrinciples() {
     <div>
       <SectionHeader
         title="Core Research Principles"
-        description="Four principles guide every research decision at Simplical Capital."
+        description="Four principles guide every research decision at Simplicial Capital."
         centered={false}
       />
       <div className="mt-8 space-y-8">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Refund Policy — Simplical Capital",
+  title: "Refund Policy — Simplicial Capital",
   description:
     "The terms under which subscription fees may be refunded, in accordance with the SEBI (Research Analysts) Regulations, 2014.",
 };
@@ -20,7 +20,7 @@ export default function RefundPage() {
         General Policy — Fees Non-Refundable
       </h2>
       <p className={`${typography.body} mt-4 text-secondary`}>
-        All fees paid to Simplical Capital for research services are non-refundable
+        All fees paid to Simplicial Capital for research services are non-refundable
         once the subscription period has commenced and the research services
         have been made available to the client. By subscribing, the client
         acknowledges that they have reviewed the scope of services, the
@@ -36,10 +36,10 @@ export default function RefundPage() {
       <p className={`${typography.body} mt-4 text-secondary`}>
         Notwithstanding the general policy, in the event of premature
         termination of the research services by either the client or
-        Simplical Capital, the client shall be entitled to a refund of proportionate
+        Simplicial Capital, the client shall be entitled to a refund of proportionate
         fees for the unexpired period of the subscription, net of any
         applicable taxes and payment-gateway charges. A client seeking
-        termination must notify Simplical Capital in writing at [Support Email] with
+        termination must notify Simplicial Capital in writing at [Support Email] with
         their registered email ID, transaction reference, and reason for
         termination.
       </p>
@@ -48,8 +48,8 @@ export default function RefundPage() {
         Mandatory Refund — Suspension or Cancellation of RA Registration
       </h2>
       <p className={`${typography.body} mt-4 text-secondary`}>
-        If Simplical Capital&apos;s SEBI Research Analyst registration is suspended or
-        cancelled by SEBI, Simplical Capital shall refund fees on a pro-rata basis for
+        If Simplicial Capital&apos;s SEBI Research Analyst registration is suspended or
+        cancelled by SEBI, Simplicial Capital shall refund fees on a pro-rata basis for
         the period from the effective date of such suspension or cancellation
         to the end of the client&apos;s paid subscription period. This refund
         shall be processed without requiring the client to request it.

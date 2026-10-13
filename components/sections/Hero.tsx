@@ -37,7 +37,7 @@ export default function Hero() {
             Built to compound.
           </h1>
           <p className="mt-8 max-w-[560px] text-lg leading-[1.7] text-foreground/85">
-            Simplical Capital applies the same rigor quant funds use — algorithms,
+            Simplicial Capital applies the same rigor quant funds use — algorithms,
             data, discipline — bringing institutional-grade systematic
             research to investors.
           </p>

@@ -1,3 +1,3 @@
-# Simplical Capital
+# Simplicial Capital
 
 Quantitative Investment Research Platform.

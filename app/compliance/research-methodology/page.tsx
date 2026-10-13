@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { typography } from "@/lib/typography";
 
 export const metadata: Metadata = {
-  title: "Research Methodology — Simplical Capital",
+  title: "Research Methodology — Simplicial Capital",
   description:
     "A transparent overview of the principles and processes used to generate research recommendations.",
 };
@@ -20,7 +20,7 @@ export default function ResearchMethodologyPage() {
         Principles of Systematic Research
       </h2>
       <p className={`${typography.body} mt-4 text-secondary`}>
-        Simplical Capital&apos;s research is systematic, rules-based, and transparent.
+        Simplicial Capital&apos;s research is systematic, rules-based, and transparent.
         The methodology is designed to be repeatable and free from
         discretionary bias. The RA maintains a documented research methodology
         that can be audited for consistency and objectivity. The scope of

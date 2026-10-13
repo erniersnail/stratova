@@ -7,9 +7,9 @@ import { typography } from "@/lib/typography";
 import { ROLES, type Role } from "@/lib/careers";
 
 export const metadata: Metadata = {
-  title: "Careers — Simplical Capital",
+  title: "Careers — Simplicial Capital",
   description:
-    "Open roles at Simplical Capital. Quantitative research, trading, engineering, marketing, and sales.",
+    "Open roles at Simplicial Capital. Quantitative research, trading, engineering, marketing, and sales.",
 };
 
 function RoleCard({ role }: { role: Role }) {
@@ -63,10 +63,10 @@ export default function CareersPage() {
             Don&apos;t see a role that fits? We still want to hear from you.
             Write to{" "}
             <a
-              href="mailto:careers@simplicalcapital.com"
+              href="mailto:careers@simplicialcapital.com"
               className="text-foreground underline hover:no-underline"
             >
-              careers@simplicalcapital.com
+              careers@simplicialcapital.com
             </a>
             .
           </p>

@@ -6,8 +6,8 @@ import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Choose a new password — Simplical Capital",
-  description: "Set a new password for your Simplical Capital account.",
+  title: "Choose a new password — Simplicial Capital",
+  description: "Set a new password for your Simplicial Capital account.",
 };
 
 /**

@@ -25,7 +25,7 @@ export default function Footer() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-md">
             <span className="text-xl font-semibold tracking-wide text-foreground">
-              SIMPLICAL CAPITAL
+              SIMPLICIAL CAPITAL
             </span>
             <p className="mt-4 text-sm leading-[1.75] text-secondary">
               Systematic investing for investors. Built to compound.
@@ -39,7 +39,7 @@ export default function Footer() {
         </div>
         <div className="mt-10 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm text-secondary">
-            &copy; 2026 Simplical Capital. All rights reserved.
+            &copy; 2026 Simplicial Capital. All rights reserved.
           </span>
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
