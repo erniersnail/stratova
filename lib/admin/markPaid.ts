@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/admin/recommendations";
 
 export type StrategyAdminState = {
   error?: string;
@@ -63,52 +64,69 @@ export async function updateStrategyAdmin(
  * Compute the last instant of the current month in IST (23:59:59.999 +05:30),
  * returned as an ISO UTC string. Used as `expires_at` on activation so the
  * subscription runs to calendar month-end, matching the per-rebalance billing
- * model (each payment covers one calendar month of picks).
+ * model.
  */
 function endOfCurrentMonthIst(): string {
   const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
   const nowIst = new Date(Date.now() + IST_OFFSET_MS);
   const year = nowIst.getUTCFullYear();
   const month = nowIst.getUTCMonth(); // 0-indexed
-  // Date.UTC(year, month+1, 0, ...) → day 0 of next month = last day of current month
   const expiresAtMs = Date.UTC(year, month + 1, 0, 18, 29, 59, 999);
   return new Date(expiresAtMs).toISOString();
 }
 
+/**
+ * Admin action: mark a pending payment as PAID and immediately activate the
+ * linked subscription.
+ *
+ * Auth is verified via the user-scoped client (cookie session). The DB writes
+ * use the service-role client so that RLS on `subscriptions` cannot silently
+ * drop the UPDATE — the earlier user-scoped approach matched 0 rows whenever
+ * the caller wasn't the subscription owner, leaving PAID payments stuck on
+ * PENDING subscriptions.
+ */
 export async function markPaymentPaid(paymentId: string): Promise<void> {
-  const supabase = await createClient();
-
+  // 1. Verify caller is an authenticated admin.
+  const authClient = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data: profile } = await supabase
+  const { data: profile } = await authClient
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .maybeSingle();
   if (profile?.role !== "admin") throw new Error("Not authorized");
 
+  // 2. Perform writes with the service-role client (bypasses RLS).
+  const admin = createServiceClient();
   const nowIso = new Date().toISOString();
 
-  const { data: payment } = await supabase
+  const { data: payment, error: fetchErr } = await admin
     .from("subscription_payments")
     .select("id, subscription_id, rebalance_date, status")
     .eq("id", paymentId)
     .maybeSingle();
+
+  if (fetchErr) {
+    console.error("[admin] markPaymentPaid fetch failed:", fetchErr.message);
+    throw new Error("Payment lookup failed");
+  }
   if (!payment) throw new Error("Payment not found");
 
-  // 1. Mark the payment PAID.
-  await supabase
+  const { error: payErr } = await admin
     .from("subscription_payments")
     .update({ status: "PAID", paid_at: nowIso })
     .eq("id", paymentId);
 
-  // 2. Activate the subscription immediately — no waiting for the daily VM
-  //    cron. Expires at end of current month (IST). Only touches PENDING subs
-  //    so a double-click on "Mark paid" can't clobber an already-ACTIVE sub.
-  await supabase
+  if (payErr) {
+    console.error("[admin] markPaymentPaid payment update failed:", payErr.message);
+    throw new Error("Could not mark payment paid");
+  }
+
+  const { error: subErr } = await admin
     .from("subscriptions")
     .update({
       status: "ACTIVE",
@@ -117,6 +135,14 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
     })
     .eq("id", payment.subscription_id)
     .eq("status", "PENDING");
+
+  if (subErr) {
+    console.error(
+      "[admin] markPaymentPaid subscription activate failed:",
+      subErr.message,
+    );
+    throw new Error("Payment recorded but subscription activation failed");
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/admin/payments");
