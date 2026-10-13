@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
 import Section from "@/components/layout/Section";
+import PageHeader from "@/components/common/PageHeader";
 import { typography } from "@/lib/typography";
 import { ROLES, type Role } from "@/lib/careers";
 
@@ -45,6 +46,10 @@ function RoleCard({ role }: { role: Role }) {
 export default function CareersPage() {
   return (
     <main>
+      <Container className="pt-16 pb-0">
+        <PageHeader title="Careers" />
+      </Container>
+
       <Section spacing="sm">
         <Container size="default">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
