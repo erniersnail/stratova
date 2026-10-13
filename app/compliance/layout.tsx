@@ -1,17 +1,7 @@
-import Link from "next/link";
 import Container from "@/components/layout/Container";
-import Section from "@/components/layout/Section";
+import ComplianceNav from "@/components/compliance/ComplianceNav";
 
-export const COMPLIANCE_PAGES = [
-  { slug: "disclaimer", title: "Disclaimer" },
-  { slug: "mitc", title: "Most Important Terms and Conditions" },
-  { slug: "investor-charter", title: "Investor Charter" },
-  { slug: "grievance", title: "Grievance Redressal" },
-  { slug: "risk-disclosure", title: "Risk Disclosure" },
-  { slug: "refund", title: "Refund Policy" },
-  { slug: "conflict-of-interest", title: "Conflict of Interest Policy" },
-  { slug: "research-methodology", title: "Research Methodology" },
-] as const;
+export { COMPLIANCE_PAGES } from "@/lib/compliance";
 
 export default function ComplianceLayout({
   children,
@@ -20,25 +10,14 @@ export default function ComplianceLayout({
 }) {
   return (
     <main>
-      <Section spacing="sm">
-        <Container size="narrow">
-          <nav aria-label="Compliance pages">
-            <ul className="flex flex-wrap gap-x-6 gap-y-2">
-              {COMPLIANCE_PAGES.map((page) => (
-                <li key={page.slug}>
-                  <Link
-                    href={`/compliance/${page.slug}`}
-                    className="text-sm text-secondary underline hover:text-foreground hover:no-underline"
-                  >
-                    {page.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="mt-8">{children}</div>
-        </Container>
-      </Section>
+      <Container size="default" className="pt-12 pb-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[220px_1fr] lg:gap-16">
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <ComplianceNav />
+          </aside>
+          <div className="min-w-0">{children}</div>
+        </div>
+      </Container>
     </main>
   );
 }
