@@ -1,19 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/admin/recommendations";
+import { createClient } from "../supabase/server";
+import { createServiceClient } from "./recommendations";
 
 export type StrategyAdminState = {
   error?: string;
   success?: string;
 };
 
-/**
- * Admin-only update of a strategy's subscription fee and availability.
- * Bound to a strategyId by the caller, so the form action signature is the
- * standard (prevState, formData) shape for useActionState.
- */
 export async function updateStrategyAdmin(
   strategyId: string,
   _prev: StrategyAdminState,
@@ -60,33 +55,29 @@ export async function updateStrategyAdmin(
   }
 }
 
-/**
- * Compute the last instant of the current month in IST (23:59:59.999 +05:30),
- * returned as an ISO UTC string. Used as `expires_at` on activation so the
- * subscription runs to calendar month-end, matching the per-rebalance billing
- * model.
- */
-function endOfCurrentMonthIst(): string {
-  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-  const nowIst = new Date(Date.now() + IST_OFFSET_MS);
-  const year = nowIst.getUTCFullYear();
-  const month = nowIst.getUTCMonth(); // 0-indexed
-  const expiresAtMs = Date.UTC(year, month + 1, 0, 18, 29, 59, 999);
+function endOfMonthIst(rebalanceDate: string): string {
+  const [yStr, mStr] = rebalanceDate.split("-");
+  const year = Number(yStr);
+  const month = Number(mStr);
+  if (!Number.isFinite(year) || !Number.isFinite(month)) {
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+    const nowIst = new Date(Date.now() + IST_OFFSET_MS);
+    const expiresAtMs = Date.UTC(
+      nowIst.getUTCFullYear(),
+      nowIst.getUTCMonth() + 1,
+      0,
+      18,
+      29,
+      59,
+      999,
+    );
+    return new Date(expiresAtMs).toISOString();
+  }
+  const expiresAtMs = Date.UTC(year, month, 0, 18, 29, 59, 999);
   return new Date(expiresAtMs).toISOString();
 }
 
-/**
- * Admin action: mark a pending payment as PAID and immediately activate the
- * linked subscription.
- *
- * Auth is verified via the user-scoped client (cookie session). The DB writes
- * use the service-role client so that RLS on `subscriptions` cannot silently
- * drop the UPDATE — the earlier user-scoped approach matched 0 rows whenever
- * the caller wasn't the subscription owner, leaving PAID payments stuck on
- * PENDING subscriptions.
- */
 export async function markPaymentPaid(paymentId: string): Promise<void> {
-  // 1. Verify caller is an authenticated admin.
   const authClient = await createClient();
   const {
     data: { user },
@@ -100,7 +91,6 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
     .maybeSingle();
   if (profile?.role !== "admin") throw new Error("Not authorized");
 
-  // 2. Perform writes with the service-role client (bypasses RLS).
   const admin = createServiceClient();
   const nowIso = new Date().toISOString();
 
@@ -131,7 +121,7 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
     .update({
       status: "ACTIVE",
       started_at: payment.rebalance_date,
-      expires_at: endOfCurrentMonthIst(),
+      expires_at: endOfMonthIst(payment.rebalance_date),
     })
     .eq("id", payment.subscription_id)
     .eq("status", "PENDING");
