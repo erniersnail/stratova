@@ -10,9 +10,9 @@ const PRINCIPLES = [
   },
   {
     number: "02",
-    title: "Repeatability",
+    title: "Consistency",
     description:
-      "A strategy is only valid if its results can be reproduced by an independent researcher using the same methodology and data. All research is documented with sufficient detail to enable independent verification.",
+      "The same input produces the same output. Our strategies run on documented rules and repeatable processes, applied identically every cycle without exception or override. Internal discipline is what makes the research trustworthy — not post-hoc narrative.",
   },
   {
     number: "03",
