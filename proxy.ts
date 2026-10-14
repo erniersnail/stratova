@@ -4,13 +4,16 @@ import { createServerClient } from "@supabase/ssr";
 /**
  * Supabase session refresh + route gating.
  *
- * Refreshes the auth cookie on every matched request, then enforces:
+ * Only runs on routes that require auth awareness (protected pages, admin,
+ * auth pages, callback). Marketing pages — homepage, strategies, performance,
+ * research, how-it-works, methodology, compliance — skip this middleware
+ * entirely, saving a Supabase Auth round trip per page load.
+ *
+ * Refreshes the auth cookie on matched requests, then enforces:
  *   - protected routes (/account, /dashboard) require a session
  *   - admin routes (/admin) require a session + profiles.role = 'admin'
  *     (non-admins get a 404 rewrite so the route isn't revealed)
  *   - auth routes (/login, /signup) are redirected away once signed in
- *
- * All marketing routes stay public.
  *
  * Uses getUser(), not getSession(): getSession reads the cookie without
  * validating it against Supabase, so it is not safe for authorisation.
@@ -111,13 +114,12 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match every route except:
-     * - _next/static   (build output)
-     * - _next/image    (image optimizer)
-     * - favicon.ico    and common static asset extensions
-     * - sitemap.xml / robots.txt (generated routes)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico)$|sitemap\\.xml|robots\\.txt).*)",
+    "/account/:path*",
+    "/dashboard/:path*",
+    "/admin/:path*",
+    "/login",
+    "/signup",
+    "/signup/:path*",
+    "/auth/callback",
   ],
 };
