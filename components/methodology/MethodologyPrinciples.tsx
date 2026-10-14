@@ -6,7 +6,7 @@ const PRINCIPLES = [
     number: "01",
     title: "Evidence over opinion",
     description:
-      "Every investment hypothesis must be grounded in reproducible empirical evidence. We do not rely on market narratives, macroeconomic forecasts, or intuition. Decisions emerge from data, testing, and observable outcomes.",
+      "Every investment hypothesis must be grounded in empirical evidence. We do not rely on market narratives, macroeconomic forecasts, or intuition. Decisions emerge from data, testing, and observable outcomes.",
   },
   {
     number: "02",
@@ -18,7 +18,7 @@ const PRINCIPLES = [
     number: "03",
     title: "Transparency",
     description:
-      "We disclose our assumptions, methodology, data sources, and known limitations. Transparency is not an afterthought — it is a design requirement that applies to every stage of the research process.",
+      "We publish what we can and are explicit about what we do not. Universe rules, rebalance cadence, weighting scheme, portfolio constraints, and the validation approach are disclosed for every strategy. The specific filter criteria are proprietary and remain undisclosed — the only material aspect of the process we do not publish.",
   },
   {
     number: "04",

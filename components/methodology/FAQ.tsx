@@ -21,7 +21,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How often will I receive recommendations?",
     answer:
-      "Each strategy rebalances on a fixed schedule — monthly for large-cap and broad-market strategies, quarterly for midcap and smallcap. Between rebalances, your dashboard shows your current positions and their performance. We do not issue intraday or off-cycle signals.",
+      "Each strategy rebalances on a fixed schedule — monthly for Broad Market, Multicap, and U.S. Equity Leadership; quarterly for Midcap and Smallcap. Between rebalances, your dashboard shows your current positions and their performance. We do not issue intraday or off-cycle signals.",
   },
   {
     question: "How does Simplicial Capital make money — and do you manage my assets?",
@@ -31,7 +31,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "What happens if I want to stop?",
     answer:
-      "Subscriptions can be cancelled at any time. You keep access to your current recommendations until the end of your paid period. No exit fees, no lock-in. Deleting your account removes your data on request, subject to statutory record-keeping requirements.",
+      "Subscriptions can be cancelled at any time from your dashboard. Cancellation is immediate — access to current recommendations for that strategy ends and the strategy page locks. No refund is issued for the current month once recommendations have been delivered. You can subscribe again in the next cycle. Deleting your account removes your data on request, subject to statutory record-keeping requirements.",
   },
 ];
 

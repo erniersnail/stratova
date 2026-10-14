@@ -6,13 +6,13 @@ const STEPS = [
     number: "01",
     title: "Rules-Based",
     description:
-      "Every strategy is defined by a fixed set of rules. Rules are established before a strategy is published and are not adjusted based on recent performance or discretionary judgement.",
+      "Every strategy is defined by a fixed set of rules decided before publication. Rules do not change in response to recent performance, market conditions, or discretionary judgement.",
   },
   {
     number: "02",
     title: "Systematic Selection",
     description:
-      "Securities are selected through a systematic process applied to a defined universe. The selection methodology is not disclosed.",
+      "Securities are selected from a defined universe by a fully specified, systematic process. The specific filter criteria are proprietary — they form the core of our research process and are not published. Everything else about the strategy is.",
   },
   {
     number: "03",
@@ -24,7 +24,7 @@ const STEPS = [
     number: "04",
     title: "Rebalancing",
     description:
-      "Each strategy rebalances on a fixed cadence. Rebalance dates are published in advance. Strategies do not deviate from their schedule.",
+      "Each strategy rebalances on a fixed cadence — monthly for Broad Market, Multicap, and U.S. Equity Leadership; quarterly for Midcap and Smallcap. Rebalance dates are published in advance and are not deviated from.",
   },
 ];
 

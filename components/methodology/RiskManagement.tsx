@@ -4,21 +4,15 @@ import { typography } from "@/lib/typography";
 const RISK_TOPICS = [
   {
     number: "01",
-    title: "Position Weighting",
+    title: "Concentration",
     description:
-      "Positions are equally weighted. Every position receives the same allocation. No single position is larger than any other.",
+      "Portfolios are concentrated by design. The number of holdings varies at each rebalance based on filter output, so the portfolio's sector mix, market-cap distribution, and position count can shift meaningfully between rebalances. This is a deliberate feature of the strategy design, not a side effect.",
   },
   {
     number: "02",
-    title: "Concentration",
-    description:
-      "Portfolios are concentrated by design. Position count varies with each rebalance, determined by how many securities pass the strategy's filter criteria. Risk level is published alongside every strategy.",
-  },
-  {
-    number: "03",
     title: "Portfolio Constraints",
     description:
-      "Long-only. No leverage. No derivatives. No short positions.",
+      "Long-only. No leverage. No derivatives. No short positions. Every strategy remains fully invested in listed equity at all times, with only the modest cash weight held between rebalances.",
   },
 ];
 
