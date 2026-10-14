@@ -9,6 +9,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
+  { label: "How It Works", href: "/how-it-works" },
   { label: "Research", href: "/research" },
   { label: "Strategies", href: "/strategies" },
   { label: "Performance", href: "/performance" },
@@ -23,7 +24,6 @@ export default function Navbar() {
     >
       <div className="mx-auto w-full max-w-[1200px] px-6 h-full flex items-center justify-between">
         <Logo />
-        {/* Desktop: inline nav + auth. Hidden below md. */}
         <ul className="hidden items-center gap-10 md:flex">
           {NAV_ITEMS.map((item) => (
             <li key={item.href}>
@@ -39,7 +39,6 @@ export default function Navbar() {
             <AuthLinks />
           </li>
         </ul>
-        {/* Mobile: hamburger + slide-down menu. Hidden at md and above. */}
         <MobileNav />
       </div>
     </nav>
