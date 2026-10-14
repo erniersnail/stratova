@@ -9,10 +9,10 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "Research", href: "/research" },
   { label: "Strategies", href: "/strategies" },
   { label: "Performance", href: "/performance" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Research", href: "/research" },
   { label: "Dashboard", href: "/dashboard" },
 ];
 
