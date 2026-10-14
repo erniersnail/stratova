@@ -9,9 +9,11 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import {
   getCurrentRecommendationsForUser,
+  getPublicStrategies,
   getStrategyPerformance,
   type PerformancePoint,
   type Recommendation,
+  type Strategy,
 } from "@/lib/strategies/fetch";
 import { formatIST } from "@/lib/format/date";
 
@@ -28,13 +30,6 @@ type SubscriptionRow = {
   started_at: string | null;
   expires_at: string | null;
   capital_allocated: number | null;
-};
-
-type StrategyRow = {
-  id: string;
-  name: string;
-  slug: string;
-  region: string | null;
 };
 
 function formatDate(value: string | null): string {
@@ -59,33 +54,30 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  await ensureProfile(supabase, user);
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  const authName =
-    ((user.user_metadata?.full_name as string | undefined) ??
-      (user.user_metadata?.name as string | undefined) ??
-      "")?.trim() || null;
-  const profileName = profile?.full_name?.trim()
-    ? profile.full_name.trim()
-    : null;
-  const fullName = profileName ?? authName;
+  // Wave 1 — fire everything independent in parallel. The old version ran
+  // each of these sequentially, which stacked ~4 round trips to Supabase
+  // on every page load.
+  const [fullName, subsResult, strategies, recommendations] = await Promise.all([
+    ensureProfile(supabase, user),
+    supabase
+      .from("subscriptions")
+      .select(
+        "id,strategy_id,status,plan,started_at,expires_at,capital_allocated",
+      )
+      .eq("user_id", user.id),
+    // Cached — same catalog for every user.
+    getPublicStrategies(),
+    getCurrentRecommendationsForUser(user.id),
+  ]);
 
   let subscriptions: SubscriptionRow[] = [];
-  const { data: subsData, error: subsError } = await supabase
-    .from("subscriptions")
-    .select("id,strategy_id,status,plan,started_at,expires_at,capital_allocated")
-    .eq("user_id", user.id);
-
-  if (subsError) {
-    console.error("Dashboard subscriptions fetch failed:", subsError.message);
-  } else if (subsData) {
-    subscriptions = subsData as SubscriptionRow[];
+  if (subsResult.error) {
+    console.error(
+      "Dashboard subscriptions fetch failed:",
+      subsResult.error.message,
+    );
+  } else if (subsResult.data) {
+    subscriptions = subsResult.data as SubscriptionRow[];
   }
 
   const paidSubscriptions = subscriptions.filter(
@@ -95,23 +87,11 @@ export default async function DashboardPage() {
   const strategyNames = new Map<string, string>();
   const strategySlugs = new Map<string, string>();
   const strategyRegions = new Map<string, string>();
-  const { data: stratData, error: stratError } = await supabase
-    .from("strategies")
-    .select("id,name,slug,region")
-    .eq("is_public", true);
-
-  if (stratError) {
-    console.error("Dashboard strategies fetch failed:", stratError.message);
-  } else if (stratData) {
-    for (const s of stratData as StrategyRow[]) {
-      strategyNames.set(s.id, s.name);
-      strategySlugs.set(s.id, s.slug);
-      if (s.region) strategyRegions.set(s.id, s.region);
-    }
+  for (const s of strategies as Strategy[]) {
+    strategyNames.set(s.id, s.name);
+    strategySlugs.set(s.id, s.slug);
+    if (s.region) strategyRegions.set(s.id, s.region);
   }
-
-  const recommendations: Recommendation[] =
-    await getCurrentRecommendationsForUser(user.id);
 
   const capitalByStrategy = new Map<string, number>();
   for (const s of subscriptions) {
@@ -119,6 +99,29 @@ export default async function DashboardPage() {
       capitalByStrategy.set(s.strategy_id, s.capital_allocated);
     }
   }
+
+  // Wave 2 — one parallel batch for every unique strategy that needs a
+  // performance curve. Dedupe first so we don't fetch the same strategy
+  // twice when a user has multiple subs on it.
+  const strategiesNeedingPerf = [
+    ...new Set(
+      paidSubscriptions
+        .filter(
+          (s) =>
+            s.strategy_id !== null &&
+            s.started_at !== null &&
+            s.capital_allocated !== null,
+        )
+        .map((s) => s.strategy_id as string),
+    ),
+  ];
+
+  const perfResults = await Promise.all(
+    strategiesNeedingPerf.map((id) => getStrategyPerformance(id)),
+  );
+  const perfCache = new Map<string, PerformancePoint[]>(
+    strategiesNeedingPerf.map((id, i) => [id, perfResults[i]]),
+  );
 
   type ClientWindow = {
     subscriptionId: string;
@@ -129,13 +132,9 @@ export default async function DashboardPage() {
     returnPct: string;
   };
   const clientWindows: ClientWindow[] = [];
-  const perfCache = new Map<string, PerformancePoint[]>();
   for (const s of paidSubscriptions) {
     if (!s.strategy_id || !s.started_at || s.capital_allocated === null) {
       continue;
-    }
-    if (!perfCache.has(s.strategy_id)) {
-      perfCache.set(s.strategy_id, await getStrategyPerformance(s.strategy_id));
     }
     const startDay = s.started_at.slice(0, 10);
     const window = (perfCache.get(s.strategy_id) ?? []).filter(
@@ -153,7 +152,6 @@ export default async function DashboardPage() {
       returnPct: (((last / first) - 1) * 100).toFixed(2),
     });
   }
-
   return (
     <main>
       <Container className="py-20">
