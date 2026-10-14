@@ -35,16 +35,16 @@ export default function LoginForm() {
         placeholder="your@email.com"
         required
         disabled={pending}
+        rightSlot={
+          <Link
+            href="/forgot-password"
+            className="text-sm text-secondary underline hover:text-foreground"
+          >
+            Forgot password?
+          </Link>
+        }
       />
 
-      <div className="flex justify-end">
-        <Link
-          href="/forgot-password"
-          className="mb-1.5 text-sm text-secondary underline hover:text-foreground"
-        >
-          Forgot password?
-        </Link>
-      </div>
       <AuthField
         id="password"
         label="Password"

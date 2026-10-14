@@ -1,8 +1,10 @@
 import Input from "@/components/ui/Input";
 
 /**
- * Auth form field with label, optional hint and inline error. Shared by the
- * signup and login forms so both read identically.
+ * Auth form field with label, optional hint, optional right-aligned slot,
+ * and inline error. Shared by the signup and login forms so both read
+ * identically. `rightSlot` renders on the same row as the label, right-
+ * aligned — used for e.g. "Forgot password?" next to the Email field.
  */
 type AuthFieldProps = {
   id: string;
@@ -15,6 +17,7 @@ type AuthFieldProps = {
   minLength?: number;
   required?: boolean;
   disabled?: boolean;
+  rightSlot?: React.ReactNode;
 };
 
 export default function AuthField({
@@ -28,15 +31,19 @@ export default function AuthField({
   minLength,
   required = false,
   disabled = false,
+  rightSlot,
 }: AuthFieldProps) {
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-foreground mb-1.5"
-      >
-        {label}
-      </label>
+      <div className="mb-1.5 flex items-center justify-between gap-4">
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-foreground"
+        >
+          {label}
+        </label>
+        {rightSlot}
+      </div>
       <Input
         id={id}
         name={id}
