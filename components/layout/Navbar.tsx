@@ -20,7 +20,7 @@ export default function Navbar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="sticky top-0 z-50 h-24 border-b border-border bg-background/95 backdrop-blur-sm"
+      className="sticky top-0 z-50 h-24 border-b border-border bg-background"
     >
       <div className="mx-auto w-full max-w-[1200px] px-6 h-full flex items-center justify-between">
         <Logo />

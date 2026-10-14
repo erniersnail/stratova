@@ -17,7 +17,7 @@ export default function Hero() {
           alt=""
           fill
           priority
-          className="object-cover object-right brightness-[0.95] contrast-[1.05]"
+          className="object-cover object-right"
           sizes="100vw"
         />
       </div>
