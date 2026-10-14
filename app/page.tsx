@@ -1,7 +1,7 @@
 import Hero from "@/components/sections/Hero";
 import StrategiesSection from "@/components/sections/StrategiesSection";
 import PhilosophySection from "@/components/sections/PhilosophySection";
-import TrustSection from "@/components/sections/TrustSection";
+import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import PerformancePreviewSection from "@/components/sections/PerformancePreviewSection";
 import NewsletterSection from "@/components/sections/NewsletterSection";
 
@@ -20,7 +20,7 @@ export default function Home() {
       <hr className="border-border" />
       <PhilosophySection />
       <hr className="border-border" />
-      <TrustSection />
+      <HowItWorksSection />
       <hr className="border-border" />
       <PerformancePreviewSection />
       <hr className="border-border" />
