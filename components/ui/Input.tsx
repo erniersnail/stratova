@@ -20,7 +20,7 @@ export default function Input({
       type={type}
       placeholder={placeholder}
       required={required}
-      className={`h-11 rounded-sm border border-border bg-surface px-4 text-sm text-foreground placeholder:text-tertiary transition-colors duration-200 focus:border-foreground focus:outline-none ${className}`}
+      className={`w-full h-11 rounded-sm border border-border bg-surface px-4 text-sm text-foreground placeholder:text-tertiary transition-colors duration-200 focus:border-foreground focus:outline-none ${className}`}
       {...props}
     />
   );
