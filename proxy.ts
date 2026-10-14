@@ -4,36 +4,29 @@ import { createServerClient } from "@supabase/ssr";
 /**
  * Supabase session refresh + route gating.
  *
- * Only runs on routes that require auth awareness (protected pages, admin,
- * auth pages, callback). Marketing pages — homepage, strategies, performance,
- * research, how-it-works, methodology, compliance — skip this middleware
- * entirely, saving a Supabase Auth round trip per page load.
+ * Runs only on routes that require auth awareness. Public marketing pages
+ * skip this middleware entirely, saving a Supabase Auth round trip per load.
  *
- * Refreshes the auth cookie on matched requests, then enforces:
- *   - protected routes (/account, /dashboard) require a session
- *   - admin routes (/admin) require a session + profiles.role = 'admin'
- *     (non-admins get a 404 rewrite so the route isn't revealed)
- *   - auth routes (/login, /signup) are redirected away once signed in
- *
- * Uses getUser(), not getSession(): getSession reads the cookie without
- * validating it against Supabase, so it is not safe for authorisation.
- *
- * Uses the publishable (anon) key only. Never the service role key.
+ * After validating the session, injects user identity into request headers
+ * (x-user-id, x-user-email, x-user-created-at, x-user-name) so downstream
+ * server components can read them without calling auth.getUser() again.
  */
 
-/** Routes that require an authenticated session. Prefix-matched. */
 const PROTECTED_ROUTES = ["/account", "/dashboard"];
-
-/** Routes that require the admin profile role. Prefix-matched. */
 const ADMIN_ROUTES = ["/admin"];
-
-/** Routes a signed-in user should be redirected away from. */
 const AUTH_ROUTES = ["/login", "/signup"];
+
+type PendingCookie = {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+};
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   let supabaseResponse = NextResponse.next({ request });
+  let pendingCookies: PendingCookie[] = [];
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -45,8 +38,11 @@ export default async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-
-          // Rebuild the response so refreshed cookies reach the browser.
+          pendingCookies = cookiesToSet.map((c) => ({
+            name: c.name,
+            value: c.value,
+            options: c.options as Record<string, unknown> | undefined,
+          }));
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
@@ -56,9 +52,6 @@ export default async function proxy(request: NextRequest) {
     },
   );
 
-  // Validates the token with Supabase AND refreshes the session.
-  // Do not remove: without it the session is never renewed and the user is
-  // silently signed out later.
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -69,7 +62,6 @@ export default async function proxy(request: NextRequest) {
   const isAuthRoute = AUTH_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
-
   const isAdminRoute = ADMIN_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
@@ -101,12 +93,38 @@ export default async function proxy(request: NextRequest) {
       .maybeSingle();
 
     if (profile?.role !== "admin") {
-      // Rewrite to a non-existent route: renders the app not-found page
-      // (404 status), so the admin route isn't revealed with a 403.
       const url = request.nextUrl.clone();
       url.pathname = "/__not-found";
       return NextResponse.rewrite(url);
     }
+  }
+
+  // Inject user identity into request headers for downstream server components.
+  if (user) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-user-id", user.id);
+    if (user.email) requestHeaders.set("x-user-email", user.email);
+    if (user.created_at) requestHeaders.set("x-user-created-at", user.created_at);
+    const metaName =
+      (user.user_metadata?.full_name as string | undefined) ??
+      (user.user_metadata?.name as string | undefined);
+    if (metaName && metaName.length > 0) {
+      requestHeaders.set("x-user-name", metaName);
+    } else {
+      requestHeaders.delete("x-user-name");
+    }
+
+    const rebuilt = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+    pendingCookies.forEach(({ name, value, options }) =>
+      rebuilt.cookies.set(
+        name,
+        value,
+        options as Parameters<typeof rebuilt.cookies.set>[2],
+      ),
+    );
+    supabaseResponse = rebuilt;
   }
 
   return supabaseResponse;
