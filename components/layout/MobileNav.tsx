@@ -15,6 +15,9 @@ const NAV_ITEMS: NavItem[] = [
 
 type AuthState = "loading" | "logged-out" | "logged-in";
 
+/** Matches the Navbar's inline height. Keep in sync if the nav changes. */
+const NAV_HEIGHT_PX = 53;
+
 function toTitleCase(s: string): string {
   if (!s) return "";
   return s
@@ -26,8 +29,8 @@ function toTitleCase(s: string): string {
 
 /**
  * Mobile-only navigation: hamburger toggle + slide-down menu with the nav
- * links and an auth block. Replicates AuthLinks' session read so the menu
- * can show the user's first name. Mounted below md; hidden at md and above.
+ * links and an auth block. Positioned to start exactly at the bottom of the
+ * navbar using an inline `top` style (avoids Tailwind-class chunking issues).
  */
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -60,7 +63,6 @@ export default function MobileNav() {
     };
   }, []);
 
-  // Lock body scroll while the menu is open.
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
@@ -115,15 +117,34 @@ export default function MobileNav() {
 
       {open && (
         <>
-          {/* Backdrop */}
           <button
             type="button"
             aria-label="Close menu"
             onClick={() => setOpen(false)}
-            className="fixed inset-x-0 bottom-0 top-24 z-40 cursor-default bg-foreground/40"
+            style={{
+              position: "fixed",
+              left: 0,
+              right: 0,
+              top: NAV_HEIGHT_PX,
+              bottom: 0,
+              zIndex: 40,
+              cursor: "default",
+              backgroundColor: "rgba(17, 17, 17, 0.4)",
+            }}
           />
-          {/* Slide-down menu */}
-          <div className="fixed inset-x-0 top-24 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto border-b border-border bg-background">
+          <div
+            style={{
+              position: "fixed",
+              left: 0,
+              right: 0,
+              top: NAV_HEIGHT_PX,
+              zIndex: 50,
+              maxHeight: `calc(100vh - ${NAV_HEIGHT_PX}px)`,
+              overflowY: "auto",
+              borderBottom: "1px solid var(--color-border)",
+              backgroundColor: "var(--color-background)",
+            }}
+          >
             <nav aria-label="Mobile navigation" className="px-6 py-4">
               <ul>
                 {NAV_ITEMS.map((item) => (

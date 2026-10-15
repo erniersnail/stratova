@@ -19,15 +19,14 @@ const NAV_ITEMS: NavItem[] = [
 /**
  * Navbar shell styles are inlined rather than applied via Tailwind classes.
  * Next.js 16 + Turbopack's per-route CSS chunk splitting was omitting the
- * height utility on some routes, causing the nav to render at content height
- * (~53px) instead of 96px. Inline styles ship with the HTML and cannot be
- * dropped by the CSS chunker.
+ * height utility on some routes, causing the nav to render inconsistently.
+ * Inline styles ship with the HTML and cannot be dropped by the chunker.
  */
 const NAV_SHELL_STYLE: React.CSSProperties = {
   position: "sticky",
   top: 0,
   zIndex: 50,
-  height: "6rem",
+  height: "53px",
   borderBottom: "1px solid var(--color-border)",
   backgroundColor: "var(--color-background)",
 };
