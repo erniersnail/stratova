@@ -4,6 +4,7 @@ import PhilosophySection from "@/components/sections/PhilosophySection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import PerformancePreviewSection from "@/components/sections/PerformancePreviewSection";
 import NewsletterSection from "@/components/sections/NewsletterSection";
+import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata = {
   title: "Simplicial Capital — Systematic Investing",
@@ -16,15 +17,25 @@ export default function Home() {
     <>
       <Hero />
       <hr className="border-border" />
-      <StrategiesSection />
+      <FadeIn>
+        <StrategiesSection />
+      </FadeIn>
       <hr className="border-border" />
-      <PhilosophySection />
+      <FadeIn>
+        <PhilosophySection />
+      </FadeIn>
       <hr className="border-border" />
-      <HowItWorksSection />
+      <FadeIn>
+        <HowItWorksSection />
+      </FadeIn>
       <hr className="border-border" />
-      <PerformancePreviewSection />
+      <FadeIn>
+        <PerformancePreviewSection />
+      </FadeIn>
       <hr className="border-border" />
-      <NewsletterSection />
+      <FadeIn>
+        <NewsletterSection />
+      </FadeIn>
     </>
   );
 }
