@@ -15,7 +15,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main>
-      <Container size="default" className="pt-16 pb-0">
+      <Container size="default" className="pt-20 pb-0">
         <PageHeader title="About" description="We apply the same rigor quant funds use to build systematic strategies for investors." />
       </Container>
 

@@ -11,7 +11,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <main>
-      <Container size="reading" className="pt-16 pb-0">
+      <Container size="reading" className="pt-20 pb-0">
         <PageHeader title="Privacy Policy" description="How we collect, use, and protect your personal information." />
       </Container>
 

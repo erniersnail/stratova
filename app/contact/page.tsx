@@ -14,7 +14,7 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <main>
-      <Container className="pt-16 pb-0">
+      <Container className="pt-20 pb-0">
         <PageHeader title="Contact" description="Contact Simplicial Capital for research inquiries, business development, media requests, and general questions." />
       </Container>
 

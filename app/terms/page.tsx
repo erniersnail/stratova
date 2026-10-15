@@ -12,7 +12,7 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <main>
-      <Container size="reading" className="pt-16 pb-0">
+      <Container size="reading" className="pt-20 pb-0">
         <PageHeader title="Terms of Use" description="By accessing this website, you agree to the following terms and conditions." />
       </Container>
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
-import Section from "@/components/layout/Section";
 import PageHeader from "@/components/common/PageHeader";
 import { typography } from "@/lib/typography";
 
