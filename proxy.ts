@@ -16,17 +16,10 @@ const PROTECTED_ROUTES = ["/account", "/dashboard"];
 const ADMIN_ROUTES = ["/admin"];
 const AUTH_ROUTES = ["/login", "/signup"];
 
-type PendingCookie = {
-  name: string;
-  value: string;
-  options?: Record<string, unknown>;
-};
-
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   let supabaseResponse = NextResponse.next({ request });
-  let pendingCookies: PendingCookie[] = [];
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,11 +31,6 @@ export default async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          pendingCookies = cookiesToSet.map((c) => ({
-            name: c.name,
-            value: c.value,
-            options: c.options as Record<string, unknown> | undefined,
-          }));
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
@@ -117,14 +105,13 @@ export default async function proxy(request: NextRequest) {
     const rebuilt = NextResponse.next({
       request: { headers: requestHeaders },
     });
-    pendingCookies.forEach(({ name, value, options }) =>
-      rebuilt.cookies.set(
-        name,
-        value,
-        options as Parameters<typeof rebuilt.cookies.set>[2],
-      ),
-    );
-    supabaseResponse = rebuilt;
+
+    // Re-apply session cookies Supabase set during getUser().
+    for (const cookie of supabaseResponse.cookies.getAll()) {
+      rebuilt.cookies.set(cookie);
+    }
+
+    return rebuilt;
   }
 
   return supabaseResponse;

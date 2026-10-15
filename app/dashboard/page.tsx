@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Container from "@/components/layout/Container";
 import PageHeader from "@/components/common/PageHeader";
 import DataTable from "@/components/ui/data-table";
 import CancelSubscriptionButton from "@/components/dashboard/CancelSubscriptionButton";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, type AuthedUser } from "@/lib/auth/session";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import {
   getCurrentRecommendationsForUser,
@@ -43,29 +45,59 @@ function formatDate(value: string | null): string {
   });
 }
 
+function DashboardSkeleton() {
+  return (
+    <div className="mt-12 space-y-12">
+      <div>
+        <div className="h-6 w-40 animate-pulse rounded bg-surface-hover" />
+        <div className="mt-4 h-48 w-full animate-pulse rounded bg-surface-hover" />
+      </div>
+      <div>
+        <div className="h-6 w-48 animate-pulse rounded bg-surface-hover" />
+        <div className="mt-4 h-48 w-full animate-pulse rounded bg-surface-hover" />
+      </div>
+    </div>
+  );
+}
+
 export default async function DashboardPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAuthedUser();
   if (!user) {
     redirect("/login");
   }
 
-  // Wave 1 — fire everything independent in parallel. The old version ran
-  // each of these sequentially, which stacked ~4 round trips to Supabase
-  // on every page load.
-  const [fullName, subsResult, strategies, recommendations] = await Promise.all([
-    ensureProfile(supabase, user),
+  // Run ensureProfile in the shell so the header can render with the user's
+  // name. This costs one extra round trip (~400ms) but only for the profile
+  // lookup; the heavy dashboard content streams in below via Suspense.
+  const supabase = await createClient();
+  const fullName = await ensureProfile(supabase, user);
+
+  return (
+    <main>
+      <Container className="py-20">
+        <PageHeader
+          title={`Welcome, ${fullName ?? "there"}`}
+          description="Your subscriptions and the latest research published to you."
+        />
+
+        <Suspense fallback={<DashboardSkeleton />}>
+          <DashboardContent user={user} />
+        </Suspense>
+      </Container>
+    </main>
+  );
+}
+
+async function DashboardContent({ user }: { user: AuthedUser }) {
+  const supabase = await createClient();
+
+  const [subsResult, strategies, recommendations] = await Promise.all([
     supabase
       .from("subscriptions")
       .select(
         "id,strategy_id,status,plan,started_at,expires_at,capital_allocated",
       )
       .eq("user_id", user.id),
-    // Cached — same catalog for every user.
     getPublicStrategies(),
     getCurrentRecommendationsForUser(user.id),
   ]);
@@ -100,9 +132,6 @@ export default async function DashboardPage() {
     }
   }
 
-  // Wave 2 — one parallel batch for every unique strategy that needs a
-  // performance curve. Dedupe first so we don't fetch the same strategy
-  // twice when a user has multiple subs on it.
   const strategiesNeedingPerf = [
     ...new Set(
       paidSubscriptions
@@ -152,216 +181,201 @@ export default async function DashboardPage() {
       returnPct: (((last / first) - 1) * 100).toFixed(2),
     });
   }
+
   return (
-    <main>
-      <Container className="py-20">
-        <PageHeader
-          title={`Welcome, ${fullName ?? "there"}`}
-          description="Your subscriptions and the latest research published to you."
-        />
-
-        <div className="mt-12 grid grid-cols-1 gap-8">
-          <section aria-labelledby="dashboard-subscriptions">
-            <h2
-              id="dashboard-subscriptions"
-              className="text-lg font-medium tracking-tight"
-            >
-              Your subscriptions
-            </h2>
-            <div className="mt-4 space-y-4">
-              <DataTable<SubscriptionRow>
-                columns={[
-                  {
-                    key: "strategy",
-                    header: "Strategy",
-                    render: (row) => (
-                      <span className="text-foreground">
-                        {row.strategy_id
-                          ? (strategyNames.get(row.strategy_id) ?? "Strategy")
-                          : "—"}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "plan",
-                    header: "Plan",
-                    render: (row) => row.plan ?? "—",
-                  },
-                  {
-                    key: "capital",
-                    header: "Capital allocated",
-                    render: (row) =>
-                      row.capital_allocated !== null
-                        ? `₹${row.capital_allocated.toLocaleString("en-IN")}`
-                        : "—",
-                  },
-                  {
-                    key: "status",
-                    header: "Status",
-                    render: (row) => row.status ?? "—",
-                  },
-                  {
-                    key: "started",
-                    header: "Started",
-                    render: (row) => formatDate(row.started_at),
-                  },
-                  {
-                    key: "expires",
-                    header: "Expires",
-                    render: (row) => formatDate(row.expires_at),
-                  },
-                  {
-                    key: "view",
-                    header: "",
-                    render: (row) => {
-                      if (!row.strategy_id) return "—";
-                      const region = strategyRegions.get(row.strategy_id);
-                      const slug = strategySlugs.get(row.strategy_id);
-                      if (!region || !slug) return "—";
-                      return (
-                        <Link
-                          href={`/strategies/${region}/${slug}`}
-                          className="underline hover:text-foreground"
-                        >
-                          View strategy
-                        </Link>
-                      );
-                    },
-                  },
-                  {
-                    key: "actions",
-                    header: "",
-                    render: (row) => {
-                      if (row.status !== "ACTIVE") return null;
-                      return <CancelSubscriptionButton subscriptionId={row.id} />;
-                    },
-                  },
-                ]}
-                rows={paidSubscriptions}
-                rowKey={(row) => row.id}
-                emptyState={
-                  <div className="rounded-lg border border-border bg-surface p-6">
-                    <p className="text-sm leading-[1.75] text-secondary">
-                      You don&apos;t have any active subscriptions yet.
-                    </p>
-                    <p className="mt-4 text-sm">
-                      <Link
-                        href="/strategies"
-                        className="underline hover:text-foreground"
-                      >
-                        Browse strategies
-                      </Link>
-                    </p>
-                  </div>
-                }
-              />
-              {clientWindows.length > 0 && (
-                <ul className="mt-4 space-y-1">
-                  {clientWindows.map((w) => (
-                    <li
-                      key={w.subscriptionId}
-                      className="text-sm text-secondary"
+    <div className="mt-12 grid grid-cols-1 gap-8">
+      <section aria-labelledby="dashboard-subscriptions">
+        <h2
+          id="dashboard-subscriptions"
+          className="text-lg font-medium tracking-tight"
+        >
+          Your subscriptions
+        </h2>
+        <div className="mt-4 space-y-4">
+          <DataTable<SubscriptionRow>
+            columns={[
+              {
+                key: "strategy",
+                header: "Strategy",
+                render: (row) => (
+                  <span className="text-foreground">
+                    {row.strategy_id
+                      ? (strategyNames.get(row.strategy_id) ?? "Strategy")
+                      : "—"}
+                  </span>
+                ),
+              },
+              {
+                key: "plan",
+                header: "Plan",
+                render: (row) => row.plan ?? "—",
+              },
+              {
+                key: "capital",
+                header: "Capital allocated",
+                render: (row) =>
+                  row.capital_allocated !== null
+                    ? `₹${row.capital_allocated.toLocaleString("en-IN")}`
+                    : "—",
+              },
+              {
+                key: "status",
+                header: "Status",
+                render: (row) => row.status ?? "—",
+              },
+              {
+                key: "started",
+                header: "Started",
+                render: (row) => formatDate(row.started_at),
+              },
+              {
+                key: "expires",
+                header: "Expires",
+                render: (row) => formatDate(row.expires_at),
+              },
+              {
+                key: "view",
+                header: "",
+                render: (row) => {
+                  if (!row.strategy_id) return "—";
+                  const region = strategyRegions.get(row.strategy_id);
+                  const slug = strategySlugs.get(row.strategy_id);
+                  if (!region || !slug) return "—";
+                  return (
+                    <Link
+                      href={`/strategies/${region}/${slug}`}
+                      className="underline hover:text-foreground"
                     >
-                      {w.name} — Since {w.startedOn}: ₹
-                      {w.capital.toLocaleString("en-IN")} → ₹
-                      {Math.round(w.current).toLocaleString("en-IN")} (
-                      {w.returnPct}%)
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </section>
-
-          <section aria-labelledby="dashboard-recommendations">
-            <h2
-              id="dashboard-recommendations"
-              className="text-lg font-medium tracking-tight"
-            >
-              Latest recommendations
-            </h2>
-            <div className="mt-4">
-              <DataTable<Recommendation>
-                columns={[
-                  {
-                    key: "strategy",
-                    header: "Strategy",
-                    render: (row) => (
-                      <span className="text-foreground">
-                        {strategyNames.get(row.strategy_id) ??
-                          strategySlugs.get(row.strategy_id) ??
-                          "—"}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "symbol",
-                    header: "Symbol",
-                    render: (row) => (
-                      <span className="font-medium text-foreground">
-                        {row.symbol}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "action",
-                    header: "Action",
-                    render: (row) => row.action ?? "—",
-                  },
-                  {
-                    key: "target",
-                    header: "Target Shares",
-                    render: (row) => {
-                      const cap = capitalByStrategy.get(row.strategy_id);
-                      const target =
-                        cap && row.weight_pct && row.price
-                          ? Math.floor((cap * row.weight_pct) / row.price)
-                          : null;
-                      return target !== null
-                        ? target.toLocaleString("en-IN")
-                        : "—";
-                    },
-                  },
-                  {
-                    key: "asof",
-                    header: "As of (IST)",
-                    render: (row) => formatIST(row.as_of),
-                  },
-                  {
-                    key: "expires",
-                    header: "Expires (IST)",
-                    render: (row) => formatIST(row.expires_at),
-                  },
-                ]}
-                rows={recommendations}
-                rowKey={(row) => row.id}
-                emptyState={
-                  <div className="rounded-lg border border-border bg-surface p-6">
-                    <p className="text-sm leading-[1.75] text-secondary">
-                      No recommendations yet.
-                    </p>
-                  </div>
-                }
-              />
-            </div>
-            <p className="mt-4 text-sm">
-              <Link
-                href="/account/history"
-                className="underline hover:text-foreground"
-              >
-                View full history →
-              </Link>
-            </p>
-          </section>
+                      View strategy
+                    </Link>
+                  );
+                },
+              },
+              {
+                key: "actions",
+                header: "",
+                render: (row) => {
+                  if (row.status !== "ACTIVE") return null;
+                  return <CancelSubscriptionButton subscriptionId={row.id} />;
+                },
+              },
+            ]}
+            rows={paidSubscriptions}
+            rowKey={(row) => row.id}
+            emptyState={
+              <div className="rounded-lg border border-border bg-surface p-6">
+                <p className="text-sm leading-[1.75] text-secondary">
+                  You don&apos;t have any active subscriptions yet.
+                </p>
+                <p className="mt-4 text-sm">
+                  <Link
+                    href="/strategies"
+                    className="underline hover:text-foreground"
+                  >
+                    Browse strategies
+                  </Link>
+                </p>
+              </div>
+            }
+          />
+          {clientWindows.length > 0 && (
+            <ul className="mt-4 space-y-1">
+              {clientWindows.map((w) => (
+                <li
+                  key={w.subscriptionId}
+                  className="text-sm text-secondary"
+                >
+                  {w.name} — Since {w.startedOn}: ₹
+                  {w.capital.toLocaleString("en-IN")} → ₹
+                  {Math.round(w.current).toLocaleString("en-IN")} (
+                  {w.returnPct}%)
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+      </section>
 
-        <p className="mt-12 text-sm text-secondary">
-          Need to update your details?{" "}
-          <Link href="/account" className="underline hover:text-foreground">
-            Go to your account
+      <section aria-labelledby="dashboard-recommendations">
+        <h2
+          id="dashboard-recommendations"
+          className="text-lg font-medium tracking-tight"
+        >
+          Latest recommendations
+        </h2>
+        <div className="mt-4">
+          <DataTable<Recommendation>
+            columns={[
+              {
+                key: "strategy",
+                header: "Strategy",
+                render: (row) => (
+                  <span className="text-foreground">
+                    {strategyNames.get(row.strategy_id) ??
+                      strategySlugs.get(row.strategy_id) ??
+                      "—"}
+                  </span>
+                ),
+              },
+              {
+                key: "symbol",
+                header: "Symbol",
+                render: (row) => (
+                  <span className="font-medium text-foreground">
+                    {row.symbol}
+                  </span>
+                ),
+              },
+              {
+                key: "action",
+                header: "Action",
+                render: (row) => row.action ?? "—",
+              },
+              {
+                key: "target",
+                header: "Target Shares",
+                render: (row) => {
+                  const cap = capitalByStrategy.get(row.strategy_id);
+                  const target =
+                    cap && row.weight_pct && row.price
+                      ? Math.floor((cap * row.weight_pct) / row.price)
+                      : null;
+                  return target !== null
+                    ? target.toLocaleString("en-IN")
+                    : "—";
+                },
+              },
+              {
+                key: "asof",
+                header: "As of (IST)",
+                render: (row) => formatIST(row.as_of),
+              },
+              {
+                key: "expires",
+                header: "Expires (IST)",
+                render: (row) => formatIST(row.expires_at),
+              },
+            ]}
+            rows={recommendations}
+            rowKey={(row) => row.id}
+            emptyState={
+              <div className="rounded-lg border border-border bg-surface p-6">
+                <p className="text-sm leading-[1.75] text-secondary">
+                  No recommendations yet.
+                </p>
+              </div>
+            }
+          />
+        </div>
+        <p className="mt-4 text-sm">
+          <Link
+            href="/account/history"
+            className="underline hover:text-foreground"
+          >
+            View full history →
           </Link>
         </p>
-      </Container>
-    </main>
+      </section>
+    </div>
   );
 }
