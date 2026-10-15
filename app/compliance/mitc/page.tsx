@@ -39,18 +39,26 @@ export default function MitcPage() {
         Refunds, Conflict of Interest, and Prohibited Practices
       </h2>
       <p className={`${typography.body} mt-4 text-secondary`}>
-        In case of premature termination of services by either party, the
-        client is entitled to a refund of proportionate fees only for the
-        unexpired period. Except as expressly provided in the Refund Policy,
-        all fees paid are non-refundable. The client acknowledges that no
-        refund will be granted for partial use of the subscription period or
-        for market losses. The RA will abide by applicable regulations
-        regarding disclosure and mitigation of any actual or potential
-        conflict of interest and will endeavor to promptly inform the client
-        of any such conflict. Any assured, guaranteed, or fixed returns
-        schemes or any other schemes of similar nature are prohibited by law
-        and shall not be offered. The RA cannot guarantee returns, profits,
-        accuracy, or risk-free investments.
+        In case of premature termination of services by the client, the
+        client is entitled to a refund of proportionate fees for the portion
+        of the subscription period for which recommendations have not yet
+        been delivered. Since recommendations for the current cycle are
+        delivered to the subscriber&apos;s dashboard on the rebalance date
+        and remain accessible for the full cycle, that cycle is treated as
+        fully served and no refund is payable for it. In case of termination
+        on account of suspension or cancellation of the RA&apos;s SEBI
+        registration, the client shall receive a pro-rata refund for the
+        period from the effective date of such suspension or cancellation to
+        the end of the paid subscription. Except as expressly provided in the
+        Refund Policy, all fees paid are non-refundable. The client
+        acknowledges that no refund will be granted for market losses. The RA
+        will abide by applicable regulations regarding disclosure and
+        mitigation of any actual or potential conflict of interest and will
+        endeavor to promptly inform the client of any such conflict. Any
+        assured, guaranteed, or fixed returns schemes or any other schemes of
+        similar nature are prohibited by law and shall not be offered. The RA
+        cannot guarantee returns, profits, accuracy, or risk-free
+        investments.
       </p>
 
       <h2 className={`${typography.h2} mt-10`}>Grievance Redressal</h2>
