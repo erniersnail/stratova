@@ -44,8 +44,6 @@ const STRATEGY_CARDS: StrategyCard[] = [
 ];
 
 export default async function StrategiesSection() {
-  // Fetch the combined curve for each region. Both underlying fetchers are
-  // unstable_cache-wrapped, so this is a no-op on repeat renders.
   const [usStrategies, indiaStrategies] = await Promise.all([
     getPublicStrategiesByRegion("us"),
     getPublicStrategiesByRegion("india"),
@@ -107,12 +105,12 @@ export default async function StrategiesSection() {
                             <Sparkline
                               values={values}
                               className={
-                                positive ? "text-foreground" : "text-tertiary"
+                                positive ? "text-accent" : "text-tertiary"
                               }
                             />
                             <span
                               className={`font-mono text-sm font-medium tracking-tight ${
-                                positive ? "text-foreground" : "text-tertiary"
+                                positive ? "text-accent" : "text-tertiary"
                               }`}
                             >
                               {positive ? "+" : ""}

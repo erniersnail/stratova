@@ -50,7 +50,7 @@ export default function StrategyCard({
           <div className="flex shrink-0 flex-col items-end">
             <span
               className={`font-mono text-sm font-medium tracking-tight ${
-                positive ? "text-foreground" : "text-tertiary"
+                positive ? "text-accent" : "text-tertiary"
               }`}
             >
               {positive ? "+" : ""}
@@ -58,7 +58,7 @@ export default function StrategyCard({
             </span>
             <Sparkline
               values={normalized}
-              className={`mt-1 ${positive ? "text-foreground" : "text-tertiary"}`}
+              className={`mt-1 ${positive ? "text-accent" : "text-tertiary"}`}
             />
             <span className="mt-1 text-[10px] uppercase tracking-[0.15em] text-tertiary">
               Since inception

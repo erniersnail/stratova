@@ -18,7 +18,11 @@ export default function SectionHeader({
   return (
     <div className={`${centered ? "text-center" : ""} ${className}`}>
       {label && (
-        <span className="text-sm font-semibold tracking-[0.15em] text-secondary uppercase">
+        <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-[0.15em] text-secondary uppercase">
+          <span
+            aria-hidden
+            className="inline-block h-1.5 w-1.5 rounded-full bg-accent"
+          />
           {label}
         </span>
       )}
