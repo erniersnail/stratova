@@ -60,7 +60,7 @@ export default function StrategyCard({
               values={normalized}
               className={`mt-1 ${positive ? "text-accent" : "text-tertiary"}`}
             />
-            <span className="mt-1 text-[10px] uppercase tracking-[0.15em] text-tertiary">
+            <span className="mt-1 text-[10px] uppercase tracking-[0.15em] text-secondary">
               Since inception
             </span>
           </div>

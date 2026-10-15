@@ -116,7 +116,7 @@ export default async function StrategiesSection() {
                               {positive ? "+" : ""}
                               {returnPct.toFixed(2)}%
                             </span>
-                            <span className="text-[10px] uppercase tracking-[0.15em] text-tertiary">
+                            <span className="text-[10px] uppercase tracking-[0.15em] text-secondary">
                               Since inception
                             </span>
                           </div>
