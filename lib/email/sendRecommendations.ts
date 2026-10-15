@@ -43,7 +43,6 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
     errors: [],
   };
 
-  // 1. Load all strategies that have at least one active subscriber.
   const { data: activeSubs, error: subsErr } = await admin
     .from("subscriptions")
     .select("strategy_id, user_id, capital_allocated")
@@ -56,7 +55,6 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
   }
   if (!activeSubs || activeSubs.length === 0) return summary;
 
-  // Group by strategy.
   const byStrategy = new Map<
     string,
     { user_id: string; capital_allocated: number | null }[]
@@ -73,7 +71,6 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
 
   const strategyIds = [...byStrategy.keys()];
 
-  // 2. Load strategy names + last-notified timestamps in parallel.
   const [{ data: strategies }, { data: logs }] = await Promise.all([
     admin.from("strategies").select("id, name").in("id", strategyIds),
     admin
@@ -92,7 +89,6 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
     ]),
   );
 
-  // 3. For each strategy, find recommendations published since last notification.
   for (const strategyId of strategyIds) {
     summary.strategiesProcessed += 1;
     const strategyName = nameById.get(strategyId) ?? "Strategy";
@@ -102,8 +98,12 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
 
     const { data: recs, error: recErr } = await admin
       .from("recommendations")
-      .select("symbol, action, weight_pct, price, as_of, expires_at, published_at")
+      .select(
+        "symbol, action, weight_pct, price, as_of, expires_at, published_at, admin_remark",
+      )
       .eq("strategy_id", strategyId)
+      .not("approved_at", "is", null)
+      .is("removed_at", null)
       .gt("published_at", cutoff)
       .order("published_at", { ascending: false });
 
@@ -115,13 +115,11 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
     }
     if (!recs || recs.length === 0) continue;
 
-    // Deduplicate: keep only the newest batch (same published_at).
     const newestPublishedAt = recs[0].published_at as string;
     const newest = recs.filter(
       (r) => r.published_at === newestPublishedAt,
     ) as RecommendationForEmail[];
 
-    // 4. Resolve subscriber emails.
     const subscribers = byStrategy.get(strategyId) ?? [];
     for (const sub of subscribers) {
       const { data: userData, error: userErr } =
@@ -155,7 +153,6 @@ export async function sendNewRecommendationEmails(): Promise<SendSummary> {
       }
     }
 
-    // 5. Mark this strategy as notified, so we don't re-send.
     await admin
       .from("notification_log")
       .upsert(

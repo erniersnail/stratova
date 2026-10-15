@@ -30,6 +30,10 @@ export type Recommendation = {
   published_at: string;
   weight_pct: number | null;
   price: number | null;
+  approved_at: string | null;
+  removed_at: string | null;
+  removed_reason: string | null;
+  admin_remark: string | null;
 };
 
 export type PerformancePoint = {
@@ -39,21 +43,9 @@ export type PerformancePoint = {
 
 export type BenchmarkPoint = { date: string; close: number };
 
-/**
- * Public strategy catalog. Reads only. Every public fetch is wrapped in
- * `unstable_cache` so repeat visitors do not hit Supabase on every render.
- * Revalidate windows are conservative — strategy metadata changes rarely,
- * benchmarks update daily.
- *
- * Errors throw inside the cached function so a transient Supabase failure
- * does not get cached as "empty result" for the revalidate window. The
- * exported wrappers catch and degrade to empty, preserving the previous
- * "never throws" contract for callers.
- */
-
-const STRATEGY_TTL = 300; // 5 minutes
-const PERFORMANCE_TTL = 300; // 5 minutes
-const BENCHMARK_TTL = 3600; // 60 minutes
+const STRATEGY_TTL = 300;
+const PERFORMANCE_TTL = 300;
+const BENCHMARK_TTL = 3600;
 
 /* ---------------- Public: strategy catalog ---------------- */
 
@@ -134,6 +126,7 @@ export async function getStrategyBySlug(
     return null;
   }
 }
+
 /* ---------------- Public: performance + benchmark ---------------- */
 
 const _getStrategyPerformance = unstable_cache(
@@ -215,9 +208,10 @@ export async function getBenchmark(
 /* ---------------- User-scoped (NOT cached) ---------------- */
 
 /**
- * Current picks for one strategy. NOT cached — RLS gates the result on the
- * caller's session, and the user-scoped client reads cookies, which is
- * incompatible with `unstable_cache`.
+ * Current picks for one strategy, visible to subscribers only.
+ * Filters approval gate at the code level in addition to RLS.
+ * `getCurrentRecommendations` reads via the public client (cookie-less) and
+ * `getCurrentRecommendationsForUser` reads via the session client (RLS).
  */
 export async function getCurrentRecommendations(
   strategyId: string,
@@ -228,6 +222,8 @@ export async function getCurrentRecommendations(
       .from("recommendations")
       .select("*")
       .eq("strategy_id", strategyId)
+      .not("approved_at", "is", null)
+      .is("removed_at", null)
       .or("expires_at.is.null,expires_at.gt.now()")
       .order("published_at", { ascending: false });
     if (error) {
@@ -253,6 +249,8 @@ export async function getCurrentRecommendationsForUser(
     const { data, error } = await supabase
       .from("recommendations")
       .select("*")
+      .not("approved_at", "is", null)
+      .is("removed_at", null)
       .or("expires_at.is.null,expires_at.gt.now()")
       .order("strategy_id", { ascending: true })
       .order("published_at", { ascending: false })
@@ -280,6 +278,7 @@ export async function getRecommendationHistoryForUser(
     const { data, error } = await supabase
       .from("recommendations")
       .select("*")
+      .not("approved_at", "is", null)
       .order("as_of", { ascending: false })
       .order("published_at", { ascending: false })
       .limit(200);

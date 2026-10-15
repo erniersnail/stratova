@@ -9,6 +9,7 @@ export type RecommendationForEmail = {
   price: number | null;
   as_of: string;
   expires_at: string | null;
+  admin_remark?: string | null;
 };
 
 export type TemplateInput = {
@@ -45,12 +46,15 @@ export function renderRecommendationEmail(input: TemplateInput): string {
   const rows = input.recommendations
     .map((r) => {
       const weight =
-        r.weight_pct !== null ? `${(Number(r.weight_pct)).toFixed(2)}%` : "—";
+        r.weight_pct !== null ? `${Number(r.weight_pct).toFixed(2)}%` : "—";
       const price =
         r.price !== null ? `₹${Number(r.price).toLocaleString("en-IN")}` : "—";
+      const remark = r.admin_remark
+        ? `<div style="margin-top:6px;padding:8px 10px;background:#faf8f4;border-left:2px solid #1e3a5f;font-size:12px;color:#3a3a36;line-height:1.6;">${escapeHtml(r.admin_remark)}</div>`
+        : "";
       return `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #e5e4e0;font-family:Georgia,serif;font-weight:600;">${escapeHtml(r.symbol)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #e5e4e0;font-family:Georgia,serif;font-weight:600;">${escapeHtml(r.symbol)}${remark}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e4e0;text-transform:uppercase;font-size:12px;letter-spacing:0.05em;">${escapeHtml(r.action)}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e4e0;">${weight}</td>
           <td style="padding:10px 12px;border-bottom:1px solid #e5e4e0;">${price}</td>
