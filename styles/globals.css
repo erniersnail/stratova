@@ -11,6 +11,10 @@
   /* Restrained institutional accent — used sparingly for positive state
      and section labels. Never for body text or primary CTAs. */
   --color-accent: #1e3a5f;
+  /* Nav links sit one step deeper than --color-secondary so they read
+     clearly against the cream background without competing with the
+     near-black wordmark. */
+  --color-nav-link: #2f2f2c;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
 }
@@ -38,4 +42,14 @@ body {
 ::selection {
   background-color: var(--color-foreground);
   color: var(--color-background);
+}
+
+/* Nav link colors live in a class (not inline) so hover can override.
+   Inline styles would beat the hover rule. */
+.nav-link {
+  color: var(--color-nav-link);
+  transition: color 200ms ease;
+}
+.nav-link:hover {
+  color: var(--color-foreground);
 }

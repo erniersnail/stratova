@@ -21,6 +21,9 @@ const NAV_ITEMS: NavItem[] = [
  * Next.js 16 + Turbopack's per-route CSS chunk splitting was omitting the
  * height utility on some routes, causing the nav to render inconsistently.
  * Inline styles ship with the HTML and cannot be dropped by the chunker.
+ *
+ * Nav link colors deliberately live in a CSS class (`nav-link` in
+ * globals.css) rather than inline, so hover can override them.
  */
 const NAV_SHELL_STYLE: React.CSSProperties = {
   position: "sticky",
@@ -60,8 +63,7 @@ export default function Navbar() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="text-sm font-semibold tracking-wide transition-colors duration-200"
-                style={{ color: "var(--color-secondary)" }}
+                className="nav-link text-sm font-semibold tracking-wide"
               >
                 {item.label}
               </Link>
