@@ -7,8 +7,12 @@ import { createClient } from "@/lib/supabase/client";
 
 type AuthLinksState = "loading" | "logged-out" | "logged-in";
 
-const linkClassName =
-  "text-sm font-semibold text-secondary tracking-wide whitespace-nowrap transition-colors duration-200 hover:text-foreground";
+/**
+ * Color comes from the `.nav-link` class in globals.css (matches the
+ * other nav items: #2f2f2c with a hover to near-black). Inline styles
+ * would beat the hover rule, so we keep the class.
+ */
+const linkClassName = "nav-link text-sm font-semibold tracking-wide whitespace-nowrap";
 
 function toTitleCase(s: string): string {
   if (!s) return "";
