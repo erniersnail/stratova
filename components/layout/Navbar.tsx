@@ -16,20 +16,53 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard" },
 ];
 
+/**
+ * Navbar shell styles are inlined rather than applied via Tailwind classes.
+ * Next.js 16 + Turbopack's per-route CSS chunk splitting was omitting the
+ * height utility on some routes, causing the nav to render at content height
+ * (~53px) instead of 96px. Inline styles ship with the HTML and cannot be
+ * dropped by the CSS chunker.
+ */
+const NAV_SHELL_STYLE: React.CSSProperties = {
+  position: "sticky",
+  top: 0,
+  zIndex: 50,
+  height: "6rem",
+  borderBottom: "1px solid var(--color-border)",
+  backgroundColor: "var(--color-background)",
+};
+
+const NAV_INNER_STYLE: React.CSSProperties = {
+  marginLeft: "auto",
+  marginRight: "auto",
+  width: "100%",
+  maxWidth: "1200px",
+  paddingLeft: "1.5rem",
+  paddingRight: "1.5rem",
+  height: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+};
+
+const NAV_LIST_STYLE: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "2.5rem",
+};
+
 export default function Navbar() {
   return (
-    <nav
-      aria-label="Main navigation"
-      className="sticky top-0 z-50 h-24 border-b border-border bg-background"
-    >
-      <div className="mx-auto w-full max-w-[1200px] px-6 h-full flex items-center justify-between">
+    <nav aria-label="Main navigation" style={NAV_SHELL_STYLE}>
+      <div style={NAV_INNER_STYLE}>
         <Logo />
-        <ul className="hidden items-center gap-10 md:flex">
+        <ul className="hidden md:flex" style={NAV_LIST_STYLE}>
           {NAV_ITEMS.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
-                className="text-sm font-semibold text-secondary tracking-wide transition-colors duration-200 hover:text-foreground"
+                className="text-sm font-semibold tracking-wide transition-colors duration-200"
+                style={{ color: "var(--color-secondary)" }}
               >
                 {item.label}
               </Link>
