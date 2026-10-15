@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
   --color-background: #faf8f4;
   --color-foreground: #111111;
-  --color-foreground-hover: #1f1f1f;
-  --color-secondary: #3f3e3b;
-  --color-tertiary: #6e6c67;
-  --color-border: #c9c7c1;
   --color-surface: #ffffff;
-  --color-surface-hover: #f5f4f2;
+  --color-surface-hover: #f0ede8;
+  --color-border: #e5e4e0;
+  --color-secondary: #6e6c67;
+  --color-tertiary: #a8a6a1;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Reserve the scrollbar track so pages with and without scrollbars
+     render at the same content width. Eliminates horizontal layout shift
+     when navigating between short and long pages. */
+  scrollbar-gutter: stable;
 }
 
+html,
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
 }
