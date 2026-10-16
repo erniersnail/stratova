@@ -300,13 +300,34 @@ export default async function StrategyDetailPage({
           </dl>
         </div>
 
+
+
+        <div className="mt-16">
+          <h2 className={`${typography.h3} text-foreground`}>
+            About this strategy
+          </h2>
+          <div className="mt-4 space-y-4">
+            {strategy.long_description
+              ? strategy.long_description.split("\n\n").map((para, i) => (
+                  <p key={i} className={`${typography.body} text-foreground`}>
+                    {para}
+                  </p>
+                ))
+              : (
+                  <p className={`${typography.body} text-foreground`}>
+                    {strategy.short_description ?? "Description coming soon."}
+                  </p>
+                )}
+          </div>
+        </div>
+
         {showChart && (
           <div className="mt-16">
             <h2 className={`${typography.h3} text-foreground`}>
               Performance since inception
             </h2>
             <div className="mt-4 rounded-md border border-border bg-surface px-6 py-6">
-              <EquityCurveChart series={chartSeries} height={360} />
+              <EquityCurveChart series={chartSeries} height={280} />
               <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
                 <span className="text-secondary">
                   {strategy.name}{" "}
@@ -334,25 +355,6 @@ export default async function StrategyDetailPage({
             </div>
           </div>
         )}
-
-        <div className="mt-16">
-          <h2 className={`${typography.h3} text-foreground`}>
-            About this strategy
-          </h2>
-          <div className="mt-4 max-w-[720px] space-y-4">
-            {strategy.long_description
-              ? strategy.long_description.split("\n\n").map((para, i) => (
-                  <p key={i} className={`${typography.body} text-foreground`}>
-                    {para}
-                  </p>
-                ))
-              : (
-                  <p className={`${typography.body} text-foreground`}>
-                    {strategy.short_description ?? "Description coming soon."}
-                  </p>
-                )}
-          </div>
-        </div>
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>
             Current picks
