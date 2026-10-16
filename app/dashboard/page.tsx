@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import Container from "@/components/layout/Container";
-import PageHeader from "@/components/common/PageHeader";
-import DataTable from "@/components/ui/data-table";
-import CancelSubscriptionButton from "@/components/dashboard/CancelSubscriptionButton";
-import { createClient } from "@/lib/supabase/server";
-import { getAuthedUser, type AuthedUser } from "@/lib/auth/session";
-import { ensureProfile } from "@/lib/auth/ensure-profile";
+import Container from "../../components/layout/Container";
+import PageHeader from "../../components/common/PageHeader";
+import DataTable from "../../components/ui/data-table";
+import CancelSubscriptionButton from "../../components/dashboard/CancelSubscriptionButton";
+import { createClient } from "../../lib/supabase/server";
+import { getAuthedUser, type AuthedUser } from "../../lib/auth/session";
+import { ensureProfile } from "../../lib/auth/ensure-profile";
 import {
   getCurrentRecommendationsForUser,
   getPublicStrategies,
@@ -16,8 +16,8 @@ import {
   type PerformancePoint,
   type Recommendation,
   type Strategy,
-} from "@/lib/strategies/fetch";
-import { formatIST } from "@/lib/format/date";
+} from "../../lib/strategies/fetch";
+import { formatIST } from "../../lib/format/date";
 
 export const metadata: Metadata = {
   title: "Dashboard — Simplicial Capital",
@@ -66,9 +66,6 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  // Run ensureProfile in the shell so the header can render with the user's
-  // name. This costs one extra round trip (~400ms) but only for the profile
-  // lookup; the heavy dashboard content streams in below via Suspense.
   const supabase = await createClient();
   const fullName = await ensureProfile(supabase, user);
 
@@ -77,9 +74,8 @@ export default async function DashboardPage() {
       <Container className="py-20">
         <PageHeader
           title={`Welcome, ${fullName ?? "there"}`}
-          description="Your subscriptions and the latest research published to you."
+          description="Your subscriptions and the latest research."
         />
-
         <Suspense fallback={<DashboardSkeleton />}>
           <DashboardContent user={user} />
         </Suspense>
@@ -87,7 +83,6 @@ export default async function DashboardPage() {
     </main>
   );
 }
-
 async function DashboardContent({ user }: { user: AuthedUser }) {
   const supabase = await createClient();
 
@@ -181,7 +176,6 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
       returnPct: (((last / first) - 1) * 100).toFixed(2),
     });
   }
-
   return (
     <div className="mt-12 grid grid-cols-1 gap-8">
       <section aria-labelledby="dashboard-subscriptions">
@@ -238,12 +232,12 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                 header: "",
                 render: (row) => {
                   if (!row.strategy_id) return "—";
-                  const region = strategyRegions.get(row.strategy_id);
-                  const slug = strategySlugs.get(row.strategy_id);
-                  if (!region || !slug) return "—";
+                  const reg = strategyRegions.get(row.strategy_id);
+                  const slg = strategySlugs.get(row.strategy_id);
+                  if (!reg || !slg) return "—";
                   return (
                     <Link
-                      href={`/strategies/${region}/${slug}`}
+                      href={`/strategies/${reg}/${slg}`}
                       className="underline hover:text-foreground"
                     >
                       View strategy
@@ -281,10 +275,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
           {clientWindows.length > 0 && (
             <ul className="mt-4 space-y-1">
               {clientWindows.map((w) => (
-                <li
-                  key={w.subscriptionId}
-                  className="text-sm text-secondary"
-                >
+                <li key={w.subscriptionId} className="text-sm text-secondary">
                   {w.name} — Since {w.startedOn}: ₹
                   {w.capital.toLocaleString("en-IN")} → ₹
                   {Math.round(w.current).toLocaleString("en-IN")} (
@@ -321,9 +312,16 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                 key: "symbol",
                 header: "Symbol",
                 render: (row) => (
-                  <span className="font-medium text-foreground">
-                    {row.symbol}
-                  </span>
+                  <div>
+                    <span className="font-medium text-foreground">
+                      {row.symbol}
+                    </span>
+                    {row.admin_remark && (
+                      <div className="mt-1 border-l-2 border-accent pl-2 text-xs leading-relaxed text-secondary">
+                        {row.admin_remark}
+                      </div>
+                    )}
+                  </div>
                 ),
               },
               {
@@ -346,14 +344,15 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                 },
               },
               {
-                key: "asof",
-                header: "As of (IST)",
+                key: "rebalance_date",
+                header: "Rebalance date",
                 render: (row) => formatIST(row.as_of),
               },
               {
-                key: "expires",
-                header: "Expires (IST)",
-                render: (row) => formatIST(row.expires_at),
+                key: "valid_until",
+                header: "Valid until",
+                render: (row) =>
+                  row.expires_at ? formatIST(row.expires_at) : "—",
               },
             ]}
             rows={recommendations}

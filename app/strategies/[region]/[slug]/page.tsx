@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import PageHeader from "@/components/common/PageHeader";
-import Container from "@/components/layout/Container";
-import DataTable from "@/components/ui/data-table";
-import { typography } from "@/lib/typography";
+import PageHeader from "../../../../components/common/PageHeader";
+import Container from "../../../../components/layout/Container";
+import DataTable from "../../../../components/ui/data-table";
+import { typography } from "../../../../lib/typography";
 import {
   getStrategyBySlug,
   getCurrentRecommendations,
   type Recommendation,
-} from "@/lib/strategies/fetch";
-import { createClient } from "@/lib/supabase/server";
-import { formatIST } from "@/lib/format/date";
+} from "../../../../lib/strategies/fetch";
+import { createClient } from "../../../../lib/supabase/server";
+import { formatIST } from "../../../../lib/format/date";
 import {
   nextRebalanceDate,
   formatRebalanceDate,
-} from "@/lib/strategies/rebalance";
-import SubscribePayForm from "@/components/strategies/SubscribePayForm";
+} from "../../../../lib/strategies/rebalance";
+import SubscribePayForm from "../../../../components/strategies/SubscribePayForm";
 
 type Region = "india" | "us";
 
@@ -38,7 +38,7 @@ export async function generateMetadata({
     title: `${strategy.name} — Simplicial Capital`,
     description:
       strategy.short_description ??
-      `${strategy.name} — quantitative strategy from Simplicial Capital.`,
+      `${strategy.name} — quantitative strategy.`,
   };
 }
 
@@ -51,7 +51,6 @@ export default async function StrategyDetailPage({
   if (!isRegion(region)) notFound();
   const strategy = await getStrategyBySlug(slug);
   if (!strategy || strategy.region !== region) notFound();
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -61,7 +60,6 @@ export default async function StrategyDetailPage({
     ? await getCurrentRecommendations(strategy.id)
     : [];
 
-  // Current user's PENDING or ACTIVE subscription for this strategy.
   type ExistingSub = {
     id: string;
     capital_allocated: number | null;
@@ -80,7 +78,6 @@ export default async function StrategyDetailPage({
     existingSub = subs && subs.length > 0 ? (subs[0] as ExistingSub) : null;
   }
   const capital = existingSub?.capital_allocated ?? null;
-  const perPositionWeight = picks[0]?.weight_pct ?? null;
 
   const nextDate = nextRebalanceDate(strategy.slug);
   const nextDateStr = formatRebalanceDate(nextDate);
@@ -94,13 +91,19 @@ export default async function StrategyDetailPage({
     r.price > 0
       ? Math.floor((capital * r.weight_pct) / r.price)
       : null;
-
   const columns = [
     {
       key: "symbol",
       header: "Symbol",
       render: (r: Recommendation) => (
-        <span className="font-medium text-foreground">{r.symbol}</span>
+        <div>
+          <span className="font-medium text-foreground">{r.symbol}</span>
+          {r.admin_remark && (
+            <div className="mt-1 border-l-2 border-accent pl-2 text-xs leading-relaxed text-secondary">
+              {r.admin_remark}
+            </div>
+          )}
+        </div>
       ),
     },
     {
@@ -143,14 +146,22 @@ export default async function StrategyDetailPage({
       },
     },
     {
-      key: "as_of",
-      header: "As of (IST)",
+      key: "rebalance_date",
+      header: "Rebalance date",
       render: (r: Recommendation) => (
         <span className="text-secondary">{formatIST(r.as_of)}</span>
       ),
     },
+    {
+      key: "valid_until",
+      header: "Valid until",
+      render: (r: Recommendation) => (
+        <span className="text-secondary">
+          {r.expires_at ? formatIST(r.expires_at) : "—"}
+        </span>
+      ),
+    },
   ];
-
   return (
     <main>
       <Container className="py-20">
@@ -206,7 +217,6 @@ export default async function StrategyDetailPage({
                 )}
           </div>
         </div>
-
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>
             Current picks
@@ -250,20 +260,11 @@ export default async function StrategyDetailPage({
                       <dt className="text-secondary">Fee</dt>
                       <dd className="text-foreground">{feeStr}</dd>
                     </div>
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-secondary">Per-position weight</dt>
-                      <dd className="text-foreground">
-                        {perPositionWeight !== null
-                          ? `${(perPositionWeight * 100).toFixed(2)}%`
-                          : "—"}
-                      </dd>
-                    </div>
                   </dl>
                   {existingSub.status === "PENDING" && (
                     <p className={`${typography.body} mt-4 text-secondary`}>
                       Your subscription will activate at the next
-                      rebalance on {nextDateStr}. You&apos;ll receive a
-                      payment confirmation email if pending.
+                      rebalance on {nextDateStr}.
                     </p>
                   )}
                 </div>
@@ -277,9 +278,6 @@ export default async function StrategyDetailPage({
                     <br />
                     Fee: <span className="text-foreground">{feeStr}</span>
                   </p>
-                  <p className={`${typography.body} mt-3 text-secondary`}>
-                    This subscription covers the rebalance on {nextDateStr}.
-                  </p>
                   <SubscribePayForm
                     strategyId={strategy.id}
                     fee={fee}
@@ -292,9 +290,7 @@ export default async function StrategyDetailPage({
                     Not open to new subscriptions
                   </p>
                   <p className="mt-2 text-sm text-secondary">
-                    {strategy.name} is currently not accepting new subscribers.
-                    Subscribe to one of our other strategies, or contact us for
-                    more information.
+                    {strategy.name} is not accepting new subscribers.
                   </p>
                   <Link
                     href={`/strategies/${region}`}
