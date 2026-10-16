@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/admin/recommendations";
-import { sendNewRecommendationEmails } from "@/lib/email/sendRecommendations";
+import { createClient } from "../supabase/server";
+import { createServiceClient } from "./recommendations";
+import { sendNewRecommendationEmails } from "../email/sendRecommendations";
 
 async function requireAdmin(): Promise<void> {
   const supabase = await createClient();
@@ -26,13 +26,24 @@ function revalidateAll(): void {
   revalidatePath("/strategies", "layout");
 }
 
-/** Approve a single pending recommendation. Does NOT send email. */
-export async function approveRecommendation(id: string): Promise<void> {
+/**
+ * Approve a single pending recommendation. Optional remark is saved in the
+ * same call so the admin does not need two round trips.
+ */
+export async function approveRecommendation(
+  id: string,
+  remark?: string,
+): Promise<void> {
   await requireAdmin();
   const admin = createServiceClient();
+  const now = new Date().toISOString();
+  const trimmed = (remark ?? "").trim();
+  const patch: Record<string, unknown> = { approved_at: now };
+  if (trimmed.length > 0) patch.admin_remark = trimmed;
+
   const { error } = await admin
     .from("recommendations")
-    .update({ approved_at: new Date().toISOString() })
+    .update(patch)
     .eq("id", id)
     .is("approved_at", null);
   if (error) {
@@ -42,7 +53,11 @@ export async function approveRecommendation(id: string): Promise<void> {
   revalidateAll();
 }
 
-/** Reject a single pending recommendation with a reason. */
+/**
+ * Reject a single pending recommendation with a reason. Stores the pick as
+ * approved+removed so it disappears from clients and admin "pending" queue
+ * but stays in the audit trail.
+ */
 export async function rejectRecommendation(
   id: string,
   reason: string,
@@ -69,6 +84,7 @@ export async function rejectRecommendation(
 /**
  * Approve all remaining pending picks for a strategy, then fire the email
  * send. Individual picks can be rejected first; this approves the rest.
+ * Returns the number of recommendations that were approved.
  */
 export async function approveAllPendingForStrategy(
   strategyId: string,
@@ -90,15 +106,10 @@ export async function approveAllPendingForStrategy(
     throw new Error("Could not approve pending recommendations");
   }
 
-  // Fire email send for the newly-approved batch. Idempotent — the send
-  // function checks notification_log so a second call within the same
-  // window is a no-op.
   try {
     await sendNewRecommendationEmails();
   } catch (err) {
     console.error("[admin] approveAllPendingForStrategy email failed:", err);
-    // Don't rethrow — approval succeeded even if email failed. The daily
-    // cron will catch up.
   }
 
   revalidateAll();
