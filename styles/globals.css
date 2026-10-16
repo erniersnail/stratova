@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @theme {
   --color-background: #faf8f4;
   --color-foreground: #111111;
@@ -13,60 +12,23 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
 }
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scrollbar-gutter: stable;
-}
-
-html,
-body {
+* { box-sizing: border-box; }
+html { scrollbar-gutter: stable; }
+html, body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-::selection {
-  background-color: var(--color-foreground);
-  color: var(--color-background);
-}
-
-.nav-link {
-  color: var(--color-nav-link);
-  transition: color 200ms ease;
-}
-.nav-link:hover {
-  color: var(--color-foreground);
-}
-
-/* Responsive nav visibility.
-   These live in globals.css because Next.js 16 + Turbopack splits utility
-   classes per-route and was dropping `hidden`/`md:flex` on some pages,
-   causing the desktop nav to leak onto mobile viewports. */
-
-.nav-desktop {
-  display: none;
-}
-
+::selection { background-color: var(--color-foreground); color: var(--color-background); }
+.nav-link { color: var(--color-nav-link); transition: color 200ms ease; }
+.nav-link:hover { color: var(--color-foreground); }
+.nav-desktop { display: none; }
 @media (min-width: 768px) {
-  .nav-desktop {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-  }
+  .nav-desktop { display: flex; align-items: center; gap: 2.5rem; }
 }
-
-.nav-mobile {
-  display: block;
-}
-
+.nav-mobile { display: block; }
 @media (min-width: 768px) {
-  .nav-mobile {
-    display: none;
-  }
+  .nav-mobile { display: none; }
 }
