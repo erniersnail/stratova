@@ -17,11 +17,6 @@ const BELIEFS = [
     title: "Simple ideas, disciplined execution",
     desc: "The most robust strategies rest on simple, well-understood ideas applied with discipline. Complexity that merely overfits to historical data is a liability, not a strength.",
   },
-  {
-    number: "04",
-    title: "Open research advances the field",
-    desc: "We publish our methodology, assumptions, and findings openly so others can verify and build upon our work. The entire field benefits when research is reproducible.",
-  },
 ];
 
 export default function InvestmentPhilosophy() {
