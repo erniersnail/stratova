@@ -263,18 +263,13 @@ export default function EquityCurveChart({
             y2={y(g)}
             stroke="currentColor"
             strokeWidth={isBaseline ? 1.5 : 1}
-            strokeDasharray={isBaseline ? "2 4" : undefined}
+            strokeDasharray={undefined}
             vectorEffect="non-scaling-stroke"
             className={isBaseline ? "text-foreground/20" : "text-border"}
           />
         );
       })}
-      {/* Area fill under the (primary) strategy line */}
-      <path
-        d={`${d} L${x(n - 1).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} L${x(0).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} Z`}
-        fill={`url(#${gradId})`}
-        stroke="none"
-      />
+
       <path
         d={d}
         fill="none"
@@ -312,8 +307,9 @@ export default function EquityCurveChart({
             y={PAD_TOP + plotH + 15}
             textAnchor={anchor(k)}
             fontSize={11}
+            fontWeight={500}
             fill="currentColor"
-            className="text-foreground/90"
+            className="text-foreground"
           >
             {shortDate(points[i].date)}
           </text>
@@ -450,7 +446,7 @@ function MultiSeriesChart({
             y2={y(g)}
             stroke="currentColor"
             strokeWidth={isBaseline ? 1.5 : 1}
-            strokeDasharray={isBaseline ? "2 4" : undefined}
+            strokeDasharray={undefined}
             vectorEffect="non-scaling-stroke"
             className={isBaseline ? "text-foreground/20" : "text-border"}
           />
@@ -466,9 +462,8 @@ function MultiSeriesChart({
         const areaD = `${d} L${xDate(lastPt.date).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} L${xDate(s.points[0].date).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} Z`;
         return (
           <g key={`${si}-${s.name}`}>
-            {isPrimary && (
-              <path d={areaD} fill={`url(#${gradId})`} stroke="none" />
-            )}
+            {/* No area fill — flat lines read as native charts, not
+                embedded images. */}
             <path
               d={d}
               fill="none"
@@ -508,8 +503,9 @@ function MultiSeriesChart({
           y={PAD_TOP + plotH + 15}
           textAnchor={anchor(k)}
           fontSize={11}
+          fontWeight={500}
           fill="currentColor"
-          className="text-foreground/90"
+          className="text-foreground"
         >
           {shortDate(allDates[pos])}
         </text>
@@ -536,3 +532,4 @@ function MultiSeriesChart({
     </div>
   );
 }
+
