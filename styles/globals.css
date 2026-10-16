@@ -8,12 +8,7 @@
   --color-border: #e5e4e0;
   --color-secondary: #6e6c67;
   --color-tertiary: #a8a6a1;
-  /* Restrained institutional accent — used sparingly for positive state
-     and section labels. Never for body text or primary CTAs. */
   --color-accent: #1e3a5f;
-  /* Nav links sit one step deeper than --color-secondary so they read
-     clearly against the cream background without competing with the
-     near-black wordmark. */
   --color-nav-link: #2f2f2c;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
@@ -24,9 +19,6 @@
 }
 
 html {
-  /* Reserve the scrollbar track so pages with and without scrollbars
-     render at the same content width. Eliminates horizontal layout shift
-     when navigating between short and long pages. */
   scrollbar-gutter: stable;
 }
 
@@ -44,12 +36,37 @@ body {
   color: var(--color-background);
 }
 
-/* Nav link colors live in a class (not inline) so hover can override.
-   Inline styles would beat the hover rule. */
 .nav-link {
   color: var(--color-nav-link);
   transition: color 200ms ease;
 }
 .nav-link:hover {
   color: var(--color-foreground);
+}
+
+/* Responsive nav visibility.
+   These live in globals.css because Next.js 16 + Turbopack splits utility
+   classes per-route and was dropping `hidden`/`md:flex` on some pages,
+   causing the desktop nav to leak onto mobile viewports. */
+
+.nav-desktop {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .nav-desktop {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+  }
+}
+
+.nav-mobile {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .nav-mobile {
+    display: none;
+  }
 }

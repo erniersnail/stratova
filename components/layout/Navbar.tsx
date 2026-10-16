@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Logo from "@/components/layout/Logo";
-import AuthLinks from "@/components/layout/AuthLinks";
-import MobileNav from "@/components/layout/MobileNav";
+import Logo from "./Logo";
+import AuthLinks from "./AuthLinks";
+import MobileNav from "./MobileNav";
 
 type NavItem = {
   label: string;
@@ -17,13 +17,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * Navbar shell styles are inlined rather than applied via Tailwind classes.
- * Next.js 16 + Turbopack's per-route CSS chunk splitting was omitting the
- * height utility on some routes, causing the nav to render inconsistently.
- * Inline styles ship with the HTML and cannot be dropped by the chunker.
- *
- * Nav link colors deliberately live in a CSS class (`nav-link` in
- * globals.css) rather than inline, so hover can override them.
+ * Shell styles inlined so they cannot be dropped by the per-route CSS
+ * chunker. Responsive visibility comes from .nav-desktop / .nav-mobile
+ * in globals.css (also not chunked).
  */
 const NAV_SHELL_STYLE: React.CSSProperties = {
   position: "sticky",
@@ -45,20 +41,21 @@ const NAV_INNER_STYLE: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  gap: "1rem",
 };
 
-const NAV_LIST_STYLE: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "2.5rem",
+const LOGO_WRAP_STYLE: React.CSSProperties = {
+  flexShrink: 0,
 };
 
 export default function Navbar() {
   return (
     <nav aria-label="Main navigation" style={NAV_SHELL_STYLE}>
       <div style={NAV_INNER_STYLE}>
-        <Logo />
-        <ul className="hidden md:flex" style={NAV_LIST_STYLE}>
+        <div style={LOGO_WRAP_STYLE}>
+          <Logo />
+        </div>
+        <ul className="nav-desktop">
           {NAV_ITEMS.map((item) => (
             <li key={item.href}>
               <Link
