@@ -4,10 +4,15 @@ import { notFound } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import Container from "@/components/layout/Container";
 import DataTable from "@/components/ui/data-table";
+import EquityCurveChart, {
+  type ChartSeries,
+} from "@/components/strategies/EquityCurveChart";
 import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
   getCurrentRecommendations,
+  getStrategyPerformance,
+  getBenchmark,
   type Recommendation,
 } from "@/lib/strategies/fetch";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +27,13 @@ type Region = "india" | "us";
 
 function isRegion(value: string): value is Region {
   return value === "india" || value === "us";
+}
+
+// Combined-curve window used everywhere else on the site.
+const WINDOW_START = "2026-08-03";
+
+function fmt(v: number): string {
+  return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
 
 export async function generateMetadata({
@@ -56,6 +68,66 @@ export default async function StrategyDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const [perf, benchRaw] = await Promise.all([
+    getStrategyPerformance(strategy.id),
+    strategy.benchmark
+      ? getBenchmark(strategy.benchmark, WINDOW_START)
+      : Promise.resolve([]),
+  ]);
+
+  const strategySeries = (() => {
+    const filtered = perf.filter((p) => p.date >= WINDOW_START);
+    if (filtered.length < 2 || filtered[0].total_value <= 0) return [];
+    const base = filtered[0].total_value;
+    return filtered.map((p) => ({
+      date: p.date,
+      value: (100 * p.total_value) / base,
+    }));
+  })();
+
+  const benchmarkSeries = (() => {
+    const filtered = benchRaw.filter((p) => p.date >= WINDOW_START);
+    if (filtered.length < 2 || filtered[0].close <= 0) return [];
+    const base = filtered[0].close;
+    return filtered.map((p) => ({
+      date: p.date,
+      value: (100 * p.close) / base,
+    }));
+  })();
+
+  const chartSeries: ChartSeries[] = [];
+  if (strategySeries.length >= 2) {
+    chartSeries.push({
+      name: strategy.name,
+      color: "#111111",
+      data: strategySeries,
+      emphasis: "primary",
+    });
+  }
+  if (benchmarkSeries.length >= 2 && strategy.benchmark) {
+    chartSeries.push({
+      name: strategy.benchmark,
+      color: "#b08900",
+      data: benchmarkSeries,
+      emphasis: "secondary",
+    });
+  }
+
+  const strategyReturn =
+    strategySeries.length >= 2
+      ? strategySeries[strategySeries.length - 1].value - 100
+      : null;
+  const benchmarkReturn =
+    benchmarkSeries.length >= 2
+      ? benchmarkSeries[benchmarkSeries.length - 1].value - 100
+      : null;
+  const alpha =
+    strategyReturn !== null && benchmarkReturn !== null
+      ? strategyReturn - benchmarkReturn
+      : null;
+
+  const showChart = chartSeries.length > 0;
 
   const picks: Recommendation[] = user
     ? await getCurrentRecommendations(strategy.id)
@@ -227,6 +299,41 @@ export default async function StrategyDetailPage({
             </div>
           </dl>
         </div>
+
+        {showChart && (
+          <div className="mt-16">
+            <h2 className={`${typography.h3} text-foreground`}>
+              Performance since inception
+            </h2>
+            <div className="mt-4 rounded-md border border-border bg-surface px-6 py-6">
+              <EquityCurveChart series={chartSeries} height={360} />
+              <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                <span className="text-secondary">
+                  {strategy.name}{" "}
+                  <strong className="text-foreground">
+                    {strategyReturn !== null ? fmt(strategyReturn) : "—"}
+                  </strong>
+                </span>
+                {benchmarkReturn !== null && strategy.benchmark && (
+                  <span className="text-secondary">
+                    {strategy.benchmark}{" "}
+                    <strong className="text-foreground">
+                      {fmt(benchmarkReturn)}
+                    </strong>
+                  </span>
+                )}
+                {alpha !== null && (
+                  <span className="text-secondary">
+                    <strong className="text-foreground">
+                      {alpha >= 0 ? "+" : ""}
+                      {alpha.toFixed(2)}% alpha
+                    </strong>
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>

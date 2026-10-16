@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import EquityCurveChart, {
   type ChartSeries,
 } from "@/components/strategies/EquityCurveChart";
@@ -10,6 +11,8 @@ export type IndividualCardData = {
   name: string;
   shortDescription: string | null;
   benchmarkSymbol: string | null;
+  /** Path to the strategy detail page, e.g. "/strategies/india/midcap-select". */
+  href: string;
   series: ChartSeries[];
   strategyReturn: number | null;
   benchmarkReturn: number | null;
@@ -63,44 +66,57 @@ export default function IndividualChartsToggle({
                 ? card.strategyReturn - card.benchmarkReturn
                 : null;
             return (
-              <section
+              <Link
                 key={card.id}
-                className="rounded-md border border-border bg-surface px-6 py-6"
+                href={card.href}
+                className="group block"
+                aria-label={`Open ${card.name} details`}
               >
-                <h3 className="font-serif text-xl font-semibold tracking-tight text-foreground">
-                  {card.name}
-                </h3>
-                <p className="mt-1 text-sm text-secondary">
-                  {card.shortDescription}
-                </p>
-                <div className="mt-6">
-                  <EquityCurveChart series={card.series} height={280} />
-                </div>
-                {card.strategyReturn !== null &&
-                  card.benchmarkReturn !== null &&
-                  alpha !== null && (
-                    <div className="mt-4 flex items-center justify-between gap-4 text-xs">
-                      <span className="text-secondary">
-                        {card.name}{" "}
-                        <strong className="text-foreground">
-                          {fmt(card.strategyReturn)}
-                        </strong>
-                      </span>
-                      <span className="text-secondary">
-                        {card.benchmarkSymbol}{" "}
-                        <strong className="text-foreground">
-                          {fmt(card.benchmarkReturn)}
-                        </strong>
-                      </span>
-                      <span className="text-secondary">
-                        <strong className="text-foreground">
-                          {alpha >= 0 ? "+" : ""}
-                          {alpha.toFixed(2)}% alpha
-                        </strong>
-                      </span>
-                    </div>
-                  )}
-              </section>
+                <section className="rounded-md border border-border bg-surface px-6 py-6 transition-colors duration-200 hover:border-foreground">
+                  <h3 className="font-serif text-xl font-semibold tracking-tight text-foreground">
+                    {card.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-secondary">
+                    {card.shortDescription}
+                  </p>
+                  <div className="mt-6">
+                    <EquityCurveChart series={card.series} height={280} />
+                  </div>
+                  {card.strategyReturn !== null &&
+                    card.benchmarkReturn !== null &&
+                    alpha !== null && (
+                      <div className="mt-4 flex items-center justify-between gap-4 text-xs">
+                        <span className="text-secondary">
+                          {card.name}{" "}
+                          <strong className="text-foreground">
+                            {fmt(card.strategyReturn)}
+                          </strong>
+                        </span>
+                        <span className="text-secondary">
+                          {card.benchmarkSymbol}{" "}
+                          <strong className="text-foreground">
+                            {fmt(card.benchmarkReturn)}
+                          </strong>
+                        </span>
+                        <span className="text-secondary">
+                          <strong className="text-foreground">
+                            {alpha >= 0 ? "+" : ""}
+                            {alpha.toFixed(2)}% alpha
+                          </strong>
+                        </span>
+                      </div>
+                    )}
+                  <p className="mt-4 text-xs font-medium uppercase tracking-[0.15em] text-foreground">
+                    View strategy{" "}
+                    <span
+                      aria-hidden
+                      className="inline-block transition-transform duration-200 group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </p>
+                </section>
+              </Link>
             );
           })}
         </div>

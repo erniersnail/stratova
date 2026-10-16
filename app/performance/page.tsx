@@ -102,6 +102,9 @@ async function buildIndividualCards(
         name: strategy.name,
         shortDescription: strategy.short_description,
         benchmarkSymbol: hasBenchmark ? benchmarkSymbol : null,
+        href: strategy.region
+          ? `/strategies/${strategy.region}/${strategy.slug}`
+          : "/strategies",
         series,
         strategyReturn: sReturn,
         benchmarkReturn: bReturn,
