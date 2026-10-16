@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import PageHeader from "../../../../components/common/PageHeader";
-import Container from "../../../../components/layout/Container";
-import DataTable from "../../../../components/ui/data-table";
-import { typography } from "../../../../lib/typography";
+import PageHeader from "@/components/common/PageHeader";
+import Container from "@/components/layout/Container";
+import DataTable from "@/components/ui/data-table";
+import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
   getCurrentRecommendations,
   type Recommendation,
-} from "../../../../lib/strategies/fetch";
-import { createClient } from "../../../../lib/supabase/server";
-import { formatIST } from "../../../../lib/format/date";
+} from "@/lib/strategies/fetch";
+import { createClient } from "@/lib/supabase/server";
+import { formatIST } from "@/lib/format/date";
 import {
   nextRebalanceDate,
   formatRebalanceDate,
-} from "../../../../lib/strategies/rebalance";
-import SubscribePayForm from "../../../../components/strategies/SubscribePayForm";
+} from "@/lib/strategies/rebalance";
+import SubscribePayForm from "@/components/strategies/SubscribePayForm";
 
 type Region = "india" | "us";
 
@@ -38,7 +38,7 @@ export async function generateMetadata({
     title: `${strategy.name} — Simplicial Capital`,
     description:
       strategy.short_description ??
-      `${strategy.name} — quantitative strategy.`,
+      `${strategy.name} — quantitative strategy from Simplicial Capital.`,
   };
 }
 
@@ -51,6 +51,7 @@ export default async function StrategyDetailPage({
   if (!isRegion(region)) notFound();
   const strategy = await getStrategyBySlug(slug);
   if (!strategy || strategy.region !== region) notFound();
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -91,6 +92,7 @@ export default async function StrategyDetailPage({
     r.price > 0
       ? Math.floor((capital * r.weight_pct) / r.price)
       : null;
+
   const columns = [
     {
       key: "symbol",
@@ -119,14 +121,14 @@ export default async function StrategyDetailPage({
       key: "price",
       header: "Price",
       render: (r: Recommendation) => (
-        <span className="text-secondary">{r.price ?? "—"}</span>
+        <span className="text-foreground">{r.price ?? "—"}</span>
       ),
     },
     {
       key: "weight",
       header: "Weight",
       render: (r: Recommendation) => (
-        <span className="text-secondary">
+        <span className="text-foreground">
           {r.weight_pct !== null
             ? `${(r.weight_pct * 100).toFixed(2)}%`
             : "—"}
@@ -149,19 +151,46 @@ export default async function StrategyDetailPage({
       key: "rebalance_date",
       header: "Rebalance date",
       render: (r: Recommendation) => (
-        <span className="text-secondary">{formatIST(r.as_of)}</span>
+        <span className="text-foreground">{formatIST(r.as_of)}</span>
       ),
     },
     {
       key: "valid_until",
       header: "Valid until",
-      render: (r: Recommendation) => (
-        <span className="text-secondary">
-          {r.expires_at ? formatIST(r.expires_at) : "—"}
-        </span>
-      ),
+      render: () => <span className="text-foreground">{nextDateStr}</span>,
     },
   ];
+
+  const pickEmptyState = (() => {
+    if (!strategy.is_subscribable) return null;
+    if (!existingSub) {
+      return (
+        <div className="rounded-md border border-border bg-surface px-4 py-6">
+          <p className={`${typography.body} text-foreground`}>
+            Subscribe to see current picks for {strategy.name}.
+          </p>
+        </div>
+      );
+    }
+    if (existingSub.status === "PENDING") {
+      return (
+        <div className="rounded-md border border-border bg-surface px-4 py-6">
+          <p className={`${typography.body} text-foreground`}>
+            Your subscription activates at the next rebalance on{" "}
+            {nextDateStr}. Picks will appear here once it does.
+          </p>
+        </div>
+      );
+    }
+    return (
+      <div className="rounded-md border border-border bg-surface px-4 py-6">
+        <p className={`${typography.body} text-foreground`}>
+          No active picks right now. The next rebalance is on {nextDateStr}.
+        </p>
+      </div>
+    );
+  })();
+
   return (
     <main>
       <Container className="py-20">
@@ -173,7 +202,7 @@ export default async function StrategyDetailPage({
         <div className="mt-16">
           <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <div className="rounded-md border border-border bg-surface p-5">
-              <dt className="text-xs font-medium uppercase tracking-wide text-tertiary">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground">
                 Benchmark
               </dt>
               <dd className={`${typography.body} mt-1 text-foreground`}>
@@ -181,7 +210,7 @@ export default async function StrategyDetailPage({
               </dd>
             </div>
             <div className="rounded-md border border-border bg-surface p-5">
-              <dt className="text-xs font-medium uppercase tracking-wide text-tertiary">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground">
                 Risk level
               </dt>
               <dd className={`${typography.body} mt-1 capitalize text-foreground`}>
@@ -189,7 +218,7 @@ export default async function StrategyDetailPage({
               </dd>
             </div>
             <div className="rounded-md border border-border bg-surface p-5">
-              <dt className="text-xs font-medium uppercase tracking-wide text-tertiary">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground">
                 Next rebalance
               </dt>
               <dd className={`${typography.body} mt-1 text-foreground`}>
@@ -206,12 +235,12 @@ export default async function StrategyDetailPage({
           <div className="mt-4 max-w-[720px] space-y-4">
             {strategy.long_description
               ? strategy.long_description.split("\n\n").map((para, i) => (
-                  <p key={i} className={`${typography.body} text-foreground/85`}>
+                  <p key={i} className={`${typography.body} text-foreground`}>
                     {para}
                   </p>
                 ))
               : (
-                  <p className={`${typography.body} text-foreground/85`}>
+                  <p className={`${typography.body} text-foreground`}>
                     {strategy.short_description ?? "Description coming soon."}
                   </p>
                 )}
@@ -224,7 +253,7 @@ export default async function StrategyDetailPage({
 
           {!user ? (
             <div className="mt-4 rounded-md border border-border bg-surface px-4 py-6">
-              <p className={`${typography.body} text-secondary`}>
+              <p className={`${typography.body} text-foreground`}>
                 Log in to see current picks.
               </p>
               <Link
@@ -245,7 +274,7 @@ export default async function StrategyDetailPage({
                   </p>
                   <dl className="mt-3 space-y-1 text-sm">
                     <div className="flex justify-between gap-4">
-                      <dt className="text-secondary">Allocated capital</dt>
+                      <dt className="text-foreground">Allocated capital</dt>
                       <dd className="text-foreground">
                         {capital !== null
                           ? `₹${capital.toLocaleString("en-IN")}`
@@ -253,16 +282,16 @@ export default async function StrategyDetailPage({
                       </dd>
                     </div>
                     <div className="flex justify-between gap-4">
-                      <dt className="text-secondary">Next rebalance</dt>
+                      <dt className="text-foreground">Next rebalance</dt>
                       <dd className="text-foreground">{nextDateStr}</dd>
                     </div>
                     <div className="flex justify-between gap-4">
-                      <dt className="text-secondary">Fee</dt>
+                      <dt className="text-foreground">Fee</dt>
                       <dd className="text-foreground">{feeStr}</dd>
                     </div>
                   </dl>
                   {existingSub.status === "PENDING" && (
-                    <p className={`${typography.body} mt-4 text-secondary`}>
+                    <p className={`${typography.body} mt-4 text-foreground`}>
                       Your subscription will activate at the next
                       rebalance on {nextDateStr}.
                     </p>
@@ -273,7 +302,7 @@ export default async function StrategyDetailPage({
                   <p className="text-sm font-medium text-foreground">
                     Subscribe to {strategy.name}
                   </p>
-                  <p className={`${typography.body} mt-2 text-secondary`}>
+                  <p className={`${typography.body} mt-2 text-foreground`}>
                     Next rebalance: <span className="text-foreground">{nextDateStr}</span>
                     <br />
                     Fee: <span className="text-foreground">{feeStr}</span>
@@ -289,8 +318,8 @@ export default async function StrategyDetailPage({
                   <p className="text-sm font-medium text-foreground">
                     Not open to new subscriptions
                   </p>
-                  <p className="mt-2 text-sm text-secondary">
-                    {strategy.name} is not accepting new subscribers.
+                  <p className="mt-2 text-sm text-foreground">
+                    {strategy.name} is currently not accepting new subscribers.
                   </p>
                   <Link
                     href={`/strategies/${region}`}
@@ -305,15 +334,7 @@ export default async function StrategyDetailPage({
                 columns={columns}
                 rows={picks}
                 rowKey={(r) => r.id}
-                emptyState={
-                  strategy.is_subscribable ? (
-                    <div className="rounded-md border border-border bg-surface px-4 py-6">
-                      <p className={`${typography.body} text-secondary`}>
-                        No active picks. Next rebalance publishes shortly.
-                      </p>
-                    </div>
-                  ) : null
-                }
+                emptyState={pickEmptyState}
               />
             </div>
           )}
