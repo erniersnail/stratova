@@ -38,6 +38,11 @@ function fmtDate(iso: string): string {
   });
 }
 
+/** weight_pct is stored as a fraction (0.3333 = 33.33%). Display x100. */
+function fmtWeight(w: number | null): string {
+  return w !== null ? `${(Number(w) * 100).toFixed(2)}%` : "—";
+}
+
 export function recommendationEmailSubject(strategyName: string): string {
   return `New recommendations — ${strategyName}`;
 }
@@ -45,8 +50,7 @@ export function recommendationEmailSubject(strategyName: string): string {
 export function renderRecommendationEmail(input: TemplateInput): string {
   const rows = input.recommendations
     .map((r) => {
-      const weight =
-        r.weight_pct !== null ? `${Number(r.weight_pct).toFixed(2)}%` : "—";
+      const weight = fmtWeight(r.weight_pct);
       const price =
         r.price !== null ? `₹${Number(r.price).toLocaleString("en-IN")}` : "—";
       const remark = r.admin_remark
@@ -96,7 +100,7 @@ export function renderRecommendationEmail(input: TemplateInput): string {
       <tbody>${rows}</tbody>
     </table>
 
-    ${expires ? `<p style="margin:16px 0 0 0;font-size:13px;color:#6e6c67;">These recommendations remain current until ${escapeHtml(fmtDate(expires))}.</p>` : ""}
+    ${expires ? `<p style="margin:16px 0 0 0;font-size:13px;color:#6e6c67;">These recommendations remain current until ${escapeHtml(fmtDate(expires))}</p>` : ""}
 
     <div style="margin:32px 0;text-align:center;">
       <a href="${escapeHtml(input.dashboardUrl)}"

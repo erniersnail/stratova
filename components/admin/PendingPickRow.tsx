@@ -4,8 +4,8 @@ import { useState, useTransition } from "react";
 import {
   approveRecommendation,
   rejectRecommendation,
-} from "../../lib/admin/recommendationApproval";
-import type { AdminRecommendation } from "../../lib/admin/recommendations";
+} from "@/lib/admin/recommendationApproval";
+import type { AdminRecommendation } from "@/lib/admin/recommendations";
 
 function formatIST(value: string): string {
   const d = new Date(value);
@@ -15,6 +15,11 @@ function formatIST(value: string): string {
     timeStyle: "short",
     timeZone: "Asia/Kolkata",
   });
+}
+
+/** weight_pct is stored as a fraction (0.3333 = 33.33%). Display x100. */
+function formatWeight(w: number | null): string {
+  return w !== null ? `${(Number(w) * 100).toFixed(2)}%` : "—";
 }
 
 const tdClass = "py-3 pr-4 align-top";
@@ -65,9 +70,7 @@ export default function PendingPickRow({
     <tr className="border-b border-border">
       <td className={`${tdClass} font-medium`}>{rec.symbol}</td>
       <td className={tdClass}>{rec.action}</td>
-      <td className={tdClass}>
-        {rec.weight_pct !== null ? `${rec.weight_pct}%` : "—"}
-      </td>
+      <td className={tdClass}>{formatWeight(rec.weight_pct)}</td>
       <td className={tdClass}>{rec.price !== null ? rec.price : "—"}</td>
       <td className={`${tdClass} text-secondary`}>{formatIST(rec.as_of)}</td>
       <td className={tdClass}>

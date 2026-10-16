@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
-import { createClient } from "../supabase/server";
-import { createPublicClient } from "../supabase/public";
+import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export type Strategy = {
   id: string;
@@ -208,16 +208,17 @@ export async function getBenchmark(
 /* ---------------- User-scoped (NOT cached) ---------------- */
 
 /**
- * Current picks for one strategy, visible to subscribers only.
- * Filters approval gate at the code level in addition to RLS.
- * `getCurrentRecommendations` reads via the public client (cookie-less) and
- * `getCurrentRecommendationsForUser` reads via the session client (RLS).
+ * Current picks for one strategy, visible only to the authenticated
+ * subscriber. Uses the session client (cookie-aware) so RLS can check
+ * the caller's subscription. Called from the strategy detail page after
+ * the page confirms a user is logged in.
  */
 export async function getCurrentRecommendations(
   strategyId: string,
 ): Promise<Recommendation[]> {
+  if (!strategyId) return [];
   try {
-    const supabase = createPublicClient();
+    const supabase = await createClient();
     const { data, error } = await supabase
       .from("recommendations")
       .select("*")
