@@ -328,27 +328,36 @@ export default async function StrategyDetailPage({
             </h2>
             <div className="mt-4 rounded-md border border-border bg-surface px-6 py-6">
               <EquityCurveChart series={chartSeries} height={280} />
-              <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
-                <span className="text-secondary">
-                  {strategy.name}{" "}
-                  <strong className="text-foreground">
-                    {strategyReturn !== null ? fmt(strategyReturn) : "—"}
-                  </strong>
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-x-8 gap-y-3 text-sm">
+                <span className="flex items-center gap-2 text-foreground">
+                  <span
+                    aria-hidden
+                    className="inline-block h-[3px] w-6 bg-foreground"
+                  />
+                  <span>
+                    {strategy.name}{" "}
+                    <strong className="text-foreground">
+                      {fmt(strategyReturn!)}
+                    </strong>
+                  </span>
                 </span>
                 {benchmarkReturn !== null && strategy.benchmark && (
-                  <span className="text-secondary">
-                    {strategy.benchmark}{" "}
-                    <strong className="text-foreground">
-                      {fmt(benchmarkReturn)}
-                    </strong>
+                  <span className="flex items-center gap-2 text-foreground">
+                    <span
+                      aria-hidden
+                      className="inline-block h-[3px] w-6 bg-[#b08900]"
+                    />
+                    <span>
+                      {strategy.benchmark}{" "}
+                      <strong className="text-foreground">
+                        {fmt(benchmarkReturn!)}
+                      </strong>
+                    </span>
                   </span>
                 )}
                 {alpha !== null && (
-                  <span className="text-secondary">
-                    <strong className="text-foreground">
-                      {alpha >= 0 ? "+" : ""}
-                      {alpha.toFixed(2)}% alpha
-                    </strong>
+                  <span className="text-foreground">
+                    <strong>{fmt(alpha)} alpha</strong>
                   </span>
                 )}
               </div>
