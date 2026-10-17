@@ -214,20 +214,19 @@ export default function EquityCurveChart({
 
 
 
-  // X labels: start date, month boundaries (each new month), end date.
-  // Deduped, capped at 5 labels for readability.
+  // X labels: start date and month boundaries only.
   const labelIdx = (() => {
-    const idx = new Set<number>([0, n - 1]);
+    const idx = new Set<number>([0]);
     for (let i = 1; i < n; i++) {
       const prevMonth = points[i - 1].date.slice(0, 7);
       const currMonth = points[i].date.slice(0, 7);
       if (prevMonth !== currMonth) idx.add(i);
     }
     const sorted = [...idx].sort((a, b) => a - b);
-    if (sorted.length <= 5) return sorted;
+    if (sorted.length <= 6) return sorted;
     const keep: number[] = [sorted[0]];
-    const step = (sorted.length - 1) / 3;
-    for (let k = 1; k <= 2; k++) keep.push(sorted[Math.round(step * k)]);
+    const step = (sorted.length - 1) / 4;
+    for (let k = 1; k <= 3; k++) keep.push(sorted[Math.round(step * k)]);
     keep.push(sorted[sorted.length - 1]);
     return [...new Set(keep)].sort((a, b) => a - b);
   })();
@@ -379,19 +378,19 @@ function MultiSeriesChart({
 
 
 
-  // X labels: start, month boundaries, end — same logic as single-series.
+  // X labels: start, month boundaries only.
   const labelIdx = (() => {
-    const idx = new Set<number>([0, m - 1]);
+    const idx = new Set<number>([0]);
     for (let i = 1; i < m; i++) {
       const prevMonth = allDates[i - 1].slice(0, 7);
       const currMonth = allDates[i].slice(0, 7);
       if (prevMonth !== currMonth) idx.add(i);
     }
     const sorted = [...idx].sort((a, b) => a - b);
-    if (sorted.length <= 5) return sorted;
+    if (sorted.length <= 6) return sorted;
     const keep: number[] = [sorted[0]];
-    const step = (sorted.length - 1) / 3;
-    for (let k = 1; k <= 2; k++) keep.push(sorted[Math.round(step * k)]);
+    const step = (sorted.length - 1) / 4;
+    for (let k = 1; k <= 3; k++) keep.push(sorted[Math.round(step * k)]);
     keep.push(sorted[sorted.length - 1]);
     return [...new Set(keep)].sort((a, b) => a - b);
   })();
