@@ -1,5 +1,5 @@
 import { typography } from "@/lib/typography";
-import SubscribePayForm from "@/components/strategies/SubscribePayForm";
+import Link from "next/link";
 
 export type TeaserPick = {
   id: string;
@@ -7,18 +7,12 @@ export type TeaserPick = {
 };
 
 export default function LockedPicksMock({
-  strategyId,
+  strategySlug,
   strategyName,
-  fee,
-  feeStr,
-  nextDateStr,
   teaserPicks,
 }: {
-  strategyId: string;
+  strategySlug: string;
   strategyName: string;
-  fee: number | null;
-  feeStr: string;
-  nextDateStr: string;
   teaserPicks: TeaserPick[];
 }) {
   const displayPicks = teaserPicks.length > 0 ? teaserPicks : [
@@ -29,7 +23,6 @@ export default function LockedPicksMock({
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-surface">
-      {/* Blurred Table Area */}
       <div className="relative min-h-[280px] flex flex-col">
         <table className="w-full text-sm">
           <thead>
@@ -57,29 +50,18 @@ export default function LockedPicksMock({
           </tbody>
         </table>
 
-        {/* Centered Overlay Box */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="pointer-events-auto flex flex-col items-center p-6 text-center">
+          <div className="pointer-events-auto flex flex-col items-center p-6 text-center bg-background/80 backdrop-blur-sm rounded-xl border border-border shadow-sm">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-3 text-foreground">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
             <p className={`${typography.h3} text-foreground`}>Unlock full picks</p>
-            <a href="#pricing" className="mt-4 inline-flex items-center rounded-md bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90">
-              See pricing &darr;
-            </a>
+            <p className={`${typography.body} mt-2 max-w-[280px] text-sm text-foreground`}>Get real-time access to {strategyName} recommendations.</p>
+            <Link href={`/subscribe/${strategySlug}`} className="mt-5 inline-flex items-center rounded-md bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90">
+              View pricing &rarr;
+            </Link>
           </div>
-        </div>
-      </div>
-
-      {/* Subscribe Form Area (Seamlessly attached) */}
-      <div className="bg-surface-hover/50 px-6 py-8 text-center" id="pricing">
-        <p className="text-lg font-medium text-foreground">Get {strategyName}</p>
-        <p className={`${typography.body} mt-2 text-foreground`}>
-          Next rebalance: <strong>{nextDateStr}</strong> &middot; Fee: <strong>{feeStr}</strong>
-        </p>
-        <div className="mt-6 max-w-md mx-auto text-left">
-          <SubscribePayForm strategyId={strategyId} fee={fee} feeStr={feeStr} />
         </div>
       </div>
     </div>

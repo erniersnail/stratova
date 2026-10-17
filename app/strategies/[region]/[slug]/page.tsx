@@ -494,11 +494,8 @@ export default async function StrategyDetailPage({
           ) : existingSub?.status !== "ACTIVE" && strategy.is_subscribable ? (
             <div className="mt-4">
               <LockedPicksMock
-                strategyId={strategy.id}
+                strategySlug={strategy.slug}
                 strategyName={strategy.name}
-                fee={fee}
-                feeStr={feeStr}
-                nextDateStr={nextDateStr}
                 teaserPicks={teaserPicks}
               />
             </div>
