@@ -9,32 +9,24 @@ export type ChartSeries = {
   name: string;
   data: ChartPoint[];
   color?: string;
-  /** Visual weight. Primary = thick solid line + area fill; secondary = thin, faded. Defaults to primary for the first series. */
   emphasis?: "primary" | "secondary";
 };
 
 type EquityCurveChartProps = {
-  data?: ChartPoint[]; // single-series mode (strategy detail page)
-  series?: ChartSeries[]; // multi-series mode; takes precedence when provided
-  height?: number; // default 280
+  data?: ChartPoint[];
+  series?: ChartSeries[];
+  height?: number;
 };
 
-/** Line colors for multi-series mode, darkest first. */
-export const SERIES_COLORS = ["#111111", "#2f6fdb", "#6e6c67", "#a8a29a"];
+/** Default colors if none provided */
+export const SERIES_COLORS = ["#111111", "#b08900", "#6e6c67", "#a8a29a"];
 
-/**
- * Compute "nice" y-axis ticks within a padded data range.
- * Picks a step from {1,2,2.5,5,10} × 10^n so the span divides into ~3–5
- * ticks, emits multiples of that step inside [min, max], and always
- * includes 100 when it lies in range (rebased-to-100 charts). Returns
- * ascending values; callers format them as ints or one decimal.
- */
 function niceTicks(min: number, max: number): number[] {
   if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) {
     return [];
   }
   const range = max - min;
-  const rawStep = range / 4; // aim for ~4 intervals → 3–5 ticks
+  const rawStep = range / 4;
   const magnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
   const norm = rawStep / magnitude;
   let base: number;
@@ -44,8 +36,6 @@ function niceTicks(min: number, max: number): number[] {
   else if (norm <= 5) base = 5;
   else base = 10;
 
-  // Sparse-tick guard: if the chosen step yields <3 ticks, halve it (up to
-  // 2 retries) so wide ranges still show 3+ gridlines.
   const emitTicks = (step: number): number[] => {
     const out: number[] = [];
     const start = Math.ceil(min / step) * step;
@@ -69,19 +59,16 @@ function niceTicks(min: number, max: number): number[] {
   return ticks;
 }
 
-/** End-of-line value label: percent change from the 100 baseline, signed. */
 function endLabel(value: number): string {
   const delta = value - 100;
   return `${delta >= 0 ? "+" : ""}${delta.toFixed(2)}%`;
 }
 
-/** Y-axis label: tick value T → signed integer percent vs the 100 baseline. */
 function pctLabel(t: number): string {
   const p = Math.round(t - 100);
   return p > 0 ? `+${p}%` : `${p}%`;
 }
 
-/** Short x-axis date: "2026-08-03" → "Aug 3" (month + day, no year). */
 function shortDate(iso: string): string {
   const d = new Date(iso + "T00:00:00Z");
   if (Number.isNaN(d.getTime())) return iso;
@@ -92,11 +79,6 @@ function shortDate(iso: string): string {
   }).format(d);
 }
 
-/**
- * Stagger label y-positions so nearby endpoints don't overlap. Items whose
- * y is within `minGap` of a previously-placed label are nudged down by
- * `stagger` until clear (or a small cap is hit).
- */
 function staggerLabels(
   entries: { key: string; y: number }[],
   minGap = 13,
@@ -130,8 +112,8 @@ function ChartPlaceholder({ height }: { height: number }) {
 }
 
 const VIEW_W = 600;
-const PAD_LEFT = 38; // room for right-aligned percentage y-axis labels
-const PAD_RIGHT = 56; // room for end-of-line value labels
+const PAD_LEFT = 38;
+const PAD_RIGHT = 56;
 const PAD_TOP = 10;
 const LABEL_H = 20;
 
@@ -142,15 +124,6 @@ export type MultiSeriesEntry = {
   emphasis?: "primary" | "secondary";
 };
 
-/**
- * Minimal static equity-curve chart. Server component, hand-rolled inline
- * SVG — no chart libraries, no interactivity, no tooltips.
- *
- * Degenerate inputs never crash:
- * - empty / all-non-finite data → bordered placeholder, no SVG
- * - single point → centered dot with its date label
- * - all-same values → artificial ±1 range centers a flat line
- */
 export default function EquityCurveChart({
   data,
   series,
@@ -158,7 +131,6 @@ export default function EquityCurveChart({
 }: EquityCurveChartProps) {
   const gradId = `area-${useId()}`;
 
-  // Multi-series mode takes precedence when the prop is provided.
   if (series !== undefined) {
     const cleaned: MultiSeriesEntry[] = series
       .map((s, si) => ({
@@ -207,12 +179,7 @@ export default function EquityCurveChart({
     .map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(2)},${y(p.value).toFixed(2)}`)
     .join(" ");
 
-  // Y gridlines at nice round values within the padded domain � purely
-  // visual, never affect scaling.
   const gridlines = niceTicks(min, max);
-
-
-
 
   // X labels: start date and month boundaries only.
   const labelIdx = (() => {
@@ -230,6 +197,7 @@ export default function EquityCurveChart({
     keep.push(sorted[sorted.length - 1]);
     return [...new Set(keep)].sort((a, b) => a - b);
   })();
+
   const anchor = (pos: number) =>
     pos === 0 ? "start" : pos === labelIdx.length - 1 ? "end" : "middle";
 
@@ -268,7 +236,6 @@ export default function EquityCurveChart({
           />
         );
       })}
-
       <path
         d={d}
         fill="none"
@@ -286,7 +253,6 @@ export default function EquityCurveChart({
         fill="currentColor"
         className="text-foreground"
       />
-      {/* End-of-line value label */}
       <text
         x={x(n - 1) + 8}
         y={y(last.value) + 4}
@@ -318,6 +284,7 @@ export default function EquityCurveChart({
   );
 }
 
+
 type CleanSeries = {
   name: string;
   points: ChartPoint[];
@@ -325,12 +292,6 @@ type CleanSeries = {
   emphasis?: "primary" | "secondary";
 };
 
-/**
- * Multi-series mode: one line per strategy on a shared date axis.
- * The y-domain spans all series with 5% padding so the full range —
- * not just a single winner — is visible. Same minimal styling as the
- * single-series mode: no interactivity, no tooltips, no dependencies.
- */
 function MultiSeriesChart({
   series,
   height,
@@ -371,12 +332,7 @@ function MultiSeriesChart({
   };
   const y = (v: number) => PAD_TOP + (1 - (v - min) / span) * plotH;
 
-  // Y gridlines at nice round values within the padded domain � purely
-  // visual, never affect scaling.
   const gridlines = niceTicks(min, max);
-
-
-
 
   // X labels: start, month boundaries only.
   const labelIdx = (() => {
@@ -394,14 +350,13 @@ function MultiSeriesChart({
     keep.push(sorted[sorted.length - 1]);
     return [...new Set(keep)].sort((a, b) => a - b);
   })();
+
   const anchor = (pos: number) =>
     pos === 0 ? "start" : pos === labelIdx.length - 1 ? "end" : "middle";
 
   const names = series.map((s) => s.name).join(", ");
-  const gradId = `area-${useId()}`;
   const primary = series.find((s) => s.emphasis !== "secondary") ?? series[0];
 
-  // Pre-compute staggered end-label y-positions so nearby endpoints don't overlap.
   const labelPositions = staggerLabels(
     series.map((s) => ({
       key: s.name,
@@ -420,20 +375,6 @@ function MultiSeriesChart({
         aria-label={`Equity curves, ${allDates[0]} to ${allDates[m - 1]}: ${names}`}
       >
       <title>{`Equity curves for ${names}, ${allDates[0]} to ${allDates[m - 1]}`}</title>
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop
-            offset="0%"
-            stopColor={primary.color ?? "#111111"}
-            stopOpacity={0.12}
-          />
-          <stop
-            offset="100%"
-            stopColor={primary.color ?? "#111111"}
-            stopOpacity={0}
-          />
-        </linearGradient>
-      </defs>
       {gridlines.map((g) => {
         const isBaseline = Math.abs(g - 100) < 1e-6;
         return (
@@ -458,11 +399,8 @@ function MultiSeriesChart({
           .map((p, i) => `${i === 0 ? "M" : "L"}${xDate(p.date).toFixed(2)},${y(p.value).toFixed(2)}`)
           .join(" ");
         const lastPt = s.points[s.points.length - 1];
-        const areaD = `${d} L${xDate(lastPt.date).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} L${xDate(s.points[0].date).toFixed(2)},${(PAD_TOP + plotH).toFixed(2)} Z`;
         return (
           <g key={`${si}-${s.name}`}>
-            {/* No area fill — flat lines read as native charts, not
-                embedded images. */}
             <path
               d={d}
               fill="none"
@@ -502,16 +440,15 @@ function MultiSeriesChart({
           }
           y={PAD_TOP + plotH + 15}
           textAnchor={anchor(k)}
-          fontSize={11}
+          fontSize={10}
           fontWeight={500}
           fill="currentColor"
-          className="text-foreground"
+          className="text-tertiary"
         >
           {shortDate(allDates[pos])}
         </text>
       ))}
       </svg>
-      {/* Percentage y-axis labels as HTML overlay (immune to SVG stretch) */}
       {Array.from(new Set(gridlines.map(pctLabel))).map((label) => {
         const g = gridlines.find((t) => pctLabel(t) === label);
         if (g === undefined) return null;
@@ -532,4 +469,3 @@ function MultiSeriesChart({
     </div>
   );
 }
-
