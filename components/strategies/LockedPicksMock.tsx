@@ -7,11 +7,9 @@ export type TeaserPick = {
 };
 
 export default function LockedPicksMock({
-  strategySlug,
   strategyName,
   teaserPicks,
 }: {
-  strategySlug: string;
   strategyName: string;
   teaserPicks: TeaserPick[];
 }) {
@@ -58,7 +56,7 @@ export default function LockedPicksMock({
             </svg>
             <p className={`${typography.h3} text-foreground`}>Unlock full picks</p>
             <p className={`${typography.body} mt-2 max-w-[280px] text-sm text-foreground`}>Get real-time access to {strategyName} recommendations.</p>
-            <Link href={`/subscribe/${strategySlug}`} className="mt-5 inline-flex items-center rounded-md bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90">
+            <Link href="/pricing" className="mt-5 inline-flex items-center rounded-md bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90">
               View pricing &rarr;
             </Link>
           </div>
