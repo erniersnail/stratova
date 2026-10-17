@@ -21,7 +21,6 @@ export default function LockedPicksMock({
   nextDateStr: string;
   teaserPicks: TeaserPick[];
 }) {
-  // If no live picks exist, show dummy returns so the layout holds shape
   const displayPicks = teaserPicks.length > 0 ? teaserPicks : [
     { id: "1", returnPct: 12.4 },
     { id: "2", returnPct: -3.52 },
@@ -47,11 +46,9 @@ export default function LockedPicksMock({
                 const isPos = r.returnPct !== null && r.returnPct >= 0;
                 return (
                   <tr key={r.id} className="border-b border-border last:border-0">
-                    {/* Blur the symbol name, action, and price */}
                     <td className="px-4 py-3 font-medium text-foreground blur-[4px] opacity-60">HIDDEN</td>
                     <td className="px-4 py-3 text-foreground blur-[4px] opacity-60">BUY</td>
                     <td className="px-4 py-3 text-foreground blur-[4px] opacity-60">₹***.**</td>
-                    {/* Show the real return clearly */}
                     <td className={`px-4 py-3 text-right font-medium ${isPos ? "text-accent" : "text-tertiary"}`}>
                       {r.returnPct !== null ? `${isPos ? "+" : ""}${r.returnPct.toFixed(2)}%` : "—"}
                     </td>
@@ -62,8 +59,8 @@ export default function LockedPicksMock({
           </table>
         </div>
 
-        {/* Overlay */}
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 p-6 text-center backdrop-blur-[1px]">
+        {/* Overlay - Gradient instead of full blur so returns are sharp */}
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-r from-background via-background/95 to-background/40 backdrop-blur-[1px]">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-3 text-foreground">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -75,7 +72,7 @@ export default function LockedPicksMock({
       </div>
 
       {/* Subscribe Form Area (Inside the same card) */}
-      <div className="border-t border-border bg-surface-hover/30 px-6 py-8 text-center" id="subscribe">
+      <div className="border-t border-border bg-surface px-6 py-8 text-center" id="subscribe">
         <p className="text-lg font-medium text-foreground">Subscribe to {strategyName}</p>
         <p className={`${typography.body} mt-2 text-foreground`}>
           Next rebalance: <strong>{nextDateStr}</strong><br />Fee: <strong>{feeStr}</strong>
