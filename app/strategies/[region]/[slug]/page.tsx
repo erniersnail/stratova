@@ -438,7 +438,7 @@ export default async function StrategyDetailPage({
             </div>
           ) : existingSub?.status !== "ACTIVE" && strategy.is_subscribable ? (
             <div className="mt-4 space-y-8">
-              <LockedPicksMock strategyName={strategy.name} />
+              <LockedPicksMock strategyName={strategy.name} picks={picks} />
               <div className="rounded-md border border-border bg-surface px-6 py-6 max-w-xl mx-auto text-center" id="subscribe">
                  <p className="text-lg font-medium text-foreground">Subscribe to {strategy.name}</p>
                  <p className={`${typography.body} mt-2 text-foreground`}>Next rebalance: <strong>{nextDateStr}</strong><br/>Fee: <strong>{feeStr}</strong></p>

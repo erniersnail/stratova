@@ -306,10 +306,10 @@ export default function EquityCurveChart({
             x={x(i)}
             y={PAD_TOP + plotH + 15}
             textAnchor={anchor(k)}
-            fontSize={11}
+            fontSize={10}
             fontWeight={500}
             fill="currentColor"
-            className="text-foreground"
+            className="text-tertiary"
           >
             {shortDate(points[i].date)}
           </text>
@@ -468,11 +468,12 @@ function MultiSeriesChart({
               d={d}
               fill="none"
               stroke={color}
-              strokeWidth={isPrimary ? 2.5 : 1.5}
+              strokeWidth={isPrimary ? 3 : 1.5}
+              strokeDasharray={isPrimary ? undefined : "4 4"}
               strokeLinejoin="round"
               strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
-              opacity={isPrimary ? 1 : 0.8}
+              opacity={isPrimary ? 1 : 0.9}
             />
             <circle
               cx={xDate(lastPt.date)}
