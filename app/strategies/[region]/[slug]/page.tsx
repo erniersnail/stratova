@@ -33,6 +33,18 @@ function isRegion(value: string): value is Region {
 // Combined-curve window used everywhere else on the site.
 const WINDOW_START = "2026-08-03";
 
+function formatDate(value: string | null): string {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  });
+}
+
 function fmt(v: number): string {
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 }
@@ -194,7 +206,7 @@ export default async function StrategyDetailPage({
       ? Math.floor((capital * r.weight_pct) / r.price)
       : null;
 
-  const columns = [
+    const columns = [
     {
       key: "symbol",
       header: "Symbol",
@@ -220,19 +232,38 @@ export default async function StrategyDetailPage({
     },
     {
       key: "price",
-      header: "Price",
+      header: "Entry Price",
       render: (r: Recommendation) => (
         <span className="text-foreground">{r.price ?? "—"}</span>
       ),
+    },
+    {
+      key: "current_price",
+      header: "Current Price",
+      render: (r: Recommendation) => (
+        <span className="text-foreground">{r.current_price ?? "—"}</span>
+      ),
+    },
+    {
+      key: "return",
+      header: "Since Rec.",
+      render: (r: Recommendation) => {
+        const ret = r.current_price && r.price ? ((r.current_price / r.price) - 1) * 100 : null;
+        if (ret === null) return <span className="text-foreground">—</span>;
+        const isPos = ret >= 0;
+        return (
+          <span className={`font-medium ${isPos ? "text-accent" : "text-tertiary"}`}>
+            {isPos ? "+" : ""}{ret.toFixed(2)}%
+          </span>
+        );
+      },
     },
     {
       key: "weight",
       header: "Weight",
       render: (r: Recommendation) => (
         <span className="text-foreground">
-          {r.weight_pct !== null
-            ? `${(r.weight_pct * 100).toFixed(2)}%`
-            : "—"}
+          {r.weight_pct !== null ? `${(r.weight_pct * 100).toFixed(2)}%` : "—"}
         </span>
       ),
     },
@@ -242,9 +273,7 @@ export default async function StrategyDetailPage({
       render: (r: Recommendation) => {
         const target = targetShares(r);
         return (
-          <span className="text-foreground">
-            {target !== null ? target : "—"}
-          </span>
+          <span className="text-foreground">{target !== null ? target : "—"}</span>
         );
       },
     },
@@ -252,7 +281,7 @@ export default async function StrategyDetailPage({
       key: "rebalance_date",
       header: "Rebalance date",
       render: (r: Recommendation) => (
-        <span className="text-foreground">{formatIST(r.as_of)}</span>
+        <span className="text-foreground">{formatDate(r.as_of)}</span>
       ),
     },
     {
