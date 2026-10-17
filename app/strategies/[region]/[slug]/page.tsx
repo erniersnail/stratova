@@ -413,8 +413,7 @@ export default async function StrategyDetailPage({
           <div className="mt-16">
             <h2 className={`${typography.h3} text-foreground`}>Performance since inception</h2>
             <p className={`${typography.body} mt-3 text-foreground`}>
-              Since inception, net of costs
-              {strategy.benchmark ? `vs ${strategy.benchmark}` : ""}.
+              {`Since inception, net of costs${strategy.benchmark ? `, vs ${strategy.benchmark}` : ""}.`}
             </p>
 
             <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
