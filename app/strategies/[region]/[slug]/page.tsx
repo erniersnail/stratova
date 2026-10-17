@@ -7,6 +7,7 @@ import DataTable from "@/components/ui/data-table";
 import EquityCurveChart, {
   type ChartSeries,
 } from "@/components/strategies/EquityCurveChart";
+import LockedPicksMock from "@/components/strategies/LockedPicksMock";
 import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
@@ -128,6 +129,34 @@ export default async function StrategyDetailPage({
       : null;
 
   const showChart = chartSeries.length > 0;
+
+  // --- Monthly Returns Computation ---
+  const monthlyReturns: { month: string; returnPct: number }[] = [];
+  if (perf.length >= 2) {
+    const monthlyMap = new Map<string, { first: number; last: number }>();
+    for (const p of perf) {
+      const monthKey = p.date.slice(0, 7);
+      if (!monthlyMap.has(monthKey)) {
+        monthlyMap.set(monthKey, { first: p.total_value, last: p.total_value });
+      } else {
+        const existing = monthlyMap.get(monthKey)!;
+        existing.last = p.total_value;
+      }
+    }
+    for (const [monthKey, data] of monthlyMap.entries()) {
+      if (data.first > 0) {
+        const pct = ((data.last / data.first) - 1) * 100;
+        const date = new Date(monthKey + "-01T00:00:00Z");
+        const label = date.toLocaleDateString("en-IN", {
+          month: "short",
+          year: "numeric",
+          timeZone: "UTC",
+        });
+        monthlyReturns.push({ month: label, returnPct: pct });
+      }
+    }
+    monthlyReturns.sort((a, b) => (a.month < b.month ? 1 : -1));
+  }
 
   const picks: Recommendation[] = user
     ? await getCurrentRecommendations(strategy.id)
@@ -358,6 +387,32 @@ export default async function StrategyDetailPage({
                 {alpha !== null && (
                   <span className="text-foreground">
                     <strong>{fmt(alpha)} alpha</strong>
+            {/* Monthly Returns Table */}
+            {monthlyReturns.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-sm font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
+                <div className="mt-4 overflow-hidden rounded-md border border-border bg-surface">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-foreground">Month</th>
+                        <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wide text-foreground">Return</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {monthlyReturns.map((m) => (
+                        <tr key={m.month} className="border-b border-border last:border-0">
+                          <td className="px-4 py-2 text-foreground">{m.month}</td>
+                          <td className={`px-4 py-2 text-right font-medium ${m.returnPct >= 0 ? "text-foreground" : "text-tertiary"}`}>
+                            {m.returnPct >= 0 ? "+" : ""}{m.returnPct.toFixed(2)}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
                   </span>
                 )}
               </div>
@@ -380,6 +435,17 @@ export default async function StrategyDetailPage({
               >
                 Log in
               </Link>
+            </div>
+          ) : existingSub?.status !== "ACTIVE" && strategy.is_subscribable ? (
+            <div className="mt-4 space-y-8">
+              <LockedPicksMock strategyName={strategy.name} />
+              <div className="rounded-md border border-border bg-surface px-6 py-6 max-w-xl mx-auto text-center" id="subscribe">
+                 <p className="text-lg font-medium text-foreground">Subscribe to {strategy.name}</p>
+                 <p className={`${typography.body} mt-2 text-foreground`}>Next rebalance: <strong>{nextDateStr}</strong><br/>Fee: <strong>{feeStr}</strong></p>
+                 <div className="mt-6">
+                   <SubscribePayForm strategyId={strategy.id} fee={fee} feeStr={feeStr} />
+                 </div>
+              </div>
             </div>
           ) : (
             <div className="mt-4 space-y-6">
