@@ -350,73 +350,72 @@ export default async function StrategyDetailPage({
           </div>
         </div>
 
-        {showChart && (
+                {showChart && (
           <div className="mt-16">
-            <h2 className={`${typography.h3} text-foreground`}>
-              Performance since inception
-            </h2>
-            <div className="mt-4 rounded-md border border-border bg-surface px-6 py-6">
-              <EquityCurveChart series={chartSeries} height={280} />
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-x-8 gap-y-3 text-sm">
-                <span className="flex items-center gap-2 text-foreground">
-                  <span
-                    aria-hidden
-                    className="inline-block h-[3px] w-6 bg-foreground"
-                  />
-                  <span>
-                    {strategy.name}{" "}
-                    <strong className="text-foreground">
-                      {fmt(strategyReturn!)}
-                    </strong>
-                  </span>
-                </span>
-                {benchmarkReturn !== null && strategy.benchmark && (
-                  <span className="flex items-center gap-2 text-foreground">
-                    <span
-                      aria-hidden
-                      className="inline-block h-[3px] w-6 bg-[#b08900]"
-                    />
-                    <span>
-                      {strategy.benchmark}{" "}
-                      <strong className="text-foreground">
-                        {fmt(benchmarkReturn!)}
-                      </strong>
-                    </span>
-                  </span>
+            <h2 className={`${typography.h3} text-foreground`}>Performance since inception</h2>
+            <p className={`${typography.body} mt-3 text-foreground`}>
+              Since inception, net of costs
+              {strategy.benchmark ? `vs ${strategy.benchmark}` : ""}.
+            </p>
+
+            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {/* Chart (Left, 2/3) */}
+              <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">
+                <EquityCurveChart series={chartSeries} height={280} />
+
+                {(strategyReturn !== null || benchmarkReturn !== null) && (
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-x-8 gap-y-3 text-sm">
+                    {strategyReturn !== null && (
+                      <span className="flex items-center gap-2 text-foreground">
+                        <span aria-hidden className="inline-block h-[3px] w-6 bg-foreground" />
+                        <span>{strategy.name} <strong className="text-foreground">{fmt(strategyReturn!)}</strong></span>
+                      </span>
+                    )}
+                    {benchmarkReturn !== null && strategy.benchmark && (
+                      <span className="flex items-center gap-2 text-foreground">
+                        <span aria-hidden className="inline-block h-[3px] w-6 border-t-2 border-dashed border-[#b08900]" />
+                        <span>{strategy.benchmark} <strong className="text-foreground">{fmt(benchmarkReturn!)}</strong></span>
+                      </span>
+                    )}
+                    {alpha !== null && (
+                      <span className="text-foreground"><strong>{fmt(alpha)} alpha</strong></span>
+                    )}
+                  </div>
                 )}
-                {alpha !== null && (
-                  <span className="text-foreground">
-                    <strong>{fmt(alpha)} alpha</strong>
-            {/* Monthly Returns Table */}
-            {monthlyReturns.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-sm font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
-                <div className="mt-4 overflow-hidden rounded-md border border-border bg-surface">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-foreground">Month</th>
-                        <th className="px-4 py-2 text-right text-xs font-medium uppercase tracking-wide text-foreground">Return</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {monthlyReturns.map((m) => (
-                        <tr key={m.month} className="border-b border-border last:border-0">
-                          <td className="px-4 py-2 text-foreground">{m.month}</td>
-                          <td className={`px-4 py-2 text-right font-medium ${m.returnPct >= 0 ? "text-foreground" : "text-tertiary"}`}>
-                            {m.returnPct >= 0 ? "+" : ""}{m.returnPct.toFixed(2)}%
-                          </td>
+              </div>
+
+              {/* Monthly Returns (Right, 1/3) */}
+              {monthlyReturns.length > 0 && (
+                <div className="lg:col-span-1 rounded-md border border-border bg-surface px-6 py-6">
+                  <h3 className="text-xs font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
+                  <div className="mt-4">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="pb-2 text-left text-xs font-medium text-tertiary">Month</th>
+                          <th className="pb-2 text-right text-xs font-medium text-tertiary">Return</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {monthlyReturns.map((m) => (
+                          <tr key={m.month} className="border-b border-border last:border-0">
+                            <td className="py-2.5 text-foreground">{m.month}</td>
+                            <td className={`py-2.5 text-right font-medium ${m.returnPct >= 0 ? "text-accent" : "text-tertiary"}`}>
+                              {m.returnPct >= 0 ? "+" : ""}{m.returnPct.toFixed(2)}%
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            )}
-                  </span>
-                )}
-              </div>
+              )}
             </div>
+
+            <p className={`${typography.body} mt-4 text-foreground`}>
+              Past performance does not indicate future results. Track record
+              is short and not statistically significant.
+            </p>
           </div>
         )}
         <div className="mt-16">
