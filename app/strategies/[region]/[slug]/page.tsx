@@ -156,7 +156,11 @@ export default async function StrategyDetailPage({
         existing.last = p.total_value;
       }
     }
-    for (const [monthKey, data] of monthlyMap.entries()) {
+    // Sort by the raw YYYY-MM string to ensure chronological order (descending)
+    const sortedMonths = Array.from(monthlyMap.keys()).sort().reverse();
+    
+    for (const monthKey of sortedMonths) {
+      const data = monthlyMap.get(monthKey)!;
       if (data.first > 0) {
         const pct = ((data.last / data.first) - 1) * 100;
         const date = new Date(monthKey + "-01T00:00:00Z");
@@ -168,7 +172,6 @@ export default async function StrategyDetailPage({
         monthlyReturns.push({ month: label, returnPct: pct });
       }
     }
-    monthlyReturns.sort((a, b) => (a.month < b.month ? 1 : -1));
   }
 
   const picks: Recommendation[] = user
@@ -461,6 +464,15 @@ export default async function StrategyDetailPage({
                             </td>
                           </tr>
                         ))}
+                        {strategyReturn !== null && (
+                          <tr className="bg-surface-hover/50">
+                            <td className="py-2.5 font-medium text-foreground">Total</td>
+                            <td className={`py-2.5 text-right font-bold ${strategyReturn >= 0 ? "text-accent" : "text-tertiary"}`}>
+                              {strategyReturn >= 0 ? "+" : ""}{strategyReturn.toFixed(2)}%
+                            </td>
+                          </tr>
+                        )}
+
                       </tbody>
                     </table>
                   </div>
