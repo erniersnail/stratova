@@ -17,6 +17,7 @@ import {
   type Recommendation,
 } from "@/lib/strategies/fetch";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/admin/recommendations";
 import { formatIST } from "@/lib/format/date";
 import {
   nextRebalanceDate,
@@ -192,6 +193,32 @@ export default async function StrategyDetailPage({
     existingSub = subs && subs.length > 0 ? (subs[0] as ExistingSub) : null;
   }
   const capital = existingSub?.capital_allocated ?? null;
+
+  const hasAccess = existingSub?.status === "ACTIVE";
+
+  // Securely fetch real returns for the teaser without exposing names/prices to the browser
+  let teaserPicks: { id: string; returnPct: number | null }[] = [];
+  if (!hasAccess) {
+    try {
+      const admin = createServiceClient();
+      const { data } = await admin
+        .from("recommendations")
+        .select("id, price, current_price")
+        .eq("strategy_id", strategy.id)
+        .not("approved_at", "is", null)
+        .is("removed_at", null)
+        .or("expires_at.is.null,expires_at.gt.now()");
+
+      if (data) {
+        teaserPicks = data.map((p) => ({
+          id: p.id,
+          returnPct: p.current_price && p.price ? ((p.current_price / p.price) - 1) * 100 : null,
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to fetch teaser picks", err);
+    }
+  }
 
   const nextDate = nextRebalanceDate(strategy.slug);
   const nextDateStr = formatRebalanceDate(nextDate);
@@ -465,15 +492,15 @@ export default async function StrategyDetailPage({
               </Link>
             </div>
           ) : existingSub?.status !== "ACTIVE" && strategy.is_subscribable ? (
-            <div className="mt-4 space-y-8">
-              <LockedPicksMock strategyName={strategy.name} picks={picks} />
-              <div className="rounded-md border border-border bg-surface px-6 py-6 max-w-xl mx-auto text-center" id="subscribe">
-                 <p className="text-lg font-medium text-foreground">Subscribe to {strategy.name}</p>
-                 <p className={`${typography.body} mt-2 text-foreground`}>Next rebalance: <strong>{nextDateStr}</strong><br/>Fee: <strong>{feeStr}</strong></p>
-                 <div className="mt-6">
-                   <SubscribePayForm strategyId={strategy.id} fee={fee} feeStr={feeStr} />
-                 </div>
-              </div>
+            <div className="mt-4">
+              <LockedPicksMock
+                strategyId={strategy.id}
+                strategyName={strategy.name}
+                fee={fee}
+                feeStr={feeStr}
+                nextDateStr={nextDateStr}
+                teaserPicks={teaserPicks}
+              />
             </div>
           ) : (
             <div className="mt-4 space-y-6">
