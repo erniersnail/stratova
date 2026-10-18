@@ -5,6 +5,7 @@ import StrategyCard from "@/components/strategies/StrategyCard";
 import {
   getPublicStrategiesByRegion,
   getStrategyPerformance,
+  getSubscriberCounts,
   type PerformancePoint,
 } from "@/lib/strategies/fetch";
 
@@ -18,12 +19,16 @@ export const dynamic = "force-dynamic";
 export default async function IndiaStrategiesPage() {
   const strategies = await getPublicStrategiesByRegion("india");
 
-  const perfEntries = await Promise.all(
-    strategies.map(async (s) => {
-      const perf = await getStrategyPerformance(s.id);
-      return [s.id, perf] as const;
-    }),
-  );
+  const [perfEntries, subscriberCounts] = await Promise.all([
+    Promise.all(
+      strategies.map(async (s) => {
+        const perf = await getStrategyPerformance(s.id);
+        return [s.id, perf] as const;
+      })
+    ),
+    getSubscriberCounts(),
+  ]);
+  
   const perfMap = new Map<string, PerformancePoint[]>(perfEntries);
 
   return (
@@ -49,6 +54,7 @@ export default async function IndiaStrategiesPage() {
                     strategy={strategy}
                     region="india"
                     performance={perfMap.get(strategy.id) ?? []}
+                    subscribers={subscriberCounts[strategy.id] ?? 0}
                   />
                 </li>
               ))}

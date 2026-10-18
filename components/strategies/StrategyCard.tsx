@@ -1,9 +1,6 @@
 import Link from "next/link";
 import Sparkline from "@/components/strategies/Sparkline";
-import type {
-  PerformancePoint,
-  Strategy,
-} from "@/lib/strategies/fetch";
+import type { PerformancePoint, Strategy } from "@/lib/strategies/fetch";
 
 const RISK_LABEL: Record<string, string> = {
   moderate: "Moderate risk",
@@ -14,9 +11,9 @@ type StrategyCardProps = {
   strategy: Strategy;
   region: "india" | "us";
   performance: PerformancePoint[];
+  subscribers: number;
 };
 
-/** Rebase to 100 at the first point so any two strategies are comparable. */
 function normalize(values: number[]): number[] {
   if (values.length < 2 || values[0] <= 0) return [];
   const base = values[0];
@@ -27,13 +24,11 @@ export default function StrategyCard({
   strategy,
   region,
   performance,
+  subscribers,
 }: StrategyCardProps) {
   const values = performance.map((p) => p.total_value);
   const normalized = normalize(values);
-  const returnPct =
-    normalized.length >= 2
-      ? normalized[normalized.length - 1] - 100
-      : null;
+  const returnPct = normalized.length >= 2 ? normalized[normalized.length - 1] - 100 : null;
   const positive = returnPct !== null && returnPct >= 0;
 
   return (
@@ -48,18 +43,10 @@ export default function StrategyCard({
 
         {returnPct !== null && (
           <div className="flex shrink-0 flex-col items-end">
-            <span
-              className={`font-mono text-sm font-medium tracking-tight ${
-                positive ? "text-accent" : "text-tertiary"
-              }`}
-            >
-              {positive ? "+" : ""}
-              {returnPct.toFixed(2)}%
+            <span className={`font-mono text-sm font-medium tracking-tight ${positive ? "text-accent" : "text-tertiary"}`}>
+              {positive ? "+" : ""}{returnPct.toFixed(2)}%
             </span>
-            <Sparkline
-              values={normalized}
-              className={`mt-1 ${positive ? "text-accent" : "text-tertiary"}`}
-            />
+            <Sparkline values={normalized} className={`mt-1 ${positive ? "text-accent" : "text-tertiary"}`} />
             <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.15em] text-foreground">
               Since inception
             </span>
@@ -68,9 +55,7 @@ export default function StrategyCard({
       </div>
 
       {strategy.short_description && (
-        <p className="mt-2 text-sm text-secondary">
-          {strategy.short_description}
-        </p>
+        <p className="mt-2 text-sm text-secondary">{strategy.short_description}</p>
       )}
 
       <dl className="mt-4 space-y-1 text-sm">
@@ -83,11 +68,13 @@ export default function StrategyCard({
         {strategy.risk_level && (
           <div className="flex justify-between gap-4">
             <dt className="text-tertiary">Risk</dt>
-            <dd className="text-secondary">
-              {RISK_LABEL[strategy.risk_level] ?? strategy.risk_level}
-            </dd>
+            <dd className="text-secondary">{RISK_LABEL[strategy.risk_level] ?? strategy.risk_level}</dd>
           </div>
         )}
+        <div className="flex justify-between gap-4">
+          <dt className="text-tertiary">Investors</dt>
+          <dd className="text-secondary">{subscribers}</dd>
+        </div>
       </dl>
 
       {strategy.is_subscribable === false && (

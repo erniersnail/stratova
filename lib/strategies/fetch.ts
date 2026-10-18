@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { createClient } from "../supabase/server";
 import { createPublicClient } from "../supabase/public";
+import { createServiceClient } from "../admin/recommendations";
 
 export type Strategy = {
   id: string;
@@ -37,7 +38,11 @@ export type Recommendation = {
   admin_remark: string | null;
 };
 
-export type PerformancePoint = { date: string; total_value: number };
+export type PerformancePoint = {
+  date: string;
+  total_value: number;
+};
+
 export type BenchmarkPoint = { date: string; close: number };
 
 const STRATEGY_TTL = 300;
@@ -47,7 +52,11 @@ const BENCHMARK_TTL = 3600;
 const _getPublicStrategies = unstable_cache(
   async (): Promise<Strategy[]> => {
     const supabase = createPublicClient();
-    const { data, error } = await supabase.from("strategies").select("*").eq("is_public", true).order("display_order", { ascending: true });
+    const { data, error } = await supabase
+      .from("strategies")
+      .select("*")
+      .eq("is_public", true)
+      .order("display_order", { ascending: true });
     if (error) throw new Error(`getPublicStrategies: ${error.message}`);
     return (data as Strategy[]) ?? [];
   },
@@ -62,7 +71,12 @@ export async function getPublicStrategies(): Promise<Strategy[]> {
 const _getPublicStrategiesByRegion = unstable_cache(
   async (region: "india" | "us"): Promise<Strategy[]> => {
     const supabase = createPublicClient();
-    const { data, error } = await supabase.from("strategies").select("*").eq("is_public", true).eq("region", region).order("name", { ascending: true });
+    const { data, error } = await supabase
+      .from("strategies")
+      .select("*")
+      .eq("is_public", true)
+      .eq("region", region)
+      .order("name", { ascending: true });
     if (error) throw new Error(`getPublicStrategiesByRegion: ${error.message}`);
     return (data as Strategy[]) ?? [];
   },
@@ -77,7 +91,12 @@ export async function getPublicStrategiesByRegion(region: "india" | "us"): Promi
 const _getStrategyBySlug = unstable_cache(
   async (slug: string): Promise<Strategy | null> => {
     const supabase = createPublicClient();
-    const { data, error } = await supabase.from("strategies").select("*").eq("slug", slug).eq("is_public", true).maybeSingle();
+    const { data, error } = await supabase
+      .from("strategies")
+      .select("*")
+      .eq("slug", slug)
+      .eq("is_public", true)
+      .maybeSingle();
     if (error) throw new Error(`getStrategyBySlug: ${error.message}`);
     return (data as Strategy) ?? null;
   },
@@ -92,9 +111,15 @@ export async function getStrategyBySlug(slug: string): Promise<Strategy | null> 
 const _getStrategyPerformance = unstable_cache(
   async (strategyId: string): Promise<PerformancePoint[]> => {
     const supabase = createPublicClient();
-    const { data, error } = await supabase.from("strategy_performance").select("date, total_value").eq("strategy_id", strategyId).order("date", { ascending: true });
+    const { data, error } = await supabase
+      .from("strategy_performance")
+      .select("date, total_value")
+      .eq("strategy_id", strategyId)
+      .order("date", { ascending: true });
     if (error) throw new Error(`getStrategyPerformance: ${error.message}`);
-    return ((data as PerformancePoint[]) ?? []).filter((r) => typeof r?.date === "string" && r.date.length >= 10 && Number.isFinite(Number(r?.total_value))).map((r) => ({ date: r.date.slice(0, 10), total_value: Number(r.total_value) }));
+    return ((data as PerformancePoint[]) ?? [])
+      .filter((r) => typeof r?.date === "string" && r.date.length >= 10 && Number.isFinite(Number(r?.total_value)))
+      .map((r) => ({ date: r.date.slice(0, 10), total_value: Number(r.total_value) }));
   },
   ["strategy-performance"],
   { revalidate: PERFORMANCE_TTL, tags: ["performance"] },
@@ -104,13 +129,19 @@ export async function getStrategyPerformance(strategyId: string): Promise<Perfor
   if (!strategyId) return [];
   try { return await _getStrategyPerformance(strategyId); } catch (err) { console.error("[strategies] getStrategyPerformance failed:", err); return []; }
 }
-
 const _getBenchmark = unstable_cache(
   async (symbol: string, fromDate: string): Promise<BenchmarkPoint[]> => {
     const supabase = createPublicClient();
-    const { data, error } = await supabase.from("benchmarks").select("date, close").eq("symbol", symbol).gte("date", fromDate).order("date", { ascending: true });
+    const { data, error } = await supabase
+      .from("benchmarks")
+      .select("date, close")
+      .eq("symbol", symbol)
+      .gte("date", fromDate)
+      .order("date", { ascending: true });
     if (error) throw new Error(`getBenchmark: ${error.message}`);
-    return ((data as BenchmarkPoint[]) ?? []).filter((r) => typeof r?.date === "string" && r.date.length >= 10 && Number.isFinite(Number(r?.close))).map((r) => ({ date: r.date.slice(0, 10), close: Number(r.close) }));
+    return ((data as BenchmarkPoint[]) ?? [])
+      .filter((r) => typeof r?.date === "string" && r.date.length >= 10 && Number.isFinite(Number(r?.close)))
+      .map((r) => ({ date: r.date.slice(0, 10), close: Number(r.close) }));
   },
   ["benchmark"],
   { revalidate: BENCHMARK_TTL, tags: ["benchmarks"] },
@@ -121,11 +152,46 @@ export async function getBenchmark(symbol: string, fromDate: string): Promise<Be
   try { return await _getBenchmark(symbol, fromDate); } catch (err) { console.error("[strategies] getBenchmark failed:", err); return []; }
 }
 
+const _getSubscriberCounts = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    try {
+      const admin = createServiceClient();
+      const { data, error } = await admin
+        .from("subscriptions")
+        .select("strategy_id")
+        .eq("status", "ACTIVE");
+      
+      if (error || !data) return {};
+      
+      const counts: Record<string, number> = {};
+      for (const row of data) {
+        if (row.strategy_id) {
+          counts[row.strategy_id] = (counts[row.strategy_id] || 0) + 1;
+        }
+      }
+      return counts;
+    } catch { return {}; }
+  },
+  ["subscriber-counts"],
+  { revalidate: 300, tags: ["subscriptions"] }
+);
+
+export async function getSubscriberCounts(): Promise<Record<string, number>> {
+  return _getSubscriberCounts();
+}
+
 export async function getCurrentRecommendations(strategyId: string): Promise<Recommendation[]> {
   if (!strategyId) return [];
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.from("recommendations").select("*").eq("strategy_id", strategyId).not("approved_at", "is", null).is("removed_at", null).or("expires_at.is.null,expires_at.gt.now()").order("published_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("recommendations")
+      .select("*")
+      .eq("strategy_id", strategyId)
+      .not("approved_at", "is", null)
+      .is("removed_at", null)
+      .or("expires_at.is.null,expires_at.gt.now()")
+      .order("published_at", { ascending: false });
     if (error) { console.error("[strategies] getCurrentRecommendations failed:", error.message); return []; }
     return (data as Recommendation[]) ?? [];
   } catch (err) { console.error("[strategies] getCurrentRecommendations threw:", err); return []; }
@@ -135,7 +201,15 @@ export async function getCurrentRecommendationsForUser(userId: string): Promise<
   if (!userId) return [];
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.from("recommendations").select("*").not("approved_at", "is", null).is("removed_at", null).or("expires_at.is.null,expires_at.gt.now()").order("strategy_id", { ascending: true }).order("published_at", { ascending: false }).limit(50);
+    const { data, error } = await supabase
+      .from("recommendations")
+      .select("*")
+      .not("approved_at", "is", null)
+      .is("removed_at", null)
+      .or("expires_at.is.null,expires_at.gt.now()")
+      .order("strategy_id", { ascending: true })
+      .order("published_at", { ascending: false })
+      .limit(50);
     if (error) { console.error("[strategies] getCurrentRecommendationsForUser failed:", error.message); return []; }
     return (data as Recommendation[]) ?? [];
   } catch (err) { console.error("[strategies] getCurrentRecommendationsForUser threw:", err); return []; }
@@ -145,7 +219,13 @@ export async function getRecommendationHistoryForUser(userId: string): Promise<R
   if (!userId) return [];
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.from("recommendations").select("*").not("approved_at", "is", null).order("as_of", { ascending: false }).order("published_at", { ascending: false }).limit(200);
+    const { data, error } = await supabase
+      .from("recommendations")
+      .select("*")
+      .not("approved_at", "is", null)
+      .order("as_of", { ascending: false })
+      .order("published_at", { ascending: false })
+      .limit(200);
     if (error) { console.error("[strategies] getRecommendationHistoryForUser failed:", error.message); return []; }
     return (data as Recommendation[]) ?? [];
   } catch (err) { console.error("[strategies] getRecommendationHistoryForUser threw:", err); return []; }
