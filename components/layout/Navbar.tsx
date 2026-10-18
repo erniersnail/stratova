@@ -2,6 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/layout/Logo";
 import AuthLinks from "@/components/layout/AuthLinks";
 import MobileNav from "@/components/layout/MobileNav";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 
 type NavItem = {
   label: string;
@@ -65,8 +66,14 @@ export default function Navbar() {
           <li>
             <AuthLinks />
           </li>
+          <li>
+            <ThemeToggle />
+          </li>
         </ul>
-        <MobileNav />
+        <div className="flex items-center gap-4 md:hidden">
+          <ThemeToggle />
+          <MobileNav />
+        </div>
       </div>
     </nav>
   );
