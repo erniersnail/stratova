@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import Container from "../../components/layout/Container";
-import PageHeader from "../../components/common/PageHeader";
-import DataTable from "../../components/ui/data-table";
-import CancelSubscriptionButton from "../../components/dashboard/CancelSubscriptionButton";
-import { createClient } from "../../lib/supabase/server";
-import { getAuthedUser, type AuthedUser } from "../../lib/auth/session";
-import { ensureProfile } from "../../lib/auth/ensure-profile";
+import Container from "@/components/layout/Container";
+import PageHeader from "@/components/common/PageHeader";
+import DataTable from "@/components/ui/data-table";
+import CancelSubscriptionButton from "@/components/dashboard/CancelSubscriptionButton";
+import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, type AuthedUser } from "@/lib/auth/session";
+import { ensureProfile } from "@/lib/auth/ensure-profile";
 import {
   getCurrentRecommendationsForUser,
   getPublicStrategies,
@@ -16,8 +16,8 @@ import {
   type PerformancePoint,
   type Recommendation,
   type Strategy,
-} from "../../lib/strategies/fetch";
-import { formatIST } from "../../lib/format/date";
+} from "@/lib/strategies/fetch";
+import { formatIST } from "@/lib/format/date";
 
 export const metadata: Metadata = {
   title: "Dashboard — Simplicial Capital",
@@ -42,6 +42,7 @@ function formatDate(value: string | null): string {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "Asia/Kolkata",
   });
 }
 
@@ -74,8 +75,9 @@ export default async function DashboardPage() {
       <Container className="py-20">
         <PageHeader
           title={`Welcome, ${fullName ?? "there"}`}
-          description="Your subscriptions and the latest research."
+          description="Your subscriptions and the latest research published to you."
         />
+
         <Suspense fallback={<DashboardSkeleton />}>
           <DashboardContent user={user} />
         </Suspense>
@@ -181,7 +183,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
       <section aria-labelledby="dashboard-subscriptions">
         <h2
           id="dashboard-subscriptions"
-          className="text-lg font-medium tracking-tight"
+          className="text-lg font-medium tracking-tight text-foreground"
         >
           Your subscriptions
         </h2>
@@ -202,43 +204,58 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "plan",
                 header: "Plan",
-                render: (row) => row.plan ?? "—",
+                render: (row) => (
+                  <span className="text-foreground">{row.plan ?? "—"}</span>
+                ),
               },
               {
                 key: "capital",
                 header: "Capital allocated",
-                render: (row) =>
-                  row.capital_allocated !== null
-                    ? `₹${row.capital_allocated.toLocaleString("en-IN")}`
-                    : "—",
+                render: (row) => (
+                  <span className="text-foreground">
+                    {row.capital_allocated !== null
+                      ? `₹${row.capital_allocated.toLocaleString("en-IN")}`
+                      : "—"}
+                  </span>
+                ),
               },
               {
                 key: "status",
                 header: "Status",
-                render: (row) => row.status ?? "—",
+                render: (row) => (
+                  <span className="text-foreground">{row.status ?? "—"}</span>
+                ),
               },
               {
                 key: "started",
                 header: "Started",
-                render: (row) => formatDate(row.started_at),
+                render: (row) => (
+                  <span className="text-foreground">
+                    {formatDate(row.started_at)}
+                  </span>
+                ),
               },
               {
                 key: "expires",
                 header: "Expires",
-                render: (row) => formatDate(row.expires_at),
+                render: (row) => (
+                  <span className="text-foreground">
+                    {formatDate(row.expires_at)}
+                  </span>
+                ),
               },
               {
                 key: "view",
                 header: "",
                 render: (row) => {
                   if (!row.strategy_id) return "—";
-                  const reg = strategyRegions.get(row.strategy_id);
-                  const slg = strategySlugs.get(row.strategy_id);
-                  if (!reg || !slg) return "—";
+                  const region = strategyRegions.get(row.strategy_id);
+                  const slug = strategySlugs.get(row.strategy_id);
+                  if (!region || !slug) return "—";
                   return (
                     <Link
-                      href={`/strategies/${reg}/${slg}`}
-                      className="underline hover:text-foreground"
+                      href={`/strategies/${region}/${slug}`}
+                      className="text-foreground underline hover:no-underline"
                     >
                       View strategy
                     </Link>
@@ -258,13 +275,13 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
             rowKey={(row) => row.id}
             emptyState={
               <div className="rounded-lg border border-border bg-surface p-6">
-                <p className="text-sm leading-[1.75] text-secondary">
+                <p className="text-sm leading-[1.75] text-foreground">
                   You don&apos;t have any active subscriptions yet.
                 </p>
                 <p className="mt-4 text-sm">
                   <Link
                     href="/strategies"
-                    className="underline hover:text-foreground"
+                    className="text-foreground underline hover:no-underline"
                   >
                     Browse strategies
                   </Link>
@@ -275,7 +292,10 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
           {clientWindows.length > 0 && (
             <ul className="mt-4 space-y-1">
               {clientWindows.map((w) => (
-                <li key={w.subscriptionId} className="text-sm text-secondary">
+                <li
+                  key={w.subscriptionId}
+                  className="text-sm text-foreground"
+                >
                   {w.name} — Since {w.startedOn}: ₹
                   {w.capital.toLocaleString("en-IN")} → ₹
                   {Math.round(w.current).toLocaleString("en-IN")} (
@@ -286,11 +306,10 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
           )}
         </div>
       </section>
-
       <section aria-labelledby="dashboard-recommendations">
         <h2
           id="dashboard-recommendations"
-          className="text-lg font-medium tracking-tight"
+          className="text-lg font-medium tracking-tight text-foreground"
         >
           Latest recommendations
         </h2>
@@ -327,7 +346,9 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "action",
                 header: "Action",
-                render: (row) => row.action ?? "—",
+                render: (row) => (
+                  <span className="text-foreground">{row.action ?? "—"}</span>
+                ),
               },
               {
                 key: "target",
@@ -338,28 +359,67 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                     cap && row.weight_pct && row.price
                       ? Math.floor((cap * row.weight_pct) / row.price)
                       : null;
-                  return target !== null
-                    ? target.toLocaleString("en-IN")
-                    : "—";
+                  return (
+                    <span className="text-foreground">
+                      {target !== null
+                        ? target.toLocaleString("en-IN")
+                        : "—"}
+                    </span>
+                  );
+                },
+              },
+              {
+                key: "price",
+                header: "Entry Price",
+                render: (row) => (
+                  <span className="text-foreground">{row.price ?? "—"}</span>
+                ),
+              },
+              {
+                key: "current_price",
+                header: "Current Price",
+                render: (row) => (
+                  <span className="text-foreground">{row.current_price ?? "—"}</span>
+                ),
+              },
+              {
+                key: "return",
+                header: "Since Rec.",
+                render: (row) => {
+                  const ret = row.current_price && row.price ? ((row.current_price / row.price) - 1) * 100 : null;
+                  if (ret === null) return <span className="text-foreground">—</span>;
+                  const isPos = ret >= 0;
+                  return (
+                    <span className={`font-medium ${isPos ? "text-accent" : "text-tertiary"}`}>
+                      {isPos ? "+" : ""}{ret.toFixed(2)}%
+                    </span>
+                  );
                 },
               },
               {
                 key: "rebalance_date",
                 header: "Rebalance date",
-                render: (row) => formatIST(row.as_of),
+                render: (row) => (
+                  <span className="text-foreground">
+                    {formatDate(row.as_of)}
+                  </span>
+                ),
               },
               {
                 key: "valid_until",
                 header: "Valid until",
-                render: (row) =>
-                  row.expires_at ? formatIST(row.expires_at) : "—",
+                render: (row) => (
+                  <span className="text-foreground">
+                    {row.expires_at ? formatDate(row.expires_at) : "—"}
+                  </span>
+                ),
               },
             ]}
             rows={recommendations}
             rowKey={(row) => row.id}
             emptyState={
               <div className="rounded-lg border border-border bg-surface p-6">
-                <p className="text-sm leading-[1.75] text-secondary">
+                <p className="text-sm leading-[1.75] text-foreground">
                   No recommendations yet.
                 </p>
               </div>
@@ -369,7 +429,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
         <p className="mt-4 text-sm">
           <Link
             href="/account/history"
-            className="underline hover:text-foreground"
+            className="text-foreground underline hover:no-underline"
           >
             View full history →
           </Link>
