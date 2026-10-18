@@ -1,22 +1,16 @@
 import Link from "next/link";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
-type BaseProps = {
+type ButtonProps = {
   children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
-};
-
-type ButtonProps = BaseProps & {
-  href: string;
-  type?: never;
-  disabled?: never;
-} | BaseProps & {
-  href?: never;
+  href?: string;
+  onClick?: () => void;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
 };
@@ -41,24 +35,23 @@ export default function Button({
   variant = "primary",
   size = "md",
   className = "",
-  ...props
+  href,
+  onClick,
+  type = "button",
+  disabled,
 }: ButtonProps) {
   const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
 
-  if ("href" in props && props.href) {
+  if (href) {
     return (
-      <Link href={props.href} className={classes}>
+      <Link href={href} className={classes} onClick={onClick}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button
-      type={props.type || "button"}
-      disabled={props.disabled}
-      className={classes}
-    >
+    <button type={type} disabled={disabled} onClick={onClick} className={classes}>
       {children}
     </button>
   );
