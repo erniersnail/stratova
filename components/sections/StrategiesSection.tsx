@@ -8,7 +8,6 @@ import { typography } from "@/lib/typography";
 import { getPublicStrategiesByRegion } from "@/lib/strategies/fetch";
 import { buildCombinedCurve } from "@/lib/strategies/combined";
 
-// Matches the window used everywhere else on the site (Aug 3 2026 seed).
 const WINDOW_START = "2026-08-03";
 
 type StrategyCard = {
@@ -16,7 +15,8 @@ type StrategyCard = {
   code: string;
   title: string;
   description: string;
-  image: string;
+  imageLight: string;
+  imageDark: string;
   tags: string[];
   region: "india" | "us";
 };
@@ -27,7 +27,8 @@ const STRATEGY_CARDS: StrategyCard[] = [
     code: "US",
     title: "U.S. Strategies",
     description: "Systematic strategies across the NASDAQ 100.",
-    image: "/images/statue_liberty.png",
+    imageLight: "/images/statue_liberty.png",
+    imageDark: "/images/White House Wireframe Hologram.png",
     tags: ["Systematic", "NASDAQ 100", "Benchmark Outperformer"],
     region: "us",
   },
@@ -37,7 +38,8 @@ const STRATEGY_CARDS: StrategyCard[] = [
     title: "India Strategies",
     description:
       "Systematic strategies across India's full market-cap spectrum.",
-    image: "/images/india_gate.png",
+    imageLight: "/images/india_gate.png",
+    imageDark: "/images/Golden Wireframe Sun Temple Chariot.png",
     tags: ["Systematic", "Multi-Cap", "Benchmark Outperformer"],
     region: "india",
   },
@@ -51,12 +53,7 @@ export default async function StrategiesSection() {
 
   const [usCurve, indiaCurve] = await Promise.all([
     buildCombinedCurve(usStrategies, WINDOW_START, "QQQ", "Nasdaq-100"),
-    buildCombinedCurve(
-      indiaStrategies,
-      WINDOW_START,
-      "NIFTY 500",
-      "NIFTY 500",
-    ),
+    buildCombinedCurve(indiaStrategies, WINDOW_START, "NIFTY 500", "NIFTY 500"),
   ]);
 
   const curveByRegion = { us: usCurve, india: indiaCurve } as const;
@@ -95,7 +92,6 @@ export default async function StrategiesSection() {
                           </span>
                           <h3 className="text-2xl font-medium">{card.title}</h3>
                         </div>
-
                         <p className="mt-5 text-sm text-foreground">
                           {card.description}
                         </p>
@@ -104,17 +100,10 @@ export default async function StrategiesSection() {
                           <div className="mt-5 flex items-center gap-3">
                             <Sparkline
                               values={values}
-                              className={
-                                positive ? "text-accent" : "text-tertiary"
-                              }
+                              className={positive ? "text-accent" : "text-tertiary"}
                             />
-                            <span
-                              className={`font-mono text-sm font-medium tracking-tight ${
-                                positive ? "text-accent" : "text-tertiary"
-                              }`}
-                            >
-                              {positive ? "+" : ""}
-                              {returnPct.toFixed(2)}%
+                            <span className={`font-mono text-sm font-medium tracking-tight ${positive ? "text-accent" : "text-tertiary"}`}>
+                              {positive ? "+" : ""}{returnPct.toFixed(2)}%
                             </span>
                             <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-foreground">
                               Since inception
@@ -135,18 +124,30 @@ export default async function StrategiesSection() {
                         </div>
                       </div>
 
+                      {/* Image Container */}
                       <div className="relative w-[40%] overflow-hidden">
+                        {/* Light Mode Image */}
                         <Image
-                          src={card.image}
+                          src={card.imageLight}
                           alt=""
                           fill
-                          className="object-cover object-center opacity-90 dark:invert dark:opacity-40 dark:brightness-200"
+                          className="object-cover object-center opacity-90 block dark:hidden"
                           sizes="(max-width: 1024px) 40vw, 300px"
                           style={{
-                            maskImage:
-                              "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-                            WebkitMaskImage:
-                              "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                          }}
+                        />
+                        {/* Dark Mode Image (mix-blend-screen makes the black background transparent) */}
+                        <Image
+                          src={card.imageDark}
+                          alt=""
+                          fill
+                          className="object-cover object-center hidden dark:block dark:mix-blend-screen"
+                          sizes="(max-width: 1024px) 40vw, 300px"
+                          style={{
+                            maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
                           }}
                         />
                       </div>
