@@ -114,7 +114,7 @@ export default async function StrategyDetailPage({
   if (strategySeries.length >= 2) {
     chartSeries.push({
       name: strategy.name,
-      color: "#111111",
+      color: "var(--color-foreground)",
       data: strategySeries,
       emphasis: "primary",
     });

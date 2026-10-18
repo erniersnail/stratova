@@ -77,7 +77,7 @@ export async function buildCombinedCurve(
   if (combined.length >= 2) {
     series.push({
       name: "Combined Portfolio",
-      color: "#111111",
+      color: "var(--color-foreground)",
       data: combined,
       emphasis: "primary",
     });

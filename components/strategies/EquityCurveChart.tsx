@@ -19,7 +19,7 @@ type EquityCurveChartProps = {
 };
 
 /** Default colors if none provided */
-export const SERIES_COLORS = ["#111111", "#b08900", "#6e6c67", "#a8a29a"];
+export const SERIES_COLORS = ["var(--color-foreground)", "#b08900", "var(--color-tertiary)", "#a8a29a"];
 
 function niceTicks(min: number, max: number): number[] {
   if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) {

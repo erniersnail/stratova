@@ -82,7 +82,7 @@ async function buildIndividualCards(
       const series: ChartSeries[] = [
         {
           name: strategy.name,
-          color: "#111111",
+          color: "var(--color-foreground)",
           data: strategySeries,
           emphasis: "primary",
         },
