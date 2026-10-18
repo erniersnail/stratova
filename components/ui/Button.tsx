@@ -1,53 +1,64 @@
 import Link from "next/link";
+import { type ReactNode } from "react";
 
-type ButtonVariant = "primary" | "secondary";
-
+type ButtonVariant = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
-type ButtonProps = {
-  children: React.ReactNode;
+type BaseProps = {
+  children: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
-  href?: string;
-} & Omit<React.ComponentPropsWithoutRef<"button">, "className">;
-
-const VARIANT_MAP: Record<ButtonVariant, string> = {
-  primary:
-    "bg-foreground text-white hover:bg-foreground-hover border border-transparent shadow-sm hover:shadow-md",
-  secondary:
-    "bg-transparent text-foreground border border-border hover:border-foreground hover:bg-surface",
 };
 
-const SIZE_MAP: Record<ButtonSize, string> = {
-  sm: "h-9 px-5 text-xs tracking-wide",
-  md: "h-11 px-6 text-sm tracking-wide",
-  lg: "h-12 px-8 text-base tracking-wide",
+type ButtonProps = BaseProps & {
+  href: string;
+  type?: never;
+  disabled?: never;
+} | BaseProps & {
+  href?: never;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 };
 
-const BASE =
-  "inline-flex items-center justify-center rounded-sm font-medium transition-all duration-200";
+const baseClasses =
+  "inline-flex items-center justify-center font-medium rounded-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+
+const variants: Record<ButtonVariant, string> = {
+  primary: "bg-foreground text-background hover:opacity-90 shadow-sm",
+  secondary: "border border-border bg-transparent text-foreground hover:bg-surface-hover",
+  ghost: "bg-transparent text-foreground hover:bg-surface-hover",
+};
+
+const sizes: Record<ButtonSize, string> = {
+  sm: "h-9 px-4 text-xs",
+  md: "h-11 px-6 text-sm",
+  lg: "h-14 px-8 text-base",
+};
 
 export default function Button({
   children,
   variant = "primary",
   size = "md",
   className = "",
-  href,
   ...props
 }: ButtonProps) {
-  const classes = `${BASE} ${VARIANT_MAP[variant]} ${SIZE_MAP[size]} ${className}`;
+  const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
 
-  if (href) {
+  if ("href" in props && props.href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={props.href} className={classes}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button className={classes} {...props}>
+    <button
+      type={props.type || "button"}
+      disabled={props.disabled}
+      className={classes}
+    >
       {children}
     </button>
   );
