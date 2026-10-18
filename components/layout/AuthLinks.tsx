@@ -7,11 +7,6 @@ import { createClient } from "@/lib/supabase/client";
 
 type AuthLinksState = "loading" | "logged-out" | "logged-in";
 
-/**
- * Color comes from the `.nav-link` class in globals.css (matches the
- * other nav items: #2f2f2c with a hover to near-black). Inline styles
- * would beat the hover rule, so we keep the class.
- */
 const linkClassName = "nav-link text-sm font-semibold tracking-wide whitespace-nowrap";
 
 function toTitleCase(s: string): string {
@@ -23,11 +18,6 @@ function toTitleCase(s: string): string {
     .join(" ");
 }
 
-/**
- * Client island mounted inside the server Navbar. Reads the session in the
- * browser so every marketing route keeps its static render. Fixed-width
- * skeleton prevents layout shift while the session resolves.
- */
 export default function AuthLinks() {
   const [state, setState] = useState<AuthLinksState>("loading");
   const [displayName, setDisplayName] = useState("Account");
@@ -36,14 +26,15 @@ export default function AuthLinks() {
     let mounted = true;
     const supabase = createClient();
 
-    supabase.auth.getUser().then(async ({ data }) => {
+    // Use getSession for immediate UI hydration (reads from local cookie synchronously)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!mounted) return;
-      if (data.user) {
+      if (session?.user) {
         setState("logged-in");
         const { data: profile } = await supabase
           .from("profiles")
           .select("full_name")
-          .eq("id", data.user.id)
+          .eq("id", session.user.id)
           .maybeSingle();
         if (!mounted) return;
         const fullName = toTitleCase(profile?.full_name ?? "").trim();
