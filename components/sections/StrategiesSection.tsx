@@ -140,7 +140,7 @@ export default async function StrategiesSection() {
                           src={card.image}
                           alt=""
                           fill
-                          className="object-cover object-center opacity-90"
+                          className="object-cover object-center opacity-90 dark:invert dark:opacity-40 dark:brightness-200"
                           sizes="(max-width: 1024px) 40vw, 300px"
                           style={{
                             maskImage:
