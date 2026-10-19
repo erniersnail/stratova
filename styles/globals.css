@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-background: #faf8f4;
   --color-foreground: #111111;
@@ -15,14 +17,14 @@
 }
 
 .dark {
-  --color-background: #09090b; /* Deep zinc black */
-  --color-foreground: #fafafa; /* Almost white */
-  --color-surface: #18181b;    /* Dark zinc for cards */
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-surface: #18181b;
   --color-surface-hover: #27272a;
-  --color-border: #3f3f46;     /* Visible borders */
-  --color-secondary: #a1a1aa;  /* Light gray text */
-  --color-tertiary: #71717a;   /* Muted gray text */
-  --color-accent: #60a5fa;     /* Brighter blue for dark mode */
+  --color-border: #3f3f46;
+  --color-secondary: #a1a1aa;
+  --color-tertiary: #71717a;
+  --color-accent: #60a5fa;
   --color-nav-link: #d4d4d8;
 }
 
@@ -75,6 +77,6 @@ body {
 
 @media (min-width: 768px) {
   .nav-mobile {
-    display: none;
+  display: none;
   }
 }

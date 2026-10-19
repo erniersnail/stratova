@@ -57,11 +57,6 @@ export default async function StrategiesSection() {
 
   const curveByRegion = { us: usCurve, india: indiaCurve } as const;
 
-  const maskStyle = {
-    maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-    WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-  };
-
   return (
     <Section spacing="none" className="py-12">
       <Container size="default">
@@ -130,11 +125,15 @@ export default async function StrategiesSection() {
 
                       <div className="absolute inset-y-0 right-0 w-[60%] z-10 pointer-events-none">
                         <div
-                          className="absolute inset-0 block dark:hidden opacity-90 bg-cover bg-right"
-                          style={{ ...maskStyle, backgroundImage: `url('${card.imageLight}')` }}
+                          className="absolute inset-0 bg-cover bg-right opacity-90 dark:opacity-0 transition-opacity duration-300"
+                          style={{
+                            maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            backgroundImage: `url('${card.imageLight}')`
+                          }}
                         />
                         <div
-                          className="absolute inset-0 hidden dark:block opacity-60 mix-blend-screen bg-cover bg-right"
+                          className="absolute inset-0 bg-cover bg-right opacity-0 dark:opacity-60 dark:mix-blend-screen transition-opacity duration-300"
                           style={{
                             maskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
                             WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
