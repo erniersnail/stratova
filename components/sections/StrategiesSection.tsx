@@ -85,8 +85,7 @@ export default async function StrategiesSection() {
                 <Link href={card.href} className="block h-full">
                   <Paper padding="none" hover className="h-full overflow-hidden">
                     <div className="flex relative">
-                      {/* Text Content */}
-                      <div className="relative z-20 flex-1 py-8 pr-4 pl-7 bg-surface/80 dark:bg-transparent">
+                      <div className="relative z-20 flex-1 py-8 pr-4 pl-7">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
                             {card.code}
@@ -125,32 +124,33 @@ export default async function StrategiesSection() {
                         </div>
                       </div>
 
-                      {/* Image Container - absolute to ensure it does not push text */}
-                      <div className="absolute inset-y-0 right-0 w-[60%] z-10 overflow-hidden pointer-events-none">
-                        {/* Light Mode Image */}
-                        <Image
-                          src={card.imageLight}
-                          alt=""
-                          fill
-                          className="object-cover object-center opacity-80 block dark:hidden"
-                          sizes="(max-width: 1024px) 60vw, 400px"
-                          style={{
-                            maskImage: "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
-                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
-                          }}
-                        />
-                        {/* Dark Mode Image - mix-blend-screen makes black transparent */}
-                        <Image
-                          src={card.imageDark}
-                          alt=""
-                          fill
-                          className="object-cover object-center hidden dark:block dark:mix-blend-screen dark:opacity-40"
-                          sizes="(max-width: 1024px) 60vw, 400px"
-                          style={{
-                            maskImage: "linear-gradient(to right, transparent 0%, transparent 40%, black 80%, black 100%)",
-                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 40%, black 80%, black 100%)",
-                          }}
-                        />
+                      <div className="absolute inset-y-0 right-0 w-[50%] z-10 overflow-hidden pointer-events-none">
+                        <div className="absolute inset-0 block dark:hidden">
+                          <Image
+                            src={card.imageLight}
+                            alt=""
+                            fill
+                            className="object-cover object-center opacity-90"
+                            sizes="(max-width: 1024px) 50vw, 400px"
+                            style={{
+                              maskImage: "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
+                              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 40%, black 100%)",
+                            }}
+                          />
+                        </div>
+                        <div className="absolute inset-0 hidden dark:block">
+                          <Image
+                            src={card.imageDark}
+                            alt=""
+                            fill
+                            className="object-cover object-center dark:mix-blend-screen dark:opacity-60"
+                            sizes="(max-width: 1024px) 50vw, 400px"
+                            style={{
+                              maskImage: "linear-gradient(to right, transparent 0%, transparent 40%, black 80%, black 100%)",
+                              WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 40%, black 80%, black 100%)",
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </Paper>
