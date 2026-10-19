@@ -84,8 +84,8 @@ export default async function StrategiesSection() {
               >
                 <Link href={card.href} className="block h-full">
                   <Paper padding="none" hover className="h-full overflow-hidden">
-                    <div className="flex relative min-h-[260px]">
-                      <div className="relative z-20 flex-1 py-8 pr-8 pl-7 w-full lg:w-[60%]">
+                    <div className="relative h-full flex min-h-[280px]">
+                      <div className="relative z-20 w-full py-8 pl-7 pr-[45%] lg:pr-[50%]">
                         <div className="flex items-center gap-3">
                           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-xs font-medium tracking-widest text-secondary">
                             {card.code}
@@ -124,17 +124,17 @@ export default async function StrategiesSection() {
                         </div>
                       </div>
 
-                      <div className="absolute inset-y-0 right-0 w-[45%] z-10 pointer-events-none">
+                      <div className="absolute inset-y-0 right-0 w-[50%] z-10 pointer-events-none">
                         <div className="absolute inset-0 block dark:hidden">
                           <Image
                             src={card.imageLight}
                             alt=""
                             fill
-                            className="object-cover object-right opacity-90"
-                            sizes="(max-width: 1024px) 45vw, 350px"
+                            className="object-contain object-right opacity-90"
+                            sizes="(max-width: 1024px) 50vw, 350px"
                             style={{
-                              maskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 60%, black 100%)",
-                              WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 60%, black 100%)",
+                              maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
                             }}
                           />
                         </div>
@@ -143,8 +143,8 @@ export default async function StrategiesSection() {
                             src={card.imageDark}
                             alt=""
                             fill
-                            className="object-cover object-right dark:opacity-60 dark:mix-blend-screen"
-                            sizes="(max-width: 1024px) 45vw, 350px"
+                            className="object-contain object-right dark:opacity-60 dark:mix-blend-screen"
+                            sizes="(max-width: 1024px) 50vw, 350px"
                             style={{
                               maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
                               WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
