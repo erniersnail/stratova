@@ -125,28 +125,32 @@ export default async function StrategiesSection() {
                       </div>
 
                       <div className="absolute inset-y-0 right-0 w-[65%] z-10 overflow-hidden pointer-events-none">
-                        <Image
-                          src={card.imageLight}
-                          alt=""
-                          fill
-                          className="object-cover object-right opacity-90 dark:opacity-0 transition-opacity duration-300"
-                          sizes="(max-width: 1024px) 65vw, 500px"
-                          style={{
-                            maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-                          }}
-                        />
-                        <Image
-                          src={card.imageDark}
-                          alt=""
-                          fill
-                          className="object-cover object-right opacity-0 dark:opacity-60 dark:mix-blend-screen transition-opacity duration-300"
-                          sizes="(max-width: 1024px) 65vw, 500px"
-                          style={{
-                            maskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
-                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
-                          }}
-                        />
+                        <div className="absolute inset-0 z-10 block dark:opacity-0 transition-opacity duration-300">
+                          <Image
+                            src={card.imageLight}
+                            alt=""
+                            fill
+                            className="object-cover object-right opacity-90"
+                            sizes="(max-width: 1024px) 65vw, 500px"
+                            style={{
+                              maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            }}
+                          />
+                        </div>
+                        <div className="absolute inset-0 z-0 hidden dark:block">
+                          <Image
+                            src={card.imageDark}
+                            alt=""
+                            fill
+                            className="object-cover object-right dark:opacity-60 dark:mix-blend-screen"
+                            sizes="(max-width: 1024px) 65vw, 500px"
+                            style={{
+                              maskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
+                              WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </Paper>
