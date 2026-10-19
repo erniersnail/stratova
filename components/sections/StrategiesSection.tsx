@@ -123,17 +123,17 @@ export default async function StrategiesSection() {
                         </div>
                       </div>
 
-                      <div className="absolute inset-y-0 right-0 w-[60%] z-10 pointer-events-none">
+                      <div className="absolute inset-y-0 right-0 w-[50%] z-10 pointer-events-none">
                         <div
-                          className="absolute inset-0 bg-cover bg-right opacity-90 dark:opacity-0 transition-opacity duration-300"
+                          className="absolute inset-0 bg-contain bg-right bg-no-repeat opacity-90 dark:opacity-0 transition-opacity duration-300"
                           style={{
-                            maskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
-                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 30%, black 100%)",
+                            maskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
+                            WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
                             backgroundImage: `url('${card.imageLight}')`
                           }}
                         />
                         <div
-                          className="absolute inset-0 bg-cover bg-right opacity-0 dark:opacity-60 dark:mix-blend-screen transition-opacity duration-300"
+                          className="absolute inset-0 bg-contain bg-right bg-no-repeat opacity-0 dark:opacity-60 dark:mix-blend-screen transition-opacity duration-300"
                           style={{
                             maskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
                             WebkitMaskImage: "linear-gradient(to right, transparent 0%, transparent 30%, black 70%, black 100%)",
