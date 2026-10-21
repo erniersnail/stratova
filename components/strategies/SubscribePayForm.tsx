@@ -3,28 +3,34 @@
 import { useActionState } from "react";
 import Button from "@/components/ui/Button";
 import { subscribeAction, type SubscribeState } from "@/lib/auth/actions";
+import { calculateTotalFee } from "@/lib/billing/cycles";
+import type { BillingCycleMonths } from "@/lib/billing/cycles";
 
 const initialState: SubscribeState = {};
 
 export default function SubscribePayForm({
   strategyId,
   fee,
-  feeStr,
+  cycle = 1,
 }: {
   strategyId: string;
   fee: number | null;
-  feeStr: string;
+  cycle?: BillingCycleMonths;
 }) {
   const [state, formAction, pending] = useActionState(
     subscribeAction,
     initialState,
   );
 
+  const totalFee = fee !== null ? calculateTotalFee(fee, cycle) : null;
+  const feeStr = totalFee !== null ? `₹${totalFee.toLocaleString("en-IN")}` : "—";
+
   const disabled = fee === null || pending;
 
   return (
     <form action={formAction} className="mt-4 space-y-4" noValidate>
       <input type="hidden" name="strategyId" value={strategyId} />
+      <input type="hidden" name="billingCycle" value={cycle} />
 
       {state.error && (
         <div

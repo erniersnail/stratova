@@ -8,6 +8,12 @@ import { TERMS_DOC_VERSION, type AuthState } from "@/lib/auth/constants";
 import { getAuthErrorMessage } from "@/lib/auth/error-messages";
 import { isValidEmail } from "@/lib/validation/email";
 import { nextRebalanceDate } from "@/lib/strategies/rebalance";
+import {
+  calculateTotalFee,
+  planForCycle,
+  isBillingCycleMonths,
+  type BillingCycleMonths,
+} from "@/lib/billing/cycles";
 
 /**
  * Signs a new user up.
@@ -262,6 +268,7 @@ export async function subscribeAction(
   formData: FormData,
 ): Promise<SubscribeState> {
   const strategyId = String(formData.get("strategyId") ?? "").trim();
+  const billingCycleRaw = String(formData.get("billingCycle") ?? "1").trim();
   const capitalRaw = String(formData.get("capital") ?? "").replace(
     /[,\s₹]/g,
     "",
@@ -270,6 +277,10 @@ export async function subscribeAction(
   if (!strategyId) {
     return { error: "Something went wrong. Please try again." };
   }
+  if (!isBillingCycleMonths(Number(billingCycleRaw))) {
+    return { error: "Invalid billing cycle." };
+  }
+  const billingCycle = Number(billingCycleRaw) as BillingCycleMonths;
   if (!/^\d+$/.test(capitalRaw)) {
     return { error: "Enter an amount in rupees (whole numbers only)." };
   }
@@ -302,6 +313,7 @@ export async function subscribeAction(
   if (strategy.fee_per_rebalance === null) {
     return { error: "Subscription fee not configured. Contact support." };
   }
+  const totalFee = calculateTotalFee(strategy.fee_per_rebalance, billingCycle);
 
   const { data: existing } = await supabase
     .from("subscriptions")
@@ -324,7 +336,8 @@ export async function subscribeAction(
       user_id: user.id,
       strategy_id: strategyId,
       status: "PENDING",
-      plan: "standard",
+      plan: planForCycle(billingCycle),
+      price: totalFee,
       capital_allocated: capital,
       started_at: null,
     })
@@ -340,7 +353,7 @@ export async function subscribeAction(
     .insert({
       subscription_id: subData.id,
       rebalance_date: rebalanceDate,
-      amount: strategy.fee_per_rebalance,
+      amount: totalFee,
       status: "PENDING",
     })
     .select("id")

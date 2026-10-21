@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cycleMonthsForPlan, expiryForCycle } from "@/lib/billing/cycles";
 import { createClient } from "../supabase/server";
 import { createServiceClient } from "./recommendations";
 
@@ -106,6 +107,18 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
   }
   if (!payment) throw new Error("Payment not found");
 
+  // Resolve the subscription's plan so multi-month purchases grant the
+  // correct access duration (not just the single rebalance month).
+  const { data: subRow } = await admin
+    .from("subscriptions")
+    .select("plan")
+    .eq("id", payment.subscription_id)
+    .maybeSingle();
+  const months = cycleMonthsForPlan(
+    (subRow?.plan as string | null) ?? null,
+  );
+  const expiresAt = expiryForCycle(payment.rebalance_date, months);
+
   const { error: payErr } = await admin
     .from("subscription_payments")
     .update({ status: "PAID", paid_at: nowIso })
@@ -121,7 +134,7 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
     .update({
       status: "ACTIVE",
       started_at: payment.rebalance_date,
-      expires_at: endOfMonthIst(payment.rebalance_date),
+      expires_at: expiresAt,
     })
     .eq("id", payment.subscription_id)
     .eq("status", "PENDING");
