@@ -10,18 +10,18 @@ type PhilosophyBlock = {
 const PHILOSOPHY_BLOCKS: PhilosophyBlock[] = [
   {
     number: "01",
-    heading: "Evidence over opinion",
+    heading: "Robustness and Out-of-Sample Testing",
     body: "Investment decisions should emerge from research, testing, and observable data rather than narratives.",
   },
   {
     number: "02",
-    heading: "Process over prediction",
+    heading: "Systematic Rule-Based Execution",
     body: "We believe disciplined investment processes are more reliable than attempting to forecast short-term market movements.",
   },
   {
     number: "03",
-    heading: "Continuous improvement",
-    body: "Every strategy is monitored, reviewed, and refined as new information and market conditions evolve.",
+    heading: "Execution and Friction",
+    body: "We model transaction costs and slippage to ensure our edge survives real-world friction. While the strategies do not use active risk controls like stop-losses, we rigorously analyze historical drawdowns to understand what to expect in live markets.",
   },
 ];
 

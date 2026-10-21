@@ -37,9 +37,9 @@ export default function Hero() {
             Built to compound.
           </h1>
           <p className="mt-8 max-w-[560px] text-lg leading-[1.7] text-foreground/85">
-            Simplicial Capital applies the same rigor quant funds use — algorithms,
-            data, discipline — bringing institutional-grade systematic
-            research to investors.
+            We develop systematic trading strategies by testing market
+            hypotheses against data. Each strategy is evaluated for robustness,
+            transaction costs, and historical drawdown before deployment.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="/strategies" variant="primary" size="md">

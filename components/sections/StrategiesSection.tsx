@@ -66,7 +66,7 @@ export default async function StrategiesSection() {
             Our Strategies
           </h2>
           <p className={`${typography.body} mt-4 text-secondary`}>
-            Rules based. Evidence driven. Built to outperform.
+            Mathematical models. Transparent rules. Systematic execution.
           </p>
         </div>
         <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
