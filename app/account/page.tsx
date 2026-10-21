@@ -10,23 +10,11 @@ import { getAuthedUser, type AuthedUser } from "@/lib/auth/session";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import { signOutAction } from "@/lib/auth/actions";
 import { typography } from "@/lib/typography";
-import ProfileForm from "@/components/account/ProfileForm";
 
 export const metadata: Metadata = {
   title: "Your account — Simplicial Capital",
   description: "Your Simplicial Capital account, profile, and consent history.",
 };
-
-function formatDate(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function AccountSkeleton() {
   return (
@@ -73,25 +61,11 @@ async function AccountContent({ user }: { user: AuthedUser }) {
 
   await ensureProfile(supabase, user);
 
-  const [{ data: profile }, { data: consents }, { data: subscriptions }] =
-    await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-      supabase
-        .from("consents")
-        .select("doc_type, doc_version, accepted_at")
-        .eq("user_id", user.id)
-        .order("accepted_at", { ascending: false }),
-      supabase
-        .from("subscriptions")
-        .select("strategy_id,status,plan")
-        .eq("user_id", user.id)
-        .eq("status", "ACTIVE"),
-    ]);
-
-  const hasPaid = (subscriptions ?? []).some(
-    (s) => s.strategy_id !== null && s.strategy_id !== "",
-  );
-  const planLabel = hasPaid ? "Subscribed" : null;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
 
   return (
     <>
@@ -105,30 +79,23 @@ async function AccountContent({ user }: { user: AuthedUser }) {
           <div className="flex flex-col gap-1 border-b border-border pb-4 sm:flex-row sm:justify-between">
             <dt className="text-sm text-secondary">Full name</dt>
             <dd className="text-sm font-medium text-foreground">
-              {profile?.full_name ?? (
-                <span className="font-normal text-secondary">
-                  Not set —{" "}
-                  <span className="underline">
-                    complete your profile during KYC verification
+              {profile?.full_name ??
+                user.fullName ?? (
+                  <span className="font-normal text-secondary">
+                    Not set —{" "}
+                    <span className="underline">
+                      complete your profile during KYC verification
+                    </span>
                   </span>
-                </span>
-              )}
+                )}
             </dd>
           </div>
-          <div className={`flex flex-col gap-1 sm:flex-row sm:justify-between${planLabel ? " border-b border-border pb-4" : ""}`}>
-            <dt className="text-sm text-secondary">KYC status</dt>
+          <div className="flex flex-col gap-1 border-b border-border pb-4 sm:flex-row sm:justify-between">
+            <dt className="text-sm text-secondary">Phone number</dt>
             <dd className="text-sm font-medium text-foreground">
-              {profile?.kyc_status ?? "pending"}
+              {(profile as { phone?: string | null })?.phone || "Not set"}
             </dd>
           </div>
-          {planLabel && (
-            <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-              <dt className="text-sm text-secondary">Plan</dt>
-              <dd className="text-sm font-medium text-foreground">
-                {planLabel}
-              </dd>
-            </div>
-          )}
         </dl>
 
         {!profile && (
@@ -139,53 +106,6 @@ async function AccountContent({ user }: { user: AuthedUser }) {
               verification — before any subscription can begin.
             </p>
           </div>
-        )}
-      </section>
-
-      <section className="mt-16">
-        <h2 className="text-xl font-semibold tracking-tight">Edit profile</h2>
-        <p className={`${typography.body} mt-3 text-sm text-secondary`}>
-          Update your name and phone number. Your email is managed through
-          sign-in and can&apos;t be changed here.
-        </p>
-
-        <div className="mt-6 max-w-[440px]">
-          <ProfileForm
-            initialFullName={profile?.full_name ?? ""}
-            initialPhone={(profile as { phone?: string | null })?.phone ?? ""}
-          />
-        </div>
-      </section>
-
-      <section className="mt-16">
-        <h2 className="text-xl font-semibold tracking-tight">
-          Consent history
-        </h2>
-        <p className={`${typography.body} mt-3 text-sm text-secondary`}>
-          A record of every document you have agreed to, and when.
-        </p>
-
-        {!consents || consents.length === 0 ? (
-          <p className="mt-6 rounded-md border border-border bg-surface px-4 py-3 text-sm text-secondary">
-            No consents recorded yet.
-          </p>
-        ) : (
-          <ul className="mt-6 divide-y divide-border border-y border-border">
-            {consents.map((consent, index) => (
-              <li
-                key={`${consent.doc_type}-${consent.accepted_at}-${index}`}
-                className="flex flex-col gap-1 py-4 sm:flex-row sm:justify-between"
-              >
-                <span className="text-sm font-medium text-foreground">
-                  {consent.doc_type}
-                </span>
-                <span className="text-sm text-secondary">
-                  {consent.doc_version} · accepted{" "}
-                  {formatDate(consent.accepted_at)}
-                </span>
-              </li>
-            ))}
-          </ul>
         )}
       </section>
 
