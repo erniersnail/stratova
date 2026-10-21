@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { typography } from "@/lib/typography";
 import SubscribePayForm from "@/components/strategies/SubscribePayForm";
 import {
   calculateTotalFee,
@@ -24,9 +25,8 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
 
   return (
     <>
-      <div className="mb-8 flex flex-wrap items-center gap-3">
-        <span className="text-sm font-medium text-foreground">Billing cycle</span>
-        <div className="inline-flex rounded-md border border-border bg-surface p-1">
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex rounded-md border border-border p-1 bg-surface">
           {BILLING_CYCLES.map((c) => (
             <button
               key={c.months}
@@ -49,7 +49,7 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="mx-auto max-w-4xl space-y-6">
         {strategies.map((strategy) => {
           const totalFee =
             strategy.fee !== null ? calculateTotalFee(strategy.fee, cycle) : null;

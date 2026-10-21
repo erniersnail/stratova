@@ -554,10 +554,9 @@ export default async function StrategyDetailPage({
                     Fee: <span className="text-foreground">{feeStr}</span>
                   </p>
                   <SubscribePayForm
-                    strategyId={strategy.id}
-                    fee={fee}
-                    feeStr={feeStr}
-                  />
+                      strategyId={strategy.id}
+                      fee={fee}
+                    />
                 </div>
               ) : (
                 <div className="rounded-md border border-border bg-surface px-4 py-4">

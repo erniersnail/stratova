@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function PricingPage() {
   const allStrategies = await getPublicStrategies();
-  const strategies = allStrategies.filter((s) => s.is_subscribable);
+  const rawStrategies = allStrategies.filter((s) => s.is_subscribable);
 
   // Fetch current user's subscriptions to hide forms if already subscribed
   const supabase = await createClient();
@@ -34,6 +34,17 @@ export default async function PricingPage() {
       });
     }
   }
+
+  // Transform raw strategies to PricingStrategy format
+  const strategies = rawStrategies.map((s) => ({
+    id: s.id,
+    name: s.name,
+    short_description: s.short_description ?? null,
+    benchmark: s.benchmark ?? null,
+    fee: s.fee_per_rebalance ?? null,
+    nextDateStr: formatRebalanceDate(nextRebalanceDate(s.slug)),
+    subStatus: userSubs[s.id],
+  }));
 
   return (
     <main>
