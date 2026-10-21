@@ -21,7 +21,7 @@ const PHILOSOPHY_BLOCKS: PhilosophyBlock[] = [
   {
     number: "03",
     heading: "Execution and Friction",
-    body: "We model transaction costs and slippage to ensure our edge survives real-world friction. While the strategies do not use active risk controls like stop-losses, we rigorously analyze historical drawdowns to understand what to expect in live markets.",
+    body: "We model transaction costs, slippage, and historical drawdowns to ensure our edge survives real-world friction and to understand what to expect in live markets.",
   },
 ];
 
