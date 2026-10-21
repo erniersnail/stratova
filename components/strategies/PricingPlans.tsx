@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import { useState } from "react";
 import { typography } from "@/lib/typography";
 import SubscribePayForm from "@/components/strategies/SubscribePayForm";
@@ -24,8 +26,9 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
   const [cycle, setCycle] = useState<BillingCycleMonths>(1);
 
   return (
-    <>
-      <div className="flex justify-center mb-8">
+    <div className="mx-auto max-w-4xl space-y-6">
+      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="flex flex-col items-center justify-center mb-10 gap-3">
         <div className="inline-flex rounded-md border border-border p-1 bg-surface">
           {BILLING_CYCLES.map((c) => (
             <button
@@ -42,9 +45,9 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
             </button>
           ))}
         </div>
-        {cycle !== 1 && (
-          <span className="text-xs text-tertiary">
-            {discountPercentFor(cycle)}% discount applied
+        {cycle > 1 && (
+          <span className="text-xs text-secondary tracking-wide uppercase">
+            {cycle === 3 ? "5% discount applied" : "10% discount applied"}
           </span>
         )}
       </div>
@@ -59,11 +62,8 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
           const subStatus = strategy.subStatus;
 
           return (
-            <div
-              key={strategy.id}
-              className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 rounded-lg border border-border bg-surface p-6 sm:p-8 shadow-sm transition-colors hover:border-foreground/20"
-            >
-              <div className="flex-1 max-w-2xl">
+            <div className="border border-border rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+              <div className="md:col-span-7 space-y-4">
                 <h2 className="text-2xl font-serif text-foreground">
                   {strategy.name}
                 </h2>
@@ -73,7 +73,7 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
                   </p>
                 )}
 
-                <div className="mt-6 flex flex-wrap gap-x-12 gap-y-4 border-t border-border pt-4">
+                <div className="grid grid-cols-3 gap-4 text-sm mt-4 border-t border-border pt-4">
                   <div>
                     <p className="text-xs text-tertiary uppercase tracking-wide">
                       Next rebalance
@@ -99,7 +99,7 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
                 </div>
               </div>
 
-              <div className="w-full lg:w-[380px] shrink-0 lg:border-l lg:border-border lg:pl-8">
+              <div className="md:col-span-5 w-full flex flex-col justify-center">
                 {subStatus ? (
                   <div className="rounded-md border border-border bg-surface-hover px-6 py-6 text-center h-full flex flex-col items-center justify-center">
                     <span className="inline-flex items-center gap-2 rounded-full border border-foreground/20 bg-background px-4 py-1.5 text-sm font-semibold uppercase tracking-wide text-foreground">
@@ -133,6 +133,6 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
           );
         })}
       </div>
-    </>
+    </div>
   );
 }
