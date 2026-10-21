@@ -5,36 +5,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TERMS_DOC_VERSION, type AuthState } from "@/lib/auth/constants";
+import { getAuthErrorMessage } from "@/lib/auth/error-messages";
 import { isValidEmail } from "@/lib/validation/email";
 import { nextRebalanceDate } from "@/lib/strategies/rebalance";
-
-/** Maps a Supabase error into copy that never reveals whether an email exists. */
-function authErrorMessage(raw: string): string {
-  const message = raw.toLowerCase();
-
-  if (message.includes("already registered") || message.includes("already been registered")) {
-    return "An account already exists for that email. Try logging in instead.";
-  }
-  if (message.includes("invalid login credentials")) {
-    return "Incorrect email or password.";
-  }
-  if (message.includes("password should be at least")) {
-    return "Password must be at least 8 characters.";
-  }
-  if (message.includes("new password should be different")) {
-    return "Choose a password you haven't used before.";
-  }
-  if (message.includes("auth session missing") || message.includes("invalid_grant")) {
-    return "Your reset link has expired. Request a new one.";
-  }
-  if (message.includes("email rate limit") || message.includes("rate limit")) {
-    return "Too many attempts. Please wait a moment and try again.";
-  }
-  if (message.includes("fetch") || message.includes("network")) {
-    return "Network error. Please check your connection and try again.";
-  }
-  return "Something went wrong. Please try again.";
-}
 
 /**
  * Signs a new user up.
@@ -76,7 +49,7 @@ export async function signUpAction(
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
-    return { error: authErrorMessage(error.message), fields };
+    return { error: getAuthErrorMessage(error), fields };
   }
 
   // No session => Supabase requires email confirmation before sign-in.
@@ -122,7 +95,7 @@ export async function signInAction(
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: authErrorMessage(error.message), fields };
+    return { error: getAuthErrorMessage(error), fields };
   }
 
   revalidatePath("/", "layout");
@@ -401,7 +374,7 @@ export async function resetPasswordAction(
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
-    return { error: authErrorMessage(error.message) };
+    return { error: getAuthErrorMessage(error) };
   }
 
   revalidatePath("/", "layout");
