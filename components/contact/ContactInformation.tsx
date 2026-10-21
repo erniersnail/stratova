@@ -1,43 +1,4 @@
 import SectionHeader from "@/components/common/SectionHeader";
-import { typography } from "@/lib/typography";
-
-const CONTACTS = [
-  {
-    title: "Founder",
-    desc: "Siddharth Kumar, Founder & Research Analyst",
-    email: "siddharth@simplicialcapital.com",
-  },
-  {
-    title: "Business Email",
-    desc: "For general business inquiries and partnership discussions.",
-    email: "business@simplicialcapital.com",
-  },
-  {
-    title: "Research Inquiries",
-    desc: "For questions about our research, methodology, or data.",
-    email: "research@simplicialcapital.com",
-  },
-  {
-    title: "Support",
-    desc: "For subscription, payment, or account issues.",
-    email: "support@simplicialcapital.com",
-  },
-  {
-    title: "Media",
-    desc: "For press inquiries, interviews, and media requests.",
-    email: "media@simplicialcapital.com",
-  },
-  {
-    title: "General Questions",
-    desc: "For all other questions about Simplicial Capital.",
-    email: "info@simplicialcapital.com",
-  },
-];
-
-const OFFICE = {
-  city: "Bangalore, India",
-  phone: "+91 90195 21998",
-};
 
 export default function ContactInformation() {
   return (
@@ -49,42 +10,30 @@ export default function ContactInformation() {
         centered={false}
       />
       <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-        {CONTACTS.map((c) => (
-          <div
-            key={c.title}
-            className="rounded-lg border border-border bg-surface p-6"
-          >
-            <h3 className="text-sm font-medium text-foreground">{c.title}</h3>
-            <p className={`${typography.body} mt-2 text-secondary`}>{c.desc}</p>
-            <a
-              href={`mailto:${c.email}`}
-              className="mt-3 block text-sm font-medium text-foreground transition-colors hover:text-secondary"
-            >
-              {c.email}
-            </a>
+        <div className="rounded-lg border border-border bg-surface p-6">
+          <h3 className="text-lg font-semibold mb-2">Founder</h3>
+          <p className="text-secondary mb-4 text-sm">Siddharth Kumar, Founder &amp; Research Analyst</p>
+          <div className="space-y-2 text-sm">
+            <p>
+              <span className="text-secondary">Email:</span>{" "}
+              <a href="mailto:siddharth@simplicialcapital.com" className="hover:text-accent">siddharth@simplicialcapital.com</a>
+            </p>
+            <p>
+              <span className="text-secondary">Phone:</span>{" "}
+              <a href="tel:+919019521998" className="hover:text-accent">+91 90195 21998</a>
+            </p>
           </div>
-        ))}
-      </div>
-
-      <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="rounded-lg border border-border bg-surface p-6">
-          <h3 className="text-sm font-medium text-foreground">Office</h3>
-          <p className={`${typography.body} mt-2 text-secondary`}>
-            {OFFICE.city}
-          </p>
         </div>
+
         <div className="rounded-lg border border-border bg-surface p-6">
-          <h3 className="text-sm font-medium text-foreground">Phone</h3>
-          <p className={`${typography.body} mt-2 text-secondary`}>
-            For non-advisory inquiries only. We do not provide investment
-            advice over the phone.
-          </p>
-          <a
-            href={`tel:${OFFICE.phone.replace(/\s/g, "")}`}
-            className="mt-3 block text-sm font-medium text-foreground transition-colors hover:text-secondary"
-          >
-            {OFFICE.phone}
-          </a>
+          <h3 className="text-lg font-semibold mb-2">Business Inquiry</h3>
+          <p className="text-secondary mb-4 text-sm">For general business inquiries and partnership discussions.</p>
+          <div className="space-y-2 text-sm">
+            <p>
+              <span className="text-secondary">Email:</span>{" "}
+              <a href="mailto:business@simplicialcapital.com" className="hover:text-accent">business@simplicialcapital.com</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
