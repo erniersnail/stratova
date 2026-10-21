@@ -52,6 +52,12 @@ export async function signUpAction(
     return { error: getAuthErrorMessage(error), fields };
   }
 
+  // Supabase can report success while silently returning no identities for an
+  // email that already exists. Treat that as an existing-account error.
+  if (data?.user && data.user.identities && data.user.identities.length === 0) {
+    return { error: "An account with this email already exists. Please sign in.", fields };
+  }
+
   // No session => Supabase requires email confirmation before sign-in.
   if (!data.session) {
     redirect("/signup/confirm");
