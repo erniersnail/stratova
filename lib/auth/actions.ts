@@ -9,7 +9,6 @@ import { getAuthErrorMessage } from "@/lib/auth/error-messages";
 import { isValidEmail } from "@/lib/validation/email";
 import { nextRebalanceDate } from "@/lib/strategies/rebalance";
 import {
-  calculateTotalFee,
   planForCycle,
   isBillingCycleMonths,
   type BillingCycleMonths,
@@ -252,13 +251,16 @@ export type SubscribeState = {
   success?: string;
 };
 
-const MIN_ALLOCATION = 10_000;
+const MIN_ALLOCATION = 100_000;
 const MAX_ALLOCATION = 10_000_000;
 
 /**
  * Creates a PENDING subscription + PENDING payment for the next rebalance,
- * then redirects to /checkout/[paymentId]. Fee is read from the strategy's
- * `fee_per_rebalance` column — never hardcoded here.
+ * then redirects to /checkout/[paymentId].
+ *
+ * The fee is derived from the capital the user allocates: a 2% annual
+ * management fee billed monthly, with a ₹2,000/month floor and a discount for
+ * longer billing cycles.
  *
  * Subscription stays PENDING until an admin marks the payment PAID (via
  * markPaymentPaid) or the VM writer promotes it at the rebalance (Phase 16b).
@@ -286,11 +288,19 @@ export async function subscribeAction(
   }
   const capital = Number(capitalRaw);
   if (capital < MIN_ALLOCATION) {
-    return { error: "Minimum allocation is ₹10,000." };
+    return { error: "Minimum capital allocation is ₹1,00,000." };
   }
   if (capital > MAX_ALLOCATION) {
     return { error: "Maximum allocation is ₹1,00,00,000." };
   }
+
+  // 2% annual management fee, billed monthly, with a ₹2,000/month floor.
+  const annualFee = capital * 0.02;
+  const monthlyFee = annualFee / 12;
+  const baseFee = Math.max(2000, monthlyFee);
+  const cycleMonths = Number(formData.get("billingCycle")) || 1;
+  const cycleDiscount = cycleMonths === 1 ? 1 : cycleMonths === 3 ? 0.95 : 0.9;
+  const totalFee = Math.round(baseFee * cycleMonths * cycleDiscount);
 
   const supabase = await createClient();
   const {
@@ -303,17 +313,13 @@ export async function subscribeAction(
 
   const { data: strategy } = await supabase
     .from("strategies")
-    .select("id, slug, fee_per_rebalance")
+    .select("id, slug")
     .eq("id", strategyId)
     .maybeSingle();
 
   if (!strategy) {
     return { error: "Something went wrong. Please try again." };
   }
-  if (strategy.fee_per_rebalance === null) {
-    return { error: "Subscription fee not configured. Contact support." };
-  }
-  const totalFee = calculateTotalFee(strategy.fee_per_rebalance, billingCycle);
 
   const { data: existing } = await supabase
     .from("subscriptions")
