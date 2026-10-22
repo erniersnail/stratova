@@ -41,7 +41,7 @@ export default function SubscribePayForm({
         </div>
       )}
 
-      <div>
+      <div className="space-y-2">
         <label
           htmlFor="capital"
           className="block text-sm font-medium text-foreground mb-1.5"
@@ -61,6 +61,12 @@ export default function SubscribePayForm({
         />
         <p className="mt-1.5 text-xs text-tertiary">
           Between ₹10,000 and ₹1,00,00,000.
+        </p>
+        <p className="text-xs text-secondary mt-1.5 leading-relaxed">
+          <span className="font-medium text-foreground">Note:</span> Position
+          sizes and share quantities are calculated based on this exact figure.
+          Fees are derived from your allocated capital. Please ensure the amount
+          is accurate.
         </p>
       </div>
 
