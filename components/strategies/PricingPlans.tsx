@@ -1,14 +1,11 @@
 "use client";
 
-"use client";
-
 import { useState } from "react";
 import { typography } from "@/lib/typography";
 import SubscribePayForm from "@/components/strategies/SubscribePayForm";
 import {
   calculateTotalFee,
   BILLING_CYCLES,
-  discountPercentFor,
   type BillingCycleMonths,
 } from "@/lib/billing/cycles";
 
@@ -27,7 +24,6 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div className="mx-auto max-w-4xl space-y-6">
       <div className="flex flex-col items-center justify-center mb-10 gap-3">
         <div className="inline-flex rounded-md border border-border p-1 bg-surface">
           {BILLING_CYCLES.map((c) => (
@@ -52,7 +48,7 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
         )}
       </div>
 
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="space-y-6">
         {strategies.map((strategy) => {
           const totalFee =
             strategy.fee !== null ? calculateTotalFee(strategy.fee, cycle) : null;
@@ -62,7 +58,10 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
           const subStatus = strategy.subStatus;
 
           return (
-            <div className="border border-border rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+            <div
+              key={strategy.id}
+              className="border border-border rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center"
+            >
               <div className="md:col-span-7 space-y-4">
                 <h2 className="text-2xl font-serif text-foreground">
                   {strategy.name}
