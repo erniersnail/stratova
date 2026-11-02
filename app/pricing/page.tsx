@@ -5,7 +5,7 @@ import PricingPlans from "@/components/strategies/PricingPlans";
 import { getPublicStrategies } from "@/lib/strategies/fetch";
 import { nextRebalanceDate, formatRebalanceDate } from "@/lib/strategies/rebalance";
 import { createClient } from "@/lib/supabase/server";
-import { typography } from "@/lib/typography";
+
 
 export const metadata: Metadata = {
   title: "Pricing & Subscriptions — Simplicial Capital",

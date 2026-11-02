@@ -355,7 +355,7 @@ function MultiSeriesChart({
     pos === 0 ? "start" : pos === labelIdx.length - 1 ? "end" : "middle";
 
   const names = series.map((s) => s.name).join(", ");
-  const primary = series.find((s) => s.emphasis !== "secondary") ?? series[0];
+
 
   const labelPositions = staggerLabels(
     series.map((s) => ({

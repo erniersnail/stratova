@@ -18,7 +18,7 @@ import {
 } from "@/lib/strategies/fetch";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/admin/recommendations";
-import { formatIST } from "@/lib/format/date";
+
 import {
   nextRebalanceDate,
   formatRebalanceDate,
@@ -31,7 +31,6 @@ function isRegion(value: string): value is Region {
   return value === "india" || value === "us";
 }
 
-// Combined-curve window used everywhere else on the site.
 const WINDOW_START = "2026-08-03";
 
 function formatDate(value: string | null): string {
@@ -156,7 +155,6 @@ export default async function StrategyDetailPage({
         existing.last = p.total_value;
       }
     }
-    // Sort by the raw YYYY-MM string to ensure chronological order (descending)
     const sortedMonths = Array.from(monthlyMap.keys()).sort().reverse();
     
     for (const monthKey of sortedMonths) {
@@ -199,7 +197,6 @@ export default async function StrategyDetailPage({
 
   const hasAccess = existingSub?.status === "ACTIVE";
 
-  // Securely fetch real returns for the teaser without exposing names/prices to the browser
   let teaserPicks: { id: string; returnPct: number | null }[] = [];
   if (!hasAccess) {
     try {
@@ -228,15 +225,18 @@ export default async function StrategyDetailPage({
   const fee = strategy.fee_per_rebalance ?? null;
   const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
 
-  const targetShares = (r: Recommendation): number | null =>
-    capital !== null &&
-    r.weight_pct !== null &&
-    r.price !== null &&
-    r.price > 0
-      ? Math.floor((capital * r.weight_pct) / r.price)
-      : null;
+  // FIXED: Uses current_price for target shares calculation
+  const targetShares = (r: Recommendation): number | null => {
+    const currentPrice = r.current_price || r.price;
+    return capital !== null &&
+      r.weight_pct !== null &&
+      currentPrice !== null &&
+      currentPrice > 0
+        ? Math.floor((capital * r.weight_pct) / currentPrice)
+        : null;
+  };
 
-    const columns = [
+  const columns = [
     {
       key: "symbol",
       header: "Symbol",
@@ -262,7 +262,7 @@ export default async function StrategyDetailPage({
     },
     {
       key: "price",
-      header: "Entry Price",
+      header: "Strategy Entry",
       render: (r: Recommendation) => (
         <span className="text-foreground">{r.price ?? "—"}</span>
       ),
@@ -276,7 +276,7 @@ export default async function StrategyDetailPage({
     },
     {
       key: "return",
-      header: "Since Rec.",
+      header: "Strategy P&L",
       render: (r: Recommendation) => {
         const ret = r.current_price && r.price ? ((r.current_price / r.price) - 1) * 100 : null;
         if (ret === null) return <span className="text-foreground">—</span>;
@@ -388,8 +388,6 @@ export default async function StrategyDetailPage({
           </dl>
         </div>
 
-
-
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>
             About this strategy
@@ -409,7 +407,7 @@ export default async function StrategyDetailPage({
           </div>
         </div>
 
-                {showChart && (
+        {showChart && (
           <div className="mt-16">
             <h2 className={`${typography.h3} text-foreground`}>Performance since inception</h2>
             <p className={`${typography.body} mt-3 text-foreground`}>
@@ -417,7 +415,6 @@ export default async function StrategyDetailPage({
             </p>
 
             <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* Chart (Left, 2/3) */}
               <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">
                 <EquityCurveChart series={chartSeries} height={280} />
 
@@ -442,7 +439,6 @@ export default async function StrategyDetailPage({
                 )}
               </div>
 
-              {/* Monthly Returns (Right, 1/3) */}
               {monthlyReturns.length > 0 && (
                 <div className="lg:col-span-1 rounded-md border border-border bg-surface px-6 py-6">
                   <h3 className="text-xs font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
@@ -471,7 +467,6 @@ export default async function StrategyDetailPage({
                             </td>
                           </tr>
                         )}
-
                       </tbody>
                     </table>
                   </div>
@@ -485,10 +480,9 @@ export default async function StrategyDetailPage({
             </p>
           </div>
         )}
+
         <div className="mt-16">
-          <h2 className={`${typography.h3} text-foreground`}>
-            Current picks
-          </h2>
+          <h2 className={`${typography.h3} text-foreground`}>Current picks</h2>
 
           {!user ? (
             <div className="mt-4 rounded-md border border-border bg-surface px-4 py-6">
@@ -554,9 +548,9 @@ export default async function StrategyDetailPage({
                     Fee: <span className="text-foreground">{feeStr}</span>
                   </p>
                   <SubscribePayForm
-                      strategyId={strategy.id}
-                      fee={fee}
-                    />
+                    strategyId={strategy.id}
+                    fee={fee}
+                  />
                 </div>
               ) : (
                 <div className="rounded-md border border-border bg-surface px-4 py-4">

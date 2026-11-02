@@ -355,9 +355,10 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                 header: "Target Shares",
                 render: (row) => {
                   const cap = capitalByStrategy.get(row.strategy_id);
+                  const currentPrice = row.current_price || row.price;
                   const target =
-                    cap && row.weight_pct && row.price
-                      ? Math.floor((cap * row.weight_pct) / row.price)
+                    cap && row.weight_pct && currentPrice
+                      ? Math.floor((cap * row.weight_pct) / currentPrice)
                       : null;
                   return (
                     <span className="text-foreground">

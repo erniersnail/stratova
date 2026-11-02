@@ -56,27 +56,7 @@ export async function updateStrategyAdmin(
   }
 }
 
-function endOfMonthIst(rebalanceDate: string): string {
-  const [yStr, mStr] = rebalanceDate.split("-");
-  const year = Number(yStr);
-  const month = Number(mStr);
-  if (!Number.isFinite(year) || !Number.isFinite(month)) {
-    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-    const nowIst = new Date(Date.now() + IST_OFFSET_MS);
-    const expiresAtMs = Date.UTC(
-      nowIst.getUTCFullYear(),
-      nowIst.getUTCMonth() + 1,
-      0,
-      18,
-      29,
-      59,
-      999,
-    );
-    return new Date(expiresAtMs).toISOString();
-  }
-  const expiresAtMs = Date.UTC(year, month, 0, 18, 29, 59, 999);
-  return new Date(expiresAtMs).toISOString();
-}
+
 
 export async function markPaymentPaid(paymentId: string): Promise<void> {
   const authClient = await createClient();
