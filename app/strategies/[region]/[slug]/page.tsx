@@ -180,12 +180,13 @@ export default async function StrategyDetailPage({
     id: string;
     capital_allocated: number | null;
     status: string;
+    started_at: string | null;
   };
   let existingSub: ExistingSub | null = null;
   if (user) {
     const { data: subs } = await supabase
       .from("subscriptions")
-      .select("id, capital_allocated, status")
+      .select("id, capital_allocated, status, started_at")
       .eq("user_id", user.id)
       .eq("strategy_id", strategy.id)
       .in("status", ["PENDING", "ACTIVE"])
@@ -226,14 +227,18 @@ export default async function StrategyDetailPage({
   const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
 
   const targetShares = (r: Recommendation): string | null => {
-    if (capital === null || r.weight_pct === null || r.price === null) {
+    if (capital === null || r.weight_pct === null) {
+      return null;
+    }
+    const isNew = existingSub?.started_at && r.as_of && new Date(existingSub.started_at) >= new Date(r.as_of);
+    const calcPrice = isNew ? (r.rebalance_price || r.price) : (r.current_price || r.price);
+    if (calcPrice === null || calcPrice <= 0) {
       return null;
     }
     const isUS =
       strategy?.slug === "us-equity-leadership" ||
       r.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-    const rawPrice = r.price;
-    const targetSharesRaw = (capital * r.weight_pct) / rawPrice;
+    const targetSharesRaw = (capital * r.weight_pct) / calcPrice;
     const targetShares = Math.floor(targetSharesRaw).toString();
     return targetShares;
   };
@@ -265,9 +270,11 @@ export default async function StrategyDetailPage({
     {
       key: "price",
       header: "Strategy Entry",
-      render: (r: Recommendation) => (
-        <span className="text-foreground">{r.price ?? "—"}</span>
-      ),
+      render: (r: Recommendation) => {
+        const isNew = existingSub?.started_at && r.as_of && new Date(existingSub.started_at) >= new Date(r.as_of);
+        const displayPrice = isNew ? (r.rebalance_price || r.price) : r.price;
+        return <span className="text-foreground">{displayPrice ?? "—"}</span>;
+      },
     },
     {
       key: "current_price",
