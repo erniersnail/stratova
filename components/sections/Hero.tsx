@@ -17,7 +17,15 @@ export default function Hero() {
           alt=""
           fill
           priority
-          className="object-cover object-right dark:opacity-40 dark:mix-blend-luminosity"
+          className="object-cover object-right block dark:hidden"
+          sizes="100vw"
+        />
+        <Image
+          src="/images/hero-dark.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-right hidden dark:block"
           sizes="100vw"
         />
       </div>
