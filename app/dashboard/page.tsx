@@ -155,6 +155,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
     capital: number;
     current: number;
     returnPct: string;
+    currency: string;
   };
   const clientWindows: ClientWindow[] = [];
   for (const s of paidSubscriptions) {
@@ -168,6 +169,8 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
     if (window.length < 2 || window[0].total_value <= 0) continue;
     const first = window[0].total_value;
     const last = window[window.length - 1].total_value;
+    const region = strategyRegions.get(s.strategy_id);
+    const currency = region === "us" ? "$" : "₹";
     clientWindows.push({
       subscriptionId: s.id,
       name: strategyNames.get(s.strategy_id) ?? "Strategy",
@@ -175,6 +178,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
       capital: s.capital_allocated,
       current: s.capital_allocated * (last / first),
       returnPct: (((last / first) - 1) * 100).toFixed(2),
+      currency,
     });
   }
   return (
@@ -303,8 +307,8 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                   key={w.subscriptionId}
                   className="text-sm text-foreground"
                 >
-                  {w.name} — Since {w.startedOn}: ₹
-                  {w.capital.toLocaleString("en-IN")} → ₹
+                  {w.name} — Since {w.startedOn}: {w.currency}
+                  {w.capital.toLocaleString("en-IN")} → {w.currency}
                   {Math.round(w.current).toLocaleString("en-IN")} (
                   {w.returnPct}%)
                 </li>
