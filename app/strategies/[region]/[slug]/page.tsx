@@ -552,6 +552,7 @@ export default async function StrategyDetailPage({
                     strategyId={strategy.id}
                     strategy={strategy}
                     fee={fee}
+                    currency={region === "us" ? "$" : "₹"}
                   />
                 </div>
               ) : (

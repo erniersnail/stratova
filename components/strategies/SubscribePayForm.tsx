@@ -11,11 +11,13 @@ export default function SubscribePayForm({
   strategyId,
   strategy,
   cycle = 1,
+  currency = "₹",
 }: {
   strategyId: string;
   strategy?: { slug: string | null; id: string };
   fee: number | null;
   cycle?: BillingCycleMonths;
+  currency?: string;
 }) {
   const isUS =
     strategy?.slug === "us-equity-leadership" ||
@@ -62,7 +64,7 @@ export default function SubscribePayForm({
           htmlFor="capital"
           className="block text-sm font-medium text-foreground mb-1.5"
         >
-          Capital to allocate ({isUS ? "USD" : "INR"})
+          Capital to allocate ({currency === "$" ? "USD" : "INR"})
         </label>
         <input
           id="capital"
@@ -105,8 +107,8 @@ export default function SubscribePayForm({
         >
           {pending
             ? "Processing…"
-            : `Pay ${isUS ? "$" : "₹"}${totalFee.toLocaleString(
-                isUS ? "en-US" : "en-IN"
+            : `Pay ${currency}${totalFee.toLocaleString(
+                currency === "$" ? "en-US" : "en-IN"
               )} & subscribe`}
         </Button>
       </div>
