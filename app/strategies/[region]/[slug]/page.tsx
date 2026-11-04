@@ -226,22 +226,6 @@ export default async function StrategyDetailPage({
   const fee = strategy.fee_per_rebalance ?? null;
   const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
 
-  const targetShares = (r: Recommendation): string | null => {
-    if (capital === null || r.weight_pct === null) {
-      return null;
-    }
-    const isNew = existingSub?.started_at && r.as_of && new Date(existingSub.started_at) >= new Date(r.as_of);
-    const calcPrice = isNew ? (r.rebalance_price || r.price) : (r.current_price || r.price);
-    if (calcPrice === null || calcPrice <= 0) {
-      return null;
-    }
-    const isUS =
-      strategy?.slug === "us-equity-leadership" ||
-      r.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-    const targetSharesRaw = (capital * r.weight_pct) / calcPrice;
-    const targetShares = Math.floor(targetSharesRaw).toString();
-    return targetShares;
-  };
 
   const columns = [
     {

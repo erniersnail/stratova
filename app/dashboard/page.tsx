@@ -17,7 +17,6 @@ import {
   type Recommendation,
   type Strategy,
 } from "@/lib/strategies/fetch";
-import { formatIST } from "@/lib/format/date";
 
 export const metadata: Metadata = {
   title: "Dashboard — Simplicial Capital",
