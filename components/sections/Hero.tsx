@@ -17,7 +17,7 @@ export default function Hero() {
           alt=""
           fill
           priority
-          className="object-cover object-right block dark:hidden"
+          className="object-cover object-right block dark:opacity-0 transition-opacity duration-500"
           sizes="100vw"
         />
         <Image
@@ -25,7 +25,7 @@ export default function Hero() {
           alt=""
           fill
           priority
-          className="object-cover object-right hidden dark:block"
+          className="object-cover object-right opacity-0 dark:opacity-100 transition-opacity duration-500"
           sizes="100vw"
         />
       </div>
