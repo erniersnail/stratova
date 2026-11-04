@@ -234,7 +234,7 @@ export default async function StrategyDetailPage({
       r.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
     const rawPrice = r.price;
     const targetSharesRaw = (capital * r.weight_pct) / rawPrice;
-    const targetShares = targetSharesRaw.toFixed(4);
+    const targetShares = Math.floor(targetSharesRaw).toString();
     return targetShares;
   };
 

@@ -374,7 +374,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                     );
                   }
                   const targetSharesRaw = (cap * row.weight_pct) / rawPrice;
-                  const targetShares = targetSharesRaw.toFixed(4);
+                  const targetShares = Math.floor(targetSharesRaw).toString();
                   return (
                     <span className="text-foreground">{targetShares}</span>
                   );
