@@ -44,6 +44,7 @@ export default async function PricingPage() {
     fee: s.fee_per_rebalance ?? null,
     nextDateStr: formatRebalanceDate(nextRebalanceDate(s.slug)),
     subStatus: userSubs[s.id],
+    region: s.region,
   }));
 
   return (

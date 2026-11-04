@@ -12,12 +12,14 @@ export default function SubscribePayForm({
   strategy,
   cycle = 1,
   currency = "₹",
+  feeStr = "—",
 }: {
   strategyId: string;
   strategy?: { slug: string | null; id: string };
   fee: number | null;
   cycle?: BillingCycleMonths;
   currency?: string;
+  feeStr?: string;
 }) {
   const isUS =
     strategy?.slug === "us-equity-leadership" ||
@@ -94,9 +96,10 @@ export default function SubscribePayForm({
       </div>
 
       <div>
-        <p className="text-xs text-secondary mt-2">
-          A 2% annual management fee (billed monthly) applies. Minimum fee:
-          ₹2,000/month.
+        <p className="mt-3 text-xs leading-relaxed text-secondary">
+          A 2% annual management fee (billed monthly) applies.
+          <br />
+          Minimum fee: {feeStr}/month.
         </p>
         <Button
           type="submit"
@@ -105,11 +108,7 @@ export default function SubscribePayForm({
           disabled={submitDisabled}
           className="mt-4 w-full"
         >
-          {pending
-            ? "Processing…"
-            : `Pay ${currency}${totalFee.toLocaleString(
-                currency === "$" ? "en-US" : "en-IN"
-              )} & subscribe`}
+          {pending ? "Processing…" : `Pay ${feeStr} & subscribe`}
         </Button>
       </div>
     </form>

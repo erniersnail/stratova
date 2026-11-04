@@ -17,6 +17,7 @@ export type PricingStrategy = {
   fee: number | null;
   nextDateStr: string;
   subStatus?: string;
+  region: string | null;
 };
 
 export default function PricingPlans({ strategies }: { strategies: PricingStrategy[] }) {
@@ -123,7 +124,8 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
                     <SubscribePayForm
                       strategyId={strategy.id}
                       fee={strategy.fee}
-                      cycle={cycle}
+                      feeStr={feeStr}
+                      currency={strategy.region === "us" ? "$" : "₹"}
                     />
                   </div>
                 )}
