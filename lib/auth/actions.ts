@@ -251,7 +251,6 @@ export type SubscribeState = {
   success?: string;
 };
 
-const MIN_ALLOCATION = 100_000;
 const MAX_ALLOCATION = 10_000_000;
 
 /**
@@ -287,20 +286,6 @@ export async function subscribeAction(
     return { error: "Enter an amount in rupees (whole numbers only)." };
   }
   const capital = Number(capitalRaw);
-  if (capital < MIN_ALLOCATION) {
-    return { error: "Minimum capital allocation is ₹1,00,000." };
-  }
-  if (capital > MAX_ALLOCATION) {
-    return { error: "Maximum allocation is ₹1,00,00,000." };
-  }
-
-  // 2% annual management fee, billed monthly, with a ₹2,000/month floor.
-  const annualFee = capital * 0.02;
-  const monthlyFee = annualFee / 12;
-  const baseFee = Math.max(2000, monthlyFee);
-  const cycleMonths = Number(formData.get("billingCycle")) || 1;
-  const cycleDiscount = cycleMonths === 1 ? 1 : cycleMonths === 3 ? 0.95 : 0.9;
-  const totalFee = Math.round(baseFee * cycleMonths * cycleDiscount);
 
   const supabase = await createClient();
   const {
@@ -320,6 +305,28 @@ export async function subscribeAction(
   if (!strategy) {
     return { error: "Something went wrong. Please try again." };
   }
+
+  const isUS =
+    strategy.slug === "us-equity-leadership" ||
+    strategy.id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
+
+  const minCapital = isUS ? 10000 : 100000;
+  if (capital < minCapital) {
+    return {
+      error: `Minimum capital allocation is ${isUS ? "$10,000" : "₹1,00,000"}.`,
+    };
+  }
+  if (capital > MAX_ALLOCATION) {
+    return { error: "Maximum allocation is ₹1,00,00,000." };
+  }
+
+  const cycleMonths = Number(formData.get("billingCycle")) || 1;
+  const annualFee = capital * 0.02;
+  const monthlyFee = annualFee / 12;
+  const minFee = isUS ? 20 : 2000; // $20 min for US, ₹2000 min for India
+  const baseFee = Math.max(minFee, monthlyFee);
+  const cycleDiscount = cycleMonths === 1 ? 1 : cycleMonths === 3 ? 0.95 : 0.90;
+  const totalFee = Math.round(baseFee * cycleMonths * cycleDiscount);
 
   const { data: existing } = await supabase
     .from("subscriptions")

@@ -211,13 +211,21 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "capital",
                 header: "Capital allocated",
-                render: (row) => (
-                  <span className="text-foreground">
-                    {row.capital_allocated !== null
-                      ? `₹${row.capital_allocated.toLocaleString("en-IN")}`
-                      : "—"}
-                  </span>
-                ),
+                render: (row) => {
+                  const strategy = strategies.find((s) => s.id === row.strategy_id);
+                  const isUS =
+                    strategy?.slug === "us-equity-leadership" ||
+                    strategy?.id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
+                  return (
+                    <span className="text-foreground">
+                      {row.capital_allocated !== null
+                        ? isUS
+                          ? `$ ${row.capital_allocated.toLocaleString("en-US")}`
+                          : `₹${row.capital_allocated.toLocaleString("en-IN")}`
+                        : "—"}
+                    </span>
+                  );
+                },
               },
               {
                 key: "status",
@@ -359,18 +367,14 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                   const isUS =
                     strategy?.slug === "us-equity-leadership" ||
                     row?.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-                  const fxRate = isUS ? 83.5 : 1;
                   const rawPrice = row.price;
                   if (!cap || !row.weight_pct || !rawPrice) {
                     return (
                       <span className="text-foreground">—</span>
                     );
                   }
-                  const currentPriceInInr = rawPrice * fxRate;
-                  const targetSharesRaw = (cap * row.weight_pct) / currentPriceInInr;
-                  const targetShares = isUS
-                    ? targetSharesRaw.toFixed(4)
-                    : Math.floor(targetSharesRaw).toString();
+                  const targetSharesRaw = (cap * row.weight_pct) / rawPrice;
+                  const targetShares = targetSharesRaw.toFixed(4);
                   return (
                     <span className="text-foreground">{targetShares}</span>
                   );

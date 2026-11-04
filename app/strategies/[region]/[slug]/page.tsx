@@ -225,7 +225,6 @@ export default async function StrategyDetailPage({
   const fee = strategy.fee_per_rebalance ?? null;
   const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
 
-  // FIXED: Converts USD prices to INR before computing target shares
   const targetShares = (r: Recommendation): string | null => {
     if (capital === null || r.weight_pct === null || r.price === null) {
       return null;
@@ -233,11 +232,10 @@ export default async function StrategyDetailPage({
     const isUS =
       strategy?.slug === "us-equity-leadership" ||
       r.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-    const fxRate = isUS ? 83.5 : 1;
     const rawPrice = r.price;
-    const currentPriceInInr = rawPrice * fxRate;
-    const targetSharesRaw = (capital * r.weight_pct) / currentPriceInInr;
-    return isUS ? targetSharesRaw.toFixed(4) : Math.floor(targetSharesRaw).toString();
+    const targetSharesRaw = (capital * r.weight_pct) / rawPrice;
+    const targetShares = targetSharesRaw.toFixed(4);
+    return targetShares;
   };
 
   const columns = [
@@ -521,7 +519,10 @@ export default async function StrategyDetailPage({
                       <dt className="text-foreground">Allocated capital</dt>
                       <dd className="text-foreground">
                         {capital !== null
-                          ? `₹${capital.toLocaleString("en-IN")}`
+                          ? strategy?.slug === "us-equity-leadership" ||
+                            strategy?.id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74"
+                            ? `$ ${capital.toLocaleString("en-US")}`
+                            : `₹${capital.toLocaleString("en-IN")}`
                           : "—"}
                       </dd>
                     </div>
@@ -553,6 +554,7 @@ export default async function StrategyDetailPage({
                   </p>
                   <SubscribePayForm
                     strategyId={strategy.id}
+                    strategy={strategy}
                     fee={fee}
                   />
                 </div>
