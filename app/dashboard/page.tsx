@@ -367,13 +367,15 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                   const isUS =
                     strategy?.slug === "us-equity-leadership" ||
                     row?.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-                  const rawPrice = row.price;
-                  if (!cap || !row.weight_pct || !rawPrice) {
+                  const sub = subscriptions.find(s => s.strategy_id === row.strategy_id);
+                  const isNew = sub?.started_at && row.as_of && new Date(sub.started_at) >= new Date(row.as_of);
+                  const calcPrice = isNew ? (row.rebalance_price || row.price) : (row.current_price || row.price);
+                  if (!cap || !row.weight_pct || !calcPrice) {
                     return (
                       <span className="text-foreground">—</span>
                     );
                   }
-                  const targetSharesRaw = (cap * row.weight_pct) / rawPrice;
+                  const targetSharesRaw = (cap * row.weight_pct) / calcPrice;
                   const targetShares = Math.floor(targetSharesRaw).toString();
                   return (
                     <span className="text-foreground">{targetShares}</span>
@@ -383,9 +385,12 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "price",
                 header: "Entry Price",
-                render: (row) => (
-                  <span className="text-foreground">{row.price ?? "—"}</span>
-                ),
+                render: (row) => {
+                  const sub = subscriptions.find(s => s.strategy_id === row.strategy_id);
+                  const isNew = sub?.started_at && row.as_of && new Date(sub.started_at) >= new Date(row.as_of);
+                  const displayPrice = isNew ? (row.rebalance_price || row.price) : row.price;
+                  return <span className="text-foreground">{displayPrice ?? "—"}</span>;
+                },
               },
               {
                 key: "current_price",

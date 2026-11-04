@@ -31,6 +31,7 @@ export type Recommendation = {
   published_at: string;
   weight_pct: number | null;
   price: number | null;
+  rebalance_price: number | null;
   current_price: number | null;
   approved_at: string | null;
   removed_at: string | null;
