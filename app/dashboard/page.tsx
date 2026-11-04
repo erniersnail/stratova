@@ -355,17 +355,24 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                 header: "Target Shares",
                 render: (row) => {
                   const cap = capitalByStrategy.get(row.strategy_id);
-                  const currentPrice = row.current_price || row.price;
-                  const target =
-                    cap && row.weight_pct && currentPrice
-                      ? Math.floor((cap * row.weight_pct) / currentPrice)
-                      : null;
+                  const strategy = strategies.find((s) => s.id === row.strategy_id);
+                  const isUS =
+                    strategy?.slug === "us-equity-leadership" ||
+                    row?.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
+                  const fxRate = isUS ? 83.5 : 1;
+                  const rawPrice = row.price;
+                  if (!cap || !row.weight_pct || !rawPrice) {
+                    return (
+                      <span className="text-foreground">—</span>
+                    );
+                  }
+                  const currentPriceInInr = rawPrice * fxRate;
+                  const targetSharesRaw = (cap * row.weight_pct) / currentPriceInInr;
+                  const targetShares = isUS
+                    ? targetSharesRaw.toFixed(4)
+                    : Math.floor(targetSharesRaw).toString();
                   return (
-                    <span className="text-foreground">
-                      {target !== null
-                        ? target.toLocaleString("en-IN")
-                        : "—"}
-                    </span>
+                    <span className="text-foreground">{targetShares}</span>
                   );
                 },
               },

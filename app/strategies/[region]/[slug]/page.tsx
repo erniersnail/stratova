@@ -225,15 +225,19 @@ export default async function StrategyDetailPage({
   const fee = strategy.fee_per_rebalance ?? null;
   const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
 
-  // FIXED: Uses current_price for target shares calculation
-  const targetShares = (r: Recommendation): number | null => {
-    const currentPrice = r.current_price || r.price;
-    return capital !== null &&
-      r.weight_pct !== null &&
-      currentPrice !== null &&
-      currentPrice > 0
-        ? Math.floor((capital * r.weight_pct) / currentPrice)
-        : null;
+  // FIXED: Converts USD prices to INR before computing target shares
+  const targetShares = (r: Recommendation): string | null => {
+    if (capital === null || r.weight_pct === null || r.price === null) {
+      return null;
+    }
+    const isUS =
+      strategy?.slug === "us-equity-leadership" ||
+      r.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
+    const fxRate = isUS ? 83.5 : 1;
+    const rawPrice = r.price;
+    const currentPriceInInr = rawPrice * fxRate;
+    const targetSharesRaw = (capital * r.weight_pct) / currentPriceInInr;
+    return isUS ? targetSharesRaw.toFixed(4) : Math.floor(targetSharesRaw).toString();
   };
 
   const columns = [
