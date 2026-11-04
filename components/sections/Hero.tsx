@@ -12,20 +12,22 @@ export default function Hero() {
     >
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
+        {/* Light Mode Image */}
         <Image
           src="/images/hero.png"
           alt=""
           fill
           priority
-          className="object-cover object-right block dark:opacity-0 transition-opacity duration-500"
+          className="object-cover object-right block dark:hidden"
           sizes="100vw"
         />
+        {/* Dark Mode Image */}
         <Image
           src="/images/hero-dark.png"
           alt=""
           fill
           priority
-          className="object-cover object-right opacity-0 dark:opacity-100 transition-opacity duration-500"
+          className="object-cover object-right hidden dark:block"
           sizes="100vw"
         />
       </div>
