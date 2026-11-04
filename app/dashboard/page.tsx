@@ -363,23 +363,9 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
                 header: "Target Shares",
                 render: (row) => {
                   const cap = capitalByStrategy.get(row.strategy_id);
-                  const strategy = strategies.find((s) => s.id === row.strategy_id);
-                  const isUS =
-                    strategy?.slug === "us-equity-leadership" ||
-                    row?.strategy_id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-                  const sub = subscriptions.find(s => s.strategy_id === row.strategy_id);
-                  const isNew = sub?.started_at && row.as_of && new Date(sub.started_at) >= new Date(row.as_of);
-                  const calcPrice = isNew ? (row.rebalance_price || row.price) : (row.current_price || row.price);
-                  if (!cap || !row.weight_pct || !calcPrice) {
-                    return (
-                      <span className="text-foreground">—</span>
-                    );
-                  }
-                  const targetSharesRaw = (cap * row.weight_pct) / calcPrice;
-                  const targetShares = Math.floor(targetSharesRaw).toString();
-                  return (
-                    <span className="text-foreground">{targetShares}</span>
-                  );
+                  const currentPrice = row.current_price || row.price;
+                  const target = cap && row.weight_pct && currentPrice ? Math.floor((cap * row.weight_pct) / currentPrice) : null;
+                  return <span className="text-foreground">{target !== null ? target.toLocaleString("en-IN") : "—"}</span>;
                 },
               },
               {
@@ -401,9 +387,12 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               },
               {
                 key: "return",
-                header: "Since Rec.",
+                header: "Strategy P&L",
                 render: (row) => {
-                  const ret = row.current_price && row.price ? ((row.current_price / row.price) - 1) * 100 : null;
+                  const sub = subscriptions.find(s => s.strategy_id === row.strategy_id);
+                  const isNew = sub?.started_at && row.as_of && new Date(sub.started_at) >= new Date(row.as_of);
+                  const displayEntry = isNew ? (row.rebalance_price || row.price) : row.price;
+                  const ret = row.current_price && displayEntry ? ((row.current_price / displayEntry) - 1) * 100 : null;
                   if (ret === null) return <span className="text-foreground">—</span>;
                   const isPos = ret >= 0;
                   return (

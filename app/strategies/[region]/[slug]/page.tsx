@@ -287,7 +287,9 @@ export default async function StrategyDetailPage({
       key: "return",
       header: "Strategy P&L",
       render: (r: Recommendation) => {
-        const ret = r.current_price && r.price ? ((r.current_price / r.price) - 1) * 100 : null;
+        const isNew = existingSub?.started_at && r.as_of && new Date(existingSub.started_at) >= new Date(r.as_of);
+        const displayEntry = isNew ? (r.rebalance_price || r.price) : r.price;
+        const ret = r.current_price && displayEntry ? ((r.current_price / displayEntry) - 1) * 100 : null;
         if (ret === null) return <span className="text-foreground">—</span>;
         const isPos = ret >= 0;
         return (
@@ -310,7 +312,10 @@ export default async function StrategyDetailPage({
       key: "target_shares",
       header: "Target Shares",
       render: (r: Recommendation) => {
-        const target = targetShares(r);
+        const currentPrice = r.current_price || r.price;
+        const target = capital !== null && r.weight_pct !== null && currentPrice !== null && currentPrice > 0
+          ? Math.floor((capital * r.weight_pct) / currentPrice)
+          : null;
         return (
           <span className="text-foreground">{target !== null ? target : "—"}</span>
         );
