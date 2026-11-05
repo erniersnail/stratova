@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cycleMonthsForPlan, expiryForCycle } from "@/lib/billing/cycles";
 import { createClient } from "../supabase/server";
 import { createServiceClient } from "./recommendations";
@@ -49,6 +49,7 @@ export async function updateStrategyAdmin(
 
     revalidatePath("/admin/strategies");
     revalidatePath("/strategies", "layout");
+    revalidateTag("strategies", "interval"); // Purges the unstable_cache for pricing pages
     return { success: "Saved." };
   } catch (err) {
     console.error("[admin] updateStrategyAdmin threw:", err);
