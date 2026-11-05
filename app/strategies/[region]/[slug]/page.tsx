@@ -269,7 +269,7 @@ export default async function StrategyDetailPage({
     },
     {
       key: "return",
-      header: "Strategy P&L",
+      header: "Returns",
       render: (r: Recommendation) => {
         const isNew = existingSub?.started_at && r.as_of && new Date(existingSub.started_at) >= new Date(r.as_of);
         const displayEntry = isNew ? (r.rebalance_price || r.price) : r.price;

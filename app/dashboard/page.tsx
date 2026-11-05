@@ -390,7 +390,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               },
               {
                 key: "return",
-                header: "Strategy P&L",
+                header: "Returns",
                 render: (row) => {
                   const sub = subscriptions.find(s => s.strategy_id === row.strategy_id);
                   const isNew = sub?.started_at && row.as_of && new Date(sub.started_at) >= new Date(row.as_of);
