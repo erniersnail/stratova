@@ -224,7 +224,8 @@ export default async function StrategyDetailPage({
   const nextDate = nextRebalanceDate(strategy.slug);
   const nextDateStr = formatRebalanceDate(nextDate);
   const fee = strategy.fee_per_rebalance ?? null;
-  const feeStr = fee !== null ? `₹${fee.toLocaleString("en-IN")}` : "—";
+  const isUS = region === "us" || strategy.slug === "us-equity-leadership";
+  const feeStr = fee !== null ? `${isUS ? "$" : "₹"}${fee.toLocaleString(isUS ? "en-US" : "en-IN")}` : "—";
 
 
   const columns = [
@@ -257,14 +258,14 @@ export default async function StrategyDetailPage({
       render: (r: Recommendation) => {
         const isNew = existingSub?.started_at && r.as_of && new Date(existingSub.started_at) >= new Date(r.as_of);
         const displayPrice = isNew ? (r.rebalance_price || r.price) : r.price;
-        return <span className="text-foreground">{displayPrice ?? "—"}</span>;
+        return <span className="text-foreground">{displayPrice !== null ? Number(displayPrice).toFixed(2) : "—"}</span>;
       },
     },
     {
       key: "current_price",
       header: "Current Price",
       render: (r: Recommendation) => (
-        <span className="text-foreground">{r.current_price ?? "—"}</span>
+        <span className="text-foreground">{r.current_price !== null ? Number(r.current_price).toFixed(2) : "—"}</span>
       ),
     },
     {
