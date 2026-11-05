@@ -285,7 +285,9 @@ export async function subscribeAction(
   if (!/^\d+$/.test(capitalRaw)) {
     return { error: "Enter an amount in rupees (whole numbers only)." };
   }
-  const capital = Number(capitalRaw);
+  // Strip commas and currency symbols before converting to a number
+  const capitalStr = String(formData.get("capital") ?? "0").replace(/[^0-9.]/g, '');
+  const capital = Number(capitalStr);
 
   const supabase = await createClient();
   const {
@@ -337,8 +339,7 @@ export async function subscribeAction(
   }
 
   // The user gets access immediately, and it expires at the next rebalance
-  const nextDate = nextRebalanceDate(strategy.slug);
-  const rebalanceDate = nextDate.toISOString().slice(0, 10);
+  // Set the payment date to TODAY so they get access immediately
   const todayDate = new Date().toISOString().slice(0, 10);
 
   const { data: subData, error: subError } = await supabase
