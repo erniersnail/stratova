@@ -5,6 +5,7 @@ import Container from "@/components/layout/Container";
 import PageHeader from "@/components/common/PageHeader";
 import { typography } from "@/lib/typography";
 import { createClient } from "@/lib/supabase/server";
+import { formatFee } from "@/lib/format/currency";
 
 export const metadata: Metadata = {
   title: "Checkout — Simplicial Capital",
@@ -40,6 +41,8 @@ export default async function CheckoutPage({
         .maybeSingle()
     : { data: null };
 
+  const region = strategy?.region ?? "india";
+
   const isPaid = payment.status === "PAID";
 
   return (
@@ -73,7 +76,7 @@ export default async function CheckoutPage({
                 <div className="flex justify-between">
                   <dt className="text-secondary">Amount</dt>
                   <dd className="font-medium text-foreground">
-                    ₹{Number(payment.amount).toLocaleString("en-IN")}
+                    {formatFee(payment.amount, region)}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -95,7 +98,7 @@ export default async function CheckoutPage({
                   Step 1 — Pay via UPI
                 </p>
                 <p className="mt-2 text-sm text-secondary">
-                  Send ₹{Number(payment.amount).toLocaleString("en-IN")} to:
+                  Send {formatFee(payment.amount, region)} to:
                 </p>
                 <p className="mt-3 font-mono text-base text-foreground">
                   {process.env.NEXT_PUBLIC_UPI_ID ?? "UPI ID not configured"}
