@@ -109,11 +109,13 @@ export async function markPaymentPaid(paymentId: string): Promise<void> {
     throw new Error("Could not mark payment paid");
   }
 
+  // Activate immediately regardless of the payment cycle date
+  const todayIso = new Date().toISOString().slice(0, 10);
   const { error: subErr } = await admin
     .from("subscriptions")
     .update({
       status: "ACTIVE",
-      started_at: payment.rebalance_date,
+      started_at: todayIso,
       expires_at: expiresAt,
     })
     .eq("id", payment.subscription_id)

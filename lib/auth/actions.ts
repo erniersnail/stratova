@@ -336,19 +336,21 @@ export async function subscribeAction(
     return { error: "You already have a subscription to this strategy." };
   }
 
+  // The user gets access immediately, and it expires at the next rebalance
   const nextDate = nextRebalanceDate(strategy.slug);
   const rebalanceDate = nextDate.toISOString().slice(0, 10);
+  const todayDate = new Date().toISOString().slice(0, 10);
 
   const { data: subData, error: subError } = await supabase
     .from("subscriptions")
     .insert({
       user_id: user.id,
       strategy_id: strategyId,
-      status: "PENDING",
+      status: "PENDING", // Still PENDING until admin marks paid
       plan: "Monthly",
       price: totalFee,
       capital_allocated: capital,
-      started_at: null,
+      started_at: null, // Will be set to today when admin marks paid
     })
     .select("id")
     .single();
@@ -361,7 +363,7 @@ export async function subscribeAction(
     .from("subscription_payments")
     .insert({
       subscription_id: subData.id,
-      rebalance_date: rebalanceDate,
+      rebalance_date: todayDate, // Use TODAY as the payment cycle, not the future date
       amount: totalFee,
       status: "PENDING",
     })
