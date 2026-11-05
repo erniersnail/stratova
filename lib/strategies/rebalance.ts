@@ -11,25 +11,27 @@ export function cadenceForSlug(slug: string): Cadence {
   return SLUG_CADENCE[slug] ?? "monthly";
 }
 
-export function nextRebalanceDate(slug: string, from: Date = new Date()): Date {
-  const cadence = cadenceForSlug(slug);
-  const d = new Date(from);
-  let candidate: Date;
-  if (cadence === "monthly") {
-    candidate = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+export function nextRebalanceDate(slug: string): Date {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-indexed (Nov is 10)
+  
+  const isQuarterly = slug === "midcap-select" || slug === "smallcap-select";
+  
+  if (isQuarterly) {
+    // Quarterly months: Feb (1), May (4), Aug (7), Nov (10)
+    const qMonths = [1, 4, 7, 10];
+    let nextMonth = qMonths.find((m) => m > month);
+    let nextYear = year;
+    if (nextMonth === undefined) {
+      nextMonth = qMonths[0]; // Feb of next year
+      nextYear += 1;
+    }
+    return new Date(nextYear, nextMonth, 1);
   } else {
-    const months = [1, 4, 7, 10]; // Feb, May, Aug, Nov (0-indexed)
-    const next = months.find((m) => m > d.getMonth() ||
-      (m === d.getMonth() && d.getDate() < 1));
-    candidate = next !== undefined
-      ? new Date(d.getFullYear(), next, 1)
-      : new Date(d.getFullYear() + 1, 1, 1);
+    // Monthly: first day of next month
+    return new Date(year, month + 1, 1);
   }
-  // Roll forward to Monday if Saturday or Sunday
-  while (candidate.getDay() === 0 || candidate.getDay() === 6) {
-    candidate.setDate(candidate.getDate() + 1);
-  }
-  return candidate;
 }
 
 export function formatRebalanceDate(d: Date): string {

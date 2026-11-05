@@ -18,6 +18,7 @@ export type PricingStrategy = {
   nextDateStr: string;
   subStatus?: string;
   region: string | null;
+  cadence: string | null;
 };
 
 export default function PricingPlans({ strategies }: { strategies: PricingStrategy[] }) {
@@ -72,6 +73,9 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
                     {strategy.short_description}
                   </p>
                 )}
+                <p className="mt-2 text-xs font-medium uppercase tracking-wider text-accent">
+                  {strategy.cadence === "quarterly" ? "Quarterly Rebalance" : "Monthly Rebalance"}
+                </p>
 
                 <div className="grid grid-cols-3 gap-4 text-sm mt-4 border-t border-border pt-4">
                   <div>

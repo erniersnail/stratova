@@ -45,6 +45,7 @@ export default async function PricingPage() {
     nextDateStr: formatRebalanceDate(nextRebalanceDate(s.slug)),
     subStatus: userSubs[s.id],
     region: s.region,
+    cadence: s.cadence,
   }));
 
   return (

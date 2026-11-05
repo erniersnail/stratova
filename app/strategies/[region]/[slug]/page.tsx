@@ -377,6 +377,14 @@ export default async function StrategyDetailPage({
             </div>
             <div className="rounded-md border border-border bg-surface p-5">
               <dt className="text-xs font-medium uppercase tracking-wide text-foreground">
+                Rebalance Cycle
+              </dt>
+              <dd className={`${typography.body} mt-1 capitalize text-foreground`}>
+                {strategy.cadence === "quarterly" ? "Quarterly" : "Monthly"}
+              </dd>
+            </div>
+            <div className="rounded-md border border-border bg-surface p-5">
+              <dt className="text-xs font-medium uppercase tracking-wide text-foreground">
                 Next rebalance
               </dt>
               <dd className={`${typography.body} mt-1 text-foreground`}>

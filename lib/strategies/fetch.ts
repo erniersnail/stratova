@@ -18,6 +18,7 @@ export type Strategy = {
   is_subscribable: boolean;
   display_order: number;
   region: string | null;
+  cadence: string | null;
 };
 
 export type Recommendation = {
