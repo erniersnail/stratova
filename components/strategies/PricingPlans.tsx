@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { typography } from "@/lib/typography";
+import { formatFee } from "@/lib/format/currency";
 import SubscribePayForm from "@/components/strategies/SubscribePayForm";
 import {
   calculateTotalFee,
@@ -54,8 +55,7 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
         {strategies.map((strategy) => {
           const totalFee =
             strategy.fee !== null ? calculateTotalFee(strategy.fee, cycle) : null;
-          const feeStr =
-            totalFee !== null ? `₹${totalFee.toLocaleString("en-IN")}` : "—";
+          const feeStr = formatFee(totalFee, strategy.region);
 
           const subStatus = strategy.subStatus;
 
@@ -128,7 +128,7 @@ export default function PricingPlans({ strategies }: { strategies: PricingStrate
                     <SubscribePayForm
                       strategyId={strategy.id}
                       fee={strategy.fee}
-                      feeStr={feeStr}
+                      feeStr={formatFee(totalFee, strategy.region)}
                       currency={strategy.region === "us" ? "$" : "₹"}
                     />
                   </div>
