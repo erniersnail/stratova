@@ -31,8 +31,8 @@ export async function updateStrategyAdmin(
     if (profile?.role !== "admin") return { error: "Not authorized" };
 
     const fee = Number(formData.get("fee_per_rebalance"));
-    if (!Number.isInteger(fee) || fee < 100 || fee > 1000000) {
-      return { error: "Fee must be a whole number between 100 and 1,000,000." };
+    if (!Number.isInteger(fee) || fee <= 0) {
+      return { error: "Fee must be a positive whole number." };
     }
 
     const isSubscribable = formData.get("is_subscribable") === "on";

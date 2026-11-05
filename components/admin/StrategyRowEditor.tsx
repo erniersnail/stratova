@@ -38,7 +38,6 @@ export default function StrategyRowEditor({
           form={formId}
           name="fee_per_rebalance"
           type="number"
-          min={100}
           max={1000000}
           step={1}
           defaultValue={strategy.fee_per_rebalance ?? 5000}
