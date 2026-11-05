@@ -349,7 +349,7 @@ export async function subscribeAction(
       user_id: user.id,
       strategy_id: strategyId,
       status: "PENDING",
-      plan: planForCycle(billingCycle),
+      plan: "Monthly",
       price: totalFee,
       capital_allocated: capital,
       started_at: null,
