@@ -209,9 +209,7 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "plan",
                 header: "Plan",
-                render: (row) => (
-                  <span className="text-foreground">{row.plan ?? "—"}</span>
-                ),
+                render: () => <span className="text-foreground">Monthly</span>,
               },
               {
                 key: "capital",
@@ -242,11 +240,15 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "started",
                 header: "Started",
-                render: (row) => (
-                  <span className="text-foreground">
-                    {formatDate(row.started_at)}
-                  </span>
-                ),
+                render: (row) => {
+                  const startDate = row.started_at ? new Date(row.started_at) : null;
+                  const isFuture = startDate && startDate > new Date();
+                  return (
+                    <span className="text-foreground">
+                      {isFuture ? "Pending" : formatDate(row.started_at)}
+                    </span>
+                  );
+                },
               },
               {
                 key: "expires",
