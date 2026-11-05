@@ -35,13 +35,7 @@ export default function SubscribePayForm({
   const capitalValue = Number.isFinite(capital) && capital > 0 ? capital : 0;
   const capitalTooLow = capitalRaw.trim().length > 0 && capitalValue < MIN_CAPITAL;
 
-  // 2% of deployed capital per year, billed monthly, with a ₹2,000/month floor.
-  const annualFee = capitalValue * 0.02;
-  const monthlyFee = annualFee / 12;
-  const minFee = isUS ? 20 : 2000;
-  const baseFee = Math.max(minFee, monthlyFee);
-  const cycleDiscount = cycle === 1 ? 1 : cycle === 3 ? 0.95 : 0.90;
-  const totalFee = Math.round(baseFee * cycle * cycleDiscount);
+  const totalFee = Number(feeStr.replace(/[^0-9.]/g, '')) * cycle;
 
   const disabled = pending;
   const submitDisabled = disabled || capitalValue < MIN_CAPITAL;
@@ -97,9 +91,7 @@ export default function SubscribePayForm({
 
       <div>
         <p className="mt-3 text-xs leading-relaxed text-secondary">
-          A 2% annual management fee (billed monthly) applies.
-          <br />
-          Minimum fee: {feeStr}/month.
+          A flat research fee of {feeStr} per cycle applies.
         </p>
         <Button
           type="submit"

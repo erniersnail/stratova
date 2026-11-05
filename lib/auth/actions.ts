@@ -321,12 +321,8 @@ export async function subscribeAction(
   }
 
   const cycleMonths = Number(formData.get("billingCycle")) || 1;
-  const annualFee = capital * 0.02;
-  const monthlyFee = annualFee / 12;
-  const minFee = isUS ? 20 : 2000; // $20 min for US, ₹2000 min for India
-  const baseFee = Math.max(minFee, monthlyFee);
-  const cycleDiscount = cycleMonths === 1 ? 1 : cycleMonths === 3 ? 0.95 : 0.90;
-  const totalFee = Math.round(baseFee * cycleMonths * cycleDiscount);
+  // Use the flat fee defined in the database, multiplied by the cycle length
+  const totalFee = Math.round(((strategy as unknown as { fee_per_rebalance: number | null }).fee_per_rebalance ?? 0) * cycleMonths);
 
   const { data: existing } = await supabase
     .from("subscriptions")
