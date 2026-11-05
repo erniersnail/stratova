@@ -17,6 +17,7 @@ import {
   type Recommendation,
   type Strategy,
 } from "@/lib/strategies/fetch";
+import { nextRebalanceDate } from "@/lib/strategies/rebalance";
 
 export const metadata: Metadata = {
   title: "Dashboard — Simplicial Capital",
@@ -159,7 +160,8 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
   };
   const clientWindows: ClientWindow[] = [];
   for (const s of paidSubscriptions) {
-    if (!s.strategy_id || !s.started_at || s.capital_allocated === null) {
+    // Only calculate performance for ACTIVE subscriptions (prevents showing cancelled/future ones in the summary)
+    if (!s.strategy_id || !s.started_at || s.capital_allocated === null || s.status !== "ACTIVE") {
       continue;
     }
     const startDay = s.started_at.slice(0, 10);
@@ -417,11 +419,12 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
               {
                 key: "valid_until",
                 header: "Valid until",
-                render: (row) => (
-                  <span className="text-foreground">
-                    {row.expires_at ? formatDate(row.expires_at) : "—"}
-                  </span>
-                ),
+                render: (row) => {
+                  // Calculate the next rebalance date dynamically if expires_at is null
+                  const nextDate = nextRebalanceDate(strategySlugs.get(row.strategy_id) || "");
+                  const displayDate = row.expires_at ? formatDate(row.expires_at) : formatDate(nextDate.toISOString());
+                  return <span className="text-foreground">{displayDate !== "—" ? displayDate : "—"}</span>;
+                },
               },
             ]}
             rows={recommendations}
