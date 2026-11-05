@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -7,23 +7,21 @@ import { createClient } from "@/lib/supabase/server";
 import { TERMS_DOC_VERSION, type AuthState } from "@/lib/auth/constants";
 import { getAuthErrorMessage } from "@/lib/auth/error-messages";
 import { isValidEmail } from "@/lib/validation/email";
-import { nextRebalanceDate } from "@/lib/strategies/rebalance";
-import {
-  planForCycle,
-  isBillingCycleMonths,
-  type BillingCycleMonths,
-} from "@/lib/billing/cycles";
+
+export type SubscribeState = {
+  error?: string;
+};
+
+export type ProfileState = {
+  error?: string;
+  success?: string;
+  fields?: { fullName?: string; phone?: string };
+};
+
+const MAX_ALLOCATION = 10000000;
 
 /**
  * Signs a new user up.
- *
- * Creates an ACCOUNT and records consent. It does
- * not create a subscription and takes no payment.
- *
- * Profile and consent rows are written here when a session is available
- * immediately. When Supabase requires email confirmation there is no session
- * yet, so `ensureProfile` backfills both on the first authenticated visit
- * (using auth.users.created_at as the authoritative acceptance timestamp).
  */
 export async function signUpAction(
   _prev: AuthState,
@@ -57,20 +55,16 @@ export async function signUpAction(
     return { error: getAuthErrorMessage(error), fields };
   }
 
-  // Supabase can report success while silently returning no identities for an
-  // email that already exists. Treat that as an existing-account error.
   if (data?.user && data.user.identities && data.user.identities.length === 0) {
     return { error: "An account with this email already exists. Please sign in.", fields };
   }
 
-  // No session => Supabase requires email confirmation before sign-in.
   if (!data.session) {
     redirect("/signup/confirm");
   }
 
   const user = data.user;
   if (!user) {
-    // signUp reported no error but returned neither a session nor a user.
     return { error: "Could not create your account. Please try again.", fields };
   }
 
@@ -99,14 +93,13 @@ export async function signInAction(
   const fields = { email };
 
   if (!email || !password) {
-    return { error: "Enter your email and password.", fields };
+    return { error: "Email and password are required.", fields };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    console.log("DEBUG: Supabase SignIn Error:", error);
     return { error: getAuthErrorMessage(error), fields };
   }
 
@@ -114,28 +107,14 @@ export async function signInAction(
   redirect("/account");
 }
 
-/** Signs the current user out and returns to the public home page. */
+/** Signs a user out. */
 export async function signOutAction(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  revalidatePath("/", "layout");
-  redirect("/");
+  redirect("/login");
 }
 
-// ── Profile editing ─────────────────────────────────────────────────────────
-
-export type ProfileState = {
-  error?: string;
-  success?: string;
-  fields?: { fullName?: string; phone?: string };
-};
-
-const PROFILE_UPDATED = "Profile updated.";
-
-/**
- * Updates the current user's profile (full_name, phone). Email is never
- * editable here — it is owned by Supabase Auth.
- */
+/** Updates the current user's profile. */
 export async function updateProfileAction(
   _prev: ProfileState,
   formData: FormData,
@@ -143,175 +122,59 @@ export async function updateProfileAction(
   const fullName = String(formData.get("fullName") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
 
-  const fields = { fullName, phone };
-
-  if (!fullName) {
-    return { error: "Enter your full name.", fields };
-  }
-
-  if (phone && !/^\+?[0-9]{10,15}$/.test(phone)) {
-    return { error: "Enter a valid phone number (10–15 digits).", fields };
-  }
-
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "Something went wrong. Please try again.", fields };
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
 
   const { error } = await supabase
     .from("profiles")
-    .update({ full_name: fullName, phone: phone || null })
+    .update({ full_name: fullName, phone })
     .eq("id", user.id);
 
-  if (error) {
-    return { error: "Something went wrong. Please try again.", fields };
-  }
+  if (error) return { error: "Could not update profile." };
 
   revalidatePath("/account");
-  return { success: PROFILE_UPDATED, fields };
+  return { success: "Profile updated." };
 }
 
-// ── Password reset ──────────────────────────────────────────────────────────
-
-type ResetState = {
-  error?: string;
-  success?: string;
-  fields?: { email?: string };
-};
-
-const RESET_LINK_SENT =
-  "If an account exists for that email, you'll receive a reset link shortly.";
-
-/**
- * Sends a password-reset email. Always returns the same success copy so the
- * caller can never learn whether the email belongs to an account.
- */
-export async function forgotPasswordAction(
-  _prev: ResetState,
-  formData: FormData,
-): Promise<ResetState> {
-  const email = String(formData.get("email") ?? "").trim();
-
-  if (!email) {
-    return { error: "Please enter your email address.", fields: { email } };
-  }
-  if (!isValidEmail(email)) {
-    return { error: "Enter a valid email address.", fields: { email } };
-  }
-
-  const headerList = await headers();
-  const forwardedHost =
-    headerList.get("x-forwarded-host") ?? headerList.get("host");
-  const proto = headerList.get("x-forwarded-proto") ?? "https";
-  const origin = forwardedHost ? `${proto}://${forwardedHost}` : null;
-
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.resetPasswordForEmail(
-    email,
-    // Route through the callback so the ?code= is exchanged for a session
-    // before /reset-password is reached. `next` selects the page after.
-    origin ? { redirectTo: `${origin}/auth/callback?next=/reset-password` } : undefined,
-  );
-
-  if (error) {
-    const message = error.message.toLowerCase();
-    if (
-      message.includes("email rate limit") ||
-      message.includes("rate limit")
-    ) {
-      return {
-        error: "Too many attempts. Please wait a moment and try again.",
-        fields: { email },
-      };
-    }
-    if (message.includes("fetch") || message.includes("network")) {
-      return {
-        error: "Network error. Please check your connection and try again.",
-        fields: { email },
-      };
-    }
-    // Every other failure (including "user not found") resolves to the same
-    // neutral copy — never reveal whether the email exists.
-    return { success: RESET_LINK_SENT };
-  }
-
-  return { success: RESET_LINK_SENT };
-}
-
-// ── Subscription (pay-per-rebalance) ────────────────────────────────────────
-
-export type SubscribeState = {
-  error?: string;
-  success?: string;
-};
-
-const MAX_ALLOCATION = 10_000_000;
-
-/**
- * Creates a PENDING subscription + PENDING payment for the next rebalance,
- * then redirects to /checkout/[paymentId].
- *
- * The fee is derived from the capital the user allocates: a 2% annual
- * management fee billed monthly, with a ₹2,000/month floor and a discount for
- * longer billing cycles.
- *
- * Subscription stays PENDING until an admin marks the payment PAID (via
- * markPaymentPaid) or the VM writer promotes it at the rebalance (Phase 16b).
- */
+/** Subscribes the current user to a strategy via payment. */
 export async function subscribeAction(
   _prev: SubscribeState,
   formData: FormData,
 ): Promise<SubscribeState> {
-  const strategyId = String(formData.get("strategyId") ?? "").trim();
-  const billingCycleRaw = String(formData.get("billingCycle") ?? "1").trim();
-  const capitalRaw = String(formData.get("capital") ?? "").replace(
-    /[,\s₹]/g,
-    "",
-  );
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "You must be signed in to subscribe." };
+  }
 
-  if (!strategyId) {
-    return { error: "Something went wrong. Please try again." };
-  }
-  if (!isBillingCycleMonths(Number(billingCycleRaw))) {
-    return { error: "Invalid billing cycle." };
-  }
-  const billingCycle = Number(billingCycleRaw) as BillingCycleMonths;
-  if (!/^\d+$/.test(capitalRaw)) {
-    return { error: "Enter an amount in rupees (whole numbers only)." };
-  }
-  // Strip commas and currency symbols before converting to a number
+  const strategyId = String(formData.get("strategyId") ?? "");
+  const cycleMonths = Number(formData.get("billingCycle")) || 1;
+  // Strip commas and currency symbols from capital
   const capitalStr = String(formData.get("capital") ?? "0").replace(/[^0-9.]/g, '');
   const capital = Number(capitalStr);
+  
+  // Use the fee calculated directly on the client form (fixes the zero amount bug)
+  const totalFee = Number(formData.get("fee") ?? 0);
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "Please log in to subscribe." };
+  if (!totalFee || totalFee <= 0) {
+    return { error: "Invalid payment amount. Please refresh and try again." };
   }
 
-  const { data: strategy } = await supabase
+  const { data: strategy, error: strategyError } = await supabase
     .from("strategies")
-    .select("id, slug")
+    .select("id, slug, name, region")
     .eq("id", strategyId)
-    .maybeSingle();
+    .single();
 
-  if (!strategy) {
-    return { error: "Something went wrong. Please try again." };
+  if (strategyError || !strategy) {
+    return { error: "Strategy not found." };
   }
 
   const isUS =
     strategy.slug === "us-equity-leadership" ||
     strategy.id === "95ccee51-d817-4a61-9a5b-b4d1a9143e74";
-
+    
   const minCapital = isUS ? 10000 : 100000;
   if (capital < minCapital) {
     return {
@@ -321,10 +184,6 @@ export async function subscribeAction(
   if (capital > MAX_ALLOCATION) {
     return { error: "Maximum allocation is ₹1,00,00,000." };
   }
-
-  const cycleMonths = Number(formData.get("billingCycle")) || 1;
-  // Use the flat fee defined in the database, multiplied by the cycle length
-  const totalFee = Math.round(((strategy as unknown as { fee_per_rebalance: number | null }).fee_per_rebalance ?? 0) * cycleMonths);
 
   const { data: existing } = await supabase
     .from("subscriptions")
@@ -338,8 +197,7 @@ export async function subscribeAction(
     return { error: "You already have a subscription to this strategy." };
   }
 
-  // The user gets access immediately, and it expires at the next rebalance
-  // Set the payment date to TODAY so they get access immediately
+  // Set the payment date to TODAY so they get immediate access
   const todayDate = new Date().toISOString().slice(0, 10);
 
   const { data: subData, error: subError } = await supabase
@@ -347,11 +205,11 @@ export async function subscribeAction(
     .insert({
       user_id: user.id,
       strategy_id: strategyId,
-      status: "PENDING", // Still PENDING until admin marks paid
+      status: "PENDING",
       plan: "Monthly",
       price: totalFee,
       capital_allocated: capital,
-      started_at: null, // Will be set to today when admin marks paid
+      started_at: null,
     })
     .select("id")
     .single();
@@ -364,7 +222,7 @@ export async function subscribeAction(
     .from("subscription_payments")
     .insert({
       subscription_id: subData.id,
-      rebalance_date: todayDate, // Use TODAY as the payment cycle, not the future date
+      rebalance_date: todayDate,
       amount: totalFee,
       status: "PENDING",
     })
@@ -378,12 +236,7 @@ export async function subscribeAction(
   redirect(`/checkout/${payData.id}`);
 }
 
-// ── Password reset (session) ────────────────────────────────────────────────
-
-/**
- * Sets the new password after following the reset link. Requires the session
- * established by the email link's code exchange.
- */
+/** Sets the new password after following the reset link. */
 export async function resetPasswordAction(
   _prev: AuthState,
   formData: FormData,
@@ -418,4 +271,29 @@ function clientIp(raw: string | null): string | null {
   if (!raw) return null;
   const first = raw.split(",")[0].trim();
   return first.length > 0 ? first : null;
+}
+
+/** Performs password reset via email link. */
+export async function forgotPasswordAction(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    return { error: "Email is required.", fields: { email } };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "/auth/callback",
+  });
+
+  if (error) {
+    return { error: getAuthErrorMessage(error) };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/check-email");
 }

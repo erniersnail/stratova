@@ -5,10 +5,10 @@
  * async functions, so a constant or a type exported there is a build error.
  */
 
-/** Document version recorded against a terms consent. Bump when the text changes. */
-export const TERMS_DOC_VERSION = "v1";
+export const TERMS_DOC_VERSION = "2026-01-01";
 
 export type AuthState = {
   error?: string;
+  success?: string;
   fields?: { email?: string; fullName?: string };
 };
