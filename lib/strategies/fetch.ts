@@ -232,3 +232,22 @@ export async function getRecommendationHistoryForUser(userId: string): Promise<R
     return (data as Recommendation[]) ?? [];
   } catch (err) { console.error("[strategies] getRecommendationHistoryForUser threw:", err); return []; }
 }
+
+export async function getRemovedRecommendations(strategyId: string): Promise<Recommendation[]> {
+  if (!strategyId) return [];
+  try {
+    const { createServiceClient } = await import("@/lib/admin/recommendations");
+    const admin = createServiceClient();
+    const { data, error } = await admin
+      .from("recommendations")
+      .select("*")
+      .eq("strategy_id", strategyId)
+      .not("removed_at", "is", null)
+      .order("removed_at", { ascending: false })
+      .limit(20);
+    if (error) return [];
+    return (data as Recommendation[]) ?? [];
+  } catch {
+    return [];
+  }
+}

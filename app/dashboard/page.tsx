@@ -11,6 +11,7 @@ import { getAuthedUser, type AuthedUser } from "@/lib/auth/session";
 import { ensureProfile } from "@/lib/auth/ensure-profile";
 import {
   getCurrentRecommendationsForUser,
+  getRemovedRecommendations,
   getPublicStrategies,
   getStrategyPerformance,
   type PerformancePoint,
@@ -112,6 +113,19 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
   const paidSubscriptions = subscriptions.filter(
     (s) => s.strategy_id !== null && s.strategy_id.length > 0,
   );
+
+  const removedResults = await Promise.all(
+    paidSubscriptions
+      .filter((s) => s.strategy_id)
+      .map(async (s) => {
+        const picks = await getRemovedRecommendations(s.strategy_id as string);
+        return picks.filter((r) => {
+          if (!s.started_at || !r.removed_at) return false;
+          return new Date(s.started_at) <= new Date(r.removed_at);
+        });
+      })
+  );
+  const removedPicks = removedResults.flat();
 
   const strategyNames = new Map<string, string>();
   const strategySlugs = new Map<string, string>();
@@ -448,6 +462,33 @@ async function DashboardContent({ user }: { user: AuthedUser }) {
             View full history →
           </Link>
         </p>
+
+        {removedPicks.length > 0 && (
+          <div className="mt-12">
+            <h3 className="text-lg font-medium text-foreground">Recently Removed</h3>
+            <p className="mt-1 text-sm text-secondary">These picks were removed from your active strategies. Please review your positions.</p>
+            <div className="mt-4 overflow-hidden rounded-md border border-border bg-surface">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-tertiary">Symbol</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-tertiary">Reason</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-tertiary">Admin Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {removedPicks.map((r) => (
+                    <tr key={r.id} className="border-b border-border last:border-0">
+                      <td className="px-4 py-3 font-medium text-foreground">{r.symbol}</td>
+                      <td className="px-4 py-3 text-secondary">{r.removed_reason || "—"}</td>
+                      <td className="px-4 py-3 text-secondary">{r.admin_remark || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );

@@ -12,6 +12,7 @@ import { typography } from "@/lib/typography";
 import {
   getStrategyBySlug,
   getCurrentRecommendations,
+  getRemovedRecommendations,
   getStrategyPerformance,
   getBenchmark,
   type Recommendation,
@@ -175,6 +176,16 @@ export default async function StrategyDetailPage({
   const picks: Recommendation[] = user
     ? await getCurrentRecommendations(strategy.id)
     : [];
+
+  const removedPicks: Recommendation[] = user
+    ? await getRemovedRecommendations(strategy.id)
+    : [];
+
+  // Only show removed picks if the user was subscribed BEFORE the pick was removed
+  const visibleRemovedPicks = removedPicks.filter((r) => {
+    if (!existingSub?.started_at || !r.removed_at) return false;
+    return new Date(existingSub.started_at) <= new Date(r.removed_at);
+  });
 
   type ExistingSub = {
     id: string;
@@ -587,6 +598,33 @@ export default async function StrategyDetailPage({
                 rowKey={(r) => r.id}
                 emptyState={pickEmptyState}
               />
+
+              {visibleRemovedPicks.length > 0 && (
+                <div className="mt-12">
+                  <h3 className="text-lg font-medium text-foreground">Recently Removed</h3>
+                  <p className="mt-1 text-sm text-secondary">These picks were removed from the strategy after you subscribed. You should review your positions.</p>
+                  <div className="mt-4 overflow-hidden rounded-md border border-border bg-surface">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-tertiary">Symbol</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-tertiary">Reason</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-tertiary">Admin Note</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {visibleRemovedPicks.map((r) => (
+                          <tr key={r.id} className="border-b border-border last:border-0">
+                            <td className="px-4 py-3 font-medium text-foreground">{r.symbol}</td>
+                            <td className="px-4 py-3 text-secondary">{r.removed_reason || "—"}</td>
+                            <td className="px-4 py-3 text-secondary">{r.admin_remark || "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
