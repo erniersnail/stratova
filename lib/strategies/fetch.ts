@@ -236,7 +236,6 @@ export async function getRecommendationHistoryForUser(userId: string): Promise<R
 export async function getRemovedRecommendations(strategyId: string): Promise<Recommendation[]> {
   if (!strategyId) return [];
   try {
-    const { createServiceClient } = await import("@/lib/admin/recommendations");
     const admin = createServiceClient();
     const { data, error } = await admin
       .from("recommendations")
