@@ -177,15 +177,7 @@ export default async function StrategyDetailPage({
     ? await getCurrentRecommendations(strategy.id)
     : [];
 
-  const removedPicks: Recommendation[] = user
-    ? await getRemovedRecommendations(strategy.id)
-    : [];
 
-  // Only show removed picks if the user was subscribed BEFORE the pick was removed
-  const visibleRemovedPicks = removedPicks.filter((r) => {
-    if (!existingSub?.started_at || !r.removed_at) return false;
-    return new Date(existingSub.started_at) <= new Date(r.removed_at);
-  });
 
   type ExistingSub = {
     id: string;
@@ -599,10 +591,19 @@ export default async function StrategyDetailPage({
                 emptyState={pickEmptyState}
               />
 
-              {visibleRemovedPicks.length > 0 && (
+            {/* Recently Removed */}
+            {(() => {
+              if (!existingSub?.started_at) return null;
+              const removedPicks = picks.filter((r) => r.removed_at);
+              const visible = removedPicks.filter((r) => {
+                if (!r.removed_at) return false;
+                return new Date(existingSub.started_at!) <= new Date(r.removed_at);
+              });
+              if (visible.length === 0) return null;
+              return (
                 <div className="mt-12">
                   <h3 className="text-lg font-medium text-foreground">Recently Removed</h3>
-                  <p className="mt-1 text-sm text-secondary">These picks were removed from the strategy after you subscribed. You should review your positions.</p>
+                  <p className="mt-1 text-sm text-secondary">These picks were removed from the strategy after you subscribed.</p>
                   <div className="mt-4 overflow-hidden rounded-md border border-border bg-surface">
                     <table className="w-full text-sm">
                       <thead>
@@ -613,7 +614,7 @@ export default async function StrategyDetailPage({
                         </tr>
                       </thead>
                       <tbody>
-                        {visibleRemovedPicks.map((r) => (
+                        {visible.map((r) => (
                           <tr key={r.id} className="border-b border-border last:border-0">
                             <td className="px-4 py-3 font-medium text-foreground">{r.symbol}</td>
                             <td className="px-4 py-3 text-secondary">{r.removed_reason || "—"}</td>
@@ -624,7 +625,8 @@ export default async function StrategyDetailPage({
                     </table>
                   </div>
                 </div>
-              )}
+              );
+            })()}
             </div>
           )}
         </div>
