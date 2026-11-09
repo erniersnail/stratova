@@ -55,6 +55,7 @@ export default async function IndiaStrategiesPage() {
                     region="india"
                     performance={perfMap.get(strategy.id) ?? []}
                     subscribers={subscriberCounts[strategy.id] ?? 0}
+                    badge={strategy.slug === "free-manual" ? "Free" : undefined}
                   />
                 </li>
               ))}

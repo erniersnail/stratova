@@ -73,6 +73,18 @@ export default async function AdminPage() {
             Insert manual recommendations and expire stale picks.
           </p>
         </Link>
+
+        <Link
+          href="/admin/manual-trades"
+          className="group rounded-lg border border-border bg-surface p-6 transition-colors hover:border-foreground"
+        >
+          <h2 className="text-lg font-semibold text-foreground group-hover:text-foreground/80">
+            Manual Trades
+          </h2>
+          <p className="mt-2 text-sm text-secondary">
+            Add target and stop-loss picks for the Free Research Picks feed.
+          </p>
+        </Link>
       </div>
     </Container>
   );

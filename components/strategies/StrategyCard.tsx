@@ -12,6 +12,7 @@ type StrategyCardProps = {
   region: "india" | "us";
   performance: PerformancePoint[];
   subscribers: number;
+  badge?: string;
 };
 
 function normalize(values: number[]): number[] {
@@ -37,9 +38,16 @@ export default function StrategyCard({
       className="flex h-full flex-col rounded-md border border-border bg-surface p-6 transition-colors duration-200 hover:border-foreground"
     >
       <div className="flex items-start justify-between gap-4">
-        <h2 className="text-xl font-semibold tracking-tight text-foreground">
-          {strategy.name}
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            {strategy.name}
+          </h2>
+          {strategy.slug === "free-manual" && (
+            <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-background">
+              Free
+            </span>
+          )}
+        </div>
 
         {returnPct !== null && (
           <div className="flex shrink-0 flex-col items-end">
