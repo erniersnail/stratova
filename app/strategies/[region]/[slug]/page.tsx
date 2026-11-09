@@ -419,10 +419,12 @@ export default async function StrategyDetailPage({
 
         {showChart && (
           <div className="mt-16">
+            <div className="mt-3">
             <h2 className={`${typography.h3} text-foreground`}>Performance since inception</h2>
-            <p className={`${typography.body} mt-3 text-foreground`}>
+            <p className={typography.body + " mt-3 text-foreground"}>
               {`Since inception, net of costs${strategy.benchmark ? `, vs ${strategy.benchmark}` : ""}.`}
             </p>
+</div>
 
             <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">

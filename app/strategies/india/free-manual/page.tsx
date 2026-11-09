@@ -29,7 +29,7 @@ export default async function FreeManualStrategyPage() {
 
   const openTrades = trades?.filter(t => t.status === "OPEN") || [];
   const closedTrades = trades?.filter(t => t.status !== "OPEN") || [];
-  
+
   const totalClosed = closedTrades.length;
   const wins = closedTrades.filter(t => t.status === "CLOSED_TARGET").length;
   const winRate = totalClosed > 0 ? ((wins / totalClosed) * 100).toFixed(1) : "0.0";
@@ -38,7 +38,7 @@ export default async function FreeManualStrategyPage() {
     <main>
       <Container className="py-20">
         <PageHeader title="Free Research Picks" description="High-conviction ideas with absolute targets and strict stop losses." />
-        
+
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div className="rounded-md border border-border bg-surface p-5">
             <p className="text-xs uppercase tracking-wide text-tertiary">Win Rate</p>
@@ -51,15 +51,8 @@ export default async function FreeManualStrategyPage() {
           <div className="rounded-md border border-border bg-surface p-5">
             <p className="text-xs uppercase tracking-wide text-tertiary">Open Trades</p>
             <p className="mt-1 text-3xl font-serif text-foreground">{openTrades.length}</p>
-          </div>
         </div>
-
-        {chartSeries.length > 0 && (
-          <div className="mt-12 rounded-md border border-border bg-surface px-6 py-6">
-            <h2 className={`${typography.h3} text-foreground mb-6`}>₹1,00,000 Portfolio Performance</h2>
-            <EquityCurveChart series={chartSeries} height={280} />
-          </div>
-        )}
+        </div>
 
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>Open Positions</h2>
@@ -126,3 +119,4 @@ export default async function FreeManualStrategyPage() {
     </main>
   );
 }
+          
