@@ -62,12 +62,15 @@ const smallButtonClass =
 
 export default async function AdminRecommendationsPage() {
   await requireAdminInPage();
-  const [strategies, allRecs, pendingRecs, formStrategies] = await Promise.all([
+  const [strategies, allRecs, pendingRecs, formStrategiesRaw] = await Promise.all([
     getStrategiesGrouped(),
     getAdminRecommendations(),
     getPendingRecommendations(),
     getAdminStrategies(),
   ]);
+
+  // Filter out the "free-manual" strategy since it has its own dedicated admin page
+  const formStrategies = formStrategiesRaw.filter((s) => s.name !== "Free Research Picks");
   const pendingByStrategy = new Map<string, AdminRecommendation[]>();
   for (const rec of pendingRecs) {
     if (!rec.strategy_id) continue;
@@ -104,6 +107,7 @@ export default async function AdminRecommendationsPage() {
         ) : (
           <div className="mt-4 space-y-8">
             {strategies.map((strategy) => {
+              if (strategy.name === "Free Research Picks") return null;
               const pending = pendingByStrategy.get(strategy.id) ?? [];
               if (pending.length === 0) return null;
               const approveAllAction = approveAllPendingForStrategy.bind(
@@ -161,6 +165,7 @@ export default async function AdminRecommendationsPage() {
         </p>
         <div className="mt-6 space-y-10">
           {strategies.map((strategy) => {
+            if (strategy.name === "Free Research Picks") return null;
             const live = liveByStrategy.get(strategy.id) ?? [];
             return (
               <div key={strategy.id}>

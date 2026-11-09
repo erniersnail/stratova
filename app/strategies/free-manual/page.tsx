@@ -2,12 +2,30 @@ import Container from "@/components/layout/Container";
 import PageHeader from "@/components/common/PageHeader";
 import { createServiceClient } from "@/lib/admin/recommendations";
 import { typography } from "@/lib/typography";
+import EquityCurveChart, { type ChartSeries } from "@/components/strategies/EquityCurveChart";
+import { getStrategyBySlug, getStrategyPerformance } from "@/lib/strategies/fetch";
 
 export const metadata = { title: "Free Research Picks — Simplicial Capital" };
 
 export default async function FreeManualStrategyPage() {
   const admin = createServiceClient();
   const { data: trades } = await admin.from("manual_trades").select("*").order("entry_date", { ascending: false });
+
+  const strategy = await getStrategyBySlug("free-manual");
+  let chartSeries: ChartSeries[] = [];
+
+  if (strategy) {
+    const perf = await getStrategyPerformance(strategy.id);
+    if (perf.length > 1 && perf[0].total_value > 0) {
+      const base = perf[0].total_value;
+      chartSeries = [{
+        name: "₹1L Portfolio",
+        color: "var(--color-foreground)",
+        data: perf.map(p => ({ date: p.date, value: (100 * p.total_value) / base })),
+        emphasis: "primary"
+      }];
+    }
+  }
 
   const openTrades = trades?.filter(t => t.status === "OPEN") || [];
   const closedTrades = trades?.filter(t => t.status !== "OPEN") || [];
@@ -35,6 +53,13 @@ export default async function FreeManualStrategyPage() {
             <p className="mt-1 text-3xl font-serif text-foreground">{openTrades.length}</p>
           </div>
         </div>
+
+        {chartSeries.length > 0 && (
+          <div className="mt-12 rounded-md border border-border bg-surface px-6 py-6">
+            <h2 className={`${typography.h3} text-foreground mb-6`}>₹1,00,000 Portfolio Performance</h2>
+            <EquityCurveChart series={chartSeries} height={280} />
+          </div>
+        )}
 
         <div className="mt-16">
           <h2 className={`${typography.h3} text-foreground`}>Open Positions</h2>
