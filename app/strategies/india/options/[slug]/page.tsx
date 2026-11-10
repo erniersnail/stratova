@@ -39,12 +39,13 @@ export default async function OptionsShowcasePage({
       
       if (data.history && data.history.length > 0) {
         const INITIAL_CAPITAL = 500000;
+        
+        // 1. Build Chart Data (Normalized to 100)
         let mappedChart = data.history.map((p: any) => ({
           date: p.date,
           value: 100 + ((p.value / INITIAL_CAPITAL) * 100)
         }));
 
-        // Prepend a starting point to start exactly at 100%
         const firstDate = new Date(data.history[0].date);
         firstDate.setDate(firstDate.getDate() - 1);
         const startDate = firstDate.toISOString().split("T")[0];
@@ -57,30 +58,41 @@ export default async function OptionsShowcasePage({
           emphasis: "primary"
         }];
 
-        // Calculate Monthly PnL
-        const monthlyMap = new Map<string, { first: number, last: number }>();
-        data.history.forEach((p: any) => {
-          const month = p.date.slice(0, 7); // YYYY-MM
-          if (!monthlyMap.has(month)) {
-            monthlyMap.set(month, { first: p.value, last: p.value });
-          } else {
-            monthlyMap.get(month)!.last = p.value;
-          }
-        });
-
-        monthlyData = Array.from(monthlyMap.entries()).map(([month, vals]) => {
-          const pnl = vals.last - vals.first;
-          return {
+        // 2. Build Monthly Returns (Mathematically Accurate)
+        const sortedHistory = [...data.history].sort((a: any, b: any) => a.date.localeCompare(b.date));
+        const months = Array.from(new Set(sortedHistory.map((p: any) => p.date.slice(0, 7)))).sort();
+        
+        let previousMonthCumulativePnl = 0;
+        
+        months.forEach((month: any) => {
+          const monthData = sortedHistory.filter((p: any) => p.date.startsWith(month));
+          if (monthData.length === 0) return;
+          
+          const endOfMonthCumulativePnl = monthData[monthData.length - 1].value;
+          const pnlThisMonth = endOfMonthCumulativePnl - previousMonthCumulativePnl;
+          
+          monthlyData.push({
             month,
-            pnl,
-            returnPct: (pnl / INITIAL_CAPITAL) * 100
-          };
-        }).reverse();
+            pnl: pnlThisMonth,
+            returnPct: (pnlThisMonth / INITIAL_CAPITAL) * 100
+          });
+          
+          previousMonthCumulativePnl = endOfMonthCumulativePnl;
+        });
+        
+        // Reverse to show most recent month first
+        monthlyData.reverse();
       }
     }
   } catch (error) {
     console.error("Failed to connect to VM API", error);
   }
+
+  // Format "2026-09" to "Sep 2026"
+  const formatMonth = (monthStr: string) => {
+    const d = new Date(monthStr + "-01T00:00:00Z");
+    return d.toLocaleDateString("en-IN", { month: "short", year: "numeric", timeZone: "UTC" });
+  };
 
   return (
     <main>
@@ -90,62 +102,67 @@ export default async function OptionsShowcasePage({
           description={strategy.description}
         />
 
-        <div className="mt-12 rounded-md border border-border bg-surface px-6 py-6">
-          <div className="flex justify-between items-end mb-6">
-            <div>
-              <h2 className={`${typography.h3} text-foreground`}>Cumulative P&L</h2>
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Chart Area */}
+          <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">
+            <div className="flex justify-between items-end mb-6">
+              <div>
+                <h2 className={`${typography.h3} text-foreground`}>Cumulative P&L</h2>
+              </div>
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-wide text-tertiary">Total Realized P&L</p>
+                <p className={`text-3xl font-serif ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
+                  {latestPnl >= 0 ? "+" : ""}₹{latestPnl.toLocaleString("en-IN")}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs uppercase tracking-wide text-tertiary">Total Realized P&L</p>
-              <p className={`text-3xl font-serif ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
-                {latestPnl >= 0 ? "+" : ""}₹{latestPnl.toLocaleString("en-IN")}
-              </p>
-            </div>
-          </div>
-          
-          {chartSeries.length >= 1 ? (
-            <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">
+            
+            {chartSeries.length >= 1 ? (
               <EquityCurveChart series={chartSeries} height={280} />
-            </div>
-          ) : (
-            <div className="h-[320px] flex items-center justify-center text-tertiary">
-              Waiting for data from VM...
-            </div>
-          )}
+            ) : (
+              <div className="h-[280px] flex items-center justify-center text-tertiary">
+                Waiting for data from VM...
+              </div>
+            )}
+          </div>
 
-          {/* Month-wise PnL Dropdown */}
+          {/* Monthly Returns Area */}
           {monthlyData.length > 0 && (
-            <div className="mt-6">
-              <details className="group">
-                <summary className="cursor-pointer list-none flex items-center gap-2 text-sm font-medium text-foreground hover:text-accent transition-colors">
-                  <span className="transition-transform group-open:rotate-90">▶</span>
-                  View Monthly Returns
-                </summary>
-                <div className="mt-4 overflow-hidden rounded-md border border-border">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border bg-surface-hover/50 text-xs uppercase tracking-wider text-tertiary">
-                        <th className="px-4 py-3 text-left">Month</th>
-                        <th className="px-4 py-3 text-right">Return</th>
+            <div className="lg:col-span-1 rounded-md border border-border bg-surface px-6 py-6">
+              <h3 className="text-xs font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
+              <div className="mt-4">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="pb-2 text-left text-xs font-medium text-tertiary">Month</th>
+                      <th className="pb-2 text-right text-xs font-medium text-tertiary">Return</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyData.map((m) => (
+                      <tr key={m.month} className="border-b border-border last:border-0">
+                        <td className="py-2.5 text-foreground">{formatMonth(m.month)}</td>
+                        <td className={`py-2.5 text-right font-medium ${m.returnPct >= 0 ? "text-accent" : "text-tertiary"}`}>
+                          {m.returnPct >= 0 ? "+" : ""}{m.returnPct.toFixed(2)}%
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {monthlyData.map((m, i) => (
-                        <tr key={i} className="border-b border-border last:border-0">
-                          <td className="px-4 py-3 text-foreground">{m.month}</td>
-                          <td className={`px-4 py-3 text-right font-medium ${m.returnPct >= 0 ? "text-accent" : "text-tertiary"}`}>
-                            {m.returnPct >= 0 ? "+" : ""}{m.returnPct.toFixed(2)}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
+                    ))}
+                    {latestPnl !== null && (
+                      <tr className="bg-surface-hover/50">
+                        <td className="py-2.5 font-medium text-foreground">Total</td>
+                        <td className={`py-2.5 text-right font-bold ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
+                          {latestPnl >= 0 ? "+" : ""}{((latestPnl / 500000) * 100).toFixed(2)}%
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
 
+        {/* Subscribe Section */}
         <div className="mt-12 max-w-xl">
           <div className="rounded-md border border-border bg-surface p-8 flex flex-col items-start">
             <h3 className={`${typography.h3} text-foreground`}>Subscribe to Options</h3>
