@@ -3,10 +3,16 @@ import PageHeader from "@/components/common/PageHeader";
 import { createServiceClient } from "@/lib/admin/recommendations";
 import { typography } from "@/lib/typography";
 import EquityCurveChart, { type ChartSeries } from "@/components/strategies/EquityCurveChart";
-import { getStrategyBySlug } from "@/lib/strategies/fetch";
+import { getStrategyBySlug, getBenchmark } from "@/lib/strategies/fetch";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Free Research Picks — Simplicial Capital" };
+
+const WINDOW_START = "2026-08-03";
+
+function fmt(v: number): string {
+  return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
+}
 
 export default async function FreeManualStrategyPage() {
   const admin = createServiceClient();
@@ -23,21 +29,57 @@ export default async function FreeManualStrategyPage() {
   let chartSeries: ChartSeries[] = [];
   
   if (strategy) {
-    // Direct query bypassing any generic filters
+    // 1. Fetch Portfolio Data
     const { data: perf } = await admin
       .from("strategy_performance")
       .select("date, total_value")
       .eq("strategy_id", strategy.id)
       .order("date", { ascending: true });
 
-    if (perf && perf.length >= 1 && perf[0].total_value > 0) {
-      const base = perf[0].total_value;
-      chartSeries = [{
+    // 2. Fetch Benchmark Data
+    const benchRaw = strategy.benchmark
+      ? await getBenchmark(strategy.benchmark, WINDOW_START)
+      : [];
+
+    // 3. Process Portfolio Series
+    const strategySeries = (() => {
+      if (!perf) return [];
+      const filtered = perf.filter((p) => p.date >= WINDOW_START);
+      if (filtered.length < 1 || filtered[0].total_value <= 0) return [];
+      const base = filtered[0].total_value;
+      return filtered.map((p) => ({
+        date: p.date,
+        value: (100 * p.total_value) / base,
+      }));
+    })();
+
+    // 4. Process Benchmark Series
+    const benchmarkSeries = (() => {
+      const filtered = benchRaw.filter((p) => p.date >= WINDOW_START);
+      if (filtered.length < 1 || filtered[0].close <= 0) return [];
+      const base = filtered[0].close;
+      return filtered.map((p) => ({
+        date: p.date,
+        value: (100 * p.close) / base,
+      }));
+    })();
+
+    // 5. Build Chart Series
+    if (strategySeries.length >= 1) {
+      chartSeries.push({
         name: "₹1L Portfolio",
         color: "var(--color-foreground)",
-        data: perf.map(p => ({ date: p.date, value: (100 * p.total_value) / base })),
-        emphasis: "primary"
-      }];
+        data: strategySeries,
+        emphasis: "primary",
+      });
+    }
+    if (benchmarkSeries.length >= 1 && strategy.benchmark) {
+      chartSeries.push({
+        name: strategy.benchmark,
+        color: "#b08900",
+        data: benchmarkSeries,
+        emphasis: "secondary",
+      });
     }
   }
 
@@ -65,6 +107,20 @@ export default async function FreeManualStrategyPage() {
           <div className="mt-12 rounded-md border border-border bg-surface px-6 py-6">
             <h2 className={`${typography.h3} text-foreground mb-6`}>₹1,00,000 Portfolio Performance</h2>
             <EquityCurveChart series={chartSeries} height={280} />
+            
+            {/* Legend matching the generic page */}
+            <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+              <span className="flex items-center gap-2 text-foreground">
+                <span aria-hidden className="inline-block h-[3px] w-6 bg-foreground" />
+                <span>₹1L Portfolio</span>
+              </span>
+              {strategy?.benchmark && (
+                <span className="flex items-center gap-2 text-foreground">
+                  <span aria-hidden className="inline-block h-[3px] w-6 border-t-2 border-dashed border-[#b08900]" />
+                  <span>{strategy.benchmark}</span>
+                </span>
+              )}
+            </div>
           </div>
         )}
 
