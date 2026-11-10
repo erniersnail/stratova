@@ -16,7 +16,6 @@ export default async function OptionsShowcasePage({
   const { slug } = await params;
   const admin = createServiceClient();
   
-  // 1. Fetch strategy metadata from Supabase (Name, Description, Streamlit URL)
   const { data: strategy } = await admin
     .from("options_strategies")
     .select("*")
@@ -25,13 +24,12 @@ export default async function OptionsShowcasePage({
 
   if (!strategy) notFound();
 
-  // 2. Fetch Live PnL directly from the VM API
   let chartSeries: ChartSeries[] = [];
   let latestPnl = 0;
 
   try {
     const res = await fetch("http://80.225.214.33:8000/api/options/pnl", {
-      next: { revalidate: 0 }, // 0 means it fetches live on every page load
+      next: { revalidate: 0 },
     });
     
     if (res.ok) {
@@ -39,10 +37,18 @@ export default async function OptionsShowcasePage({
       latestPnl = data.realized_pnl || 0;
       
       if (data.history && data.history.length > 0) {
+        // Normalize the PnL into an equity index (base 100)
+        // Assuming initial capital is ₹5,00,000 (500000)
+        const INITIAL_CAPITAL = 500000;
+        
         chartSeries = [{
           name: "Options PnL",
           color: "var(--color-foreground)",
-          data: data.history.map((p: any) => ({ date: p.date, value: p.value })),
+          data: data.history.map((p: any) => ({
+            date: p.date,
+            // (500000 + PnL) / 500000 * 100
+            value: 100 + ((p.value / INITIAL_CAPITAL) * 100)
+          })),
           emphasis: "primary"
         }];
       }
