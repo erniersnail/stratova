@@ -3,8 +3,9 @@ import PageHeader from "@/components/common/PageHeader";
 import { createServiceClient } from "@/lib/admin/recommendations";
 import { typography } from "@/lib/typography";
 import EquityCurveChart, { type ChartSeries } from "@/components/strategies/EquityCurveChart";
-import { getStrategyBySlug, getStrategyPerformance } from "@/lib/strategies/fetch";
+import { getStrategyBySlug } from "@/lib/strategies/fetch";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Free Research Picks — Simplicial Capital" };
 
 export default async function FreeManualStrategyPage() {
@@ -22,8 +23,14 @@ export default async function FreeManualStrategyPage() {
   let chartSeries: ChartSeries[] = [];
   
   if (strategy) {
-    const perf = await getStrategyPerformance(strategy.id);
-    if (perf.length >= 1 && perf[0].total_value > 0) {
+    // Direct query bypassing any generic filters
+    const { data: perf } = await admin
+      .from("strategy_performance")
+      .select("date, total_value")
+      .eq("strategy_id", strategy.id)
+      .order("date", { ascending: true });
+
+    if (perf && perf.length >= 1 && perf[0].total_value > 0) {
       const base = perf[0].total_value;
       chartSeries = [{
         name: "₹1L Portfolio",
