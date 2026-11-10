@@ -16,7 +16,7 @@ export default async function OptionsShowcasePage({
   const { slug } = await params;
   const admin = createServiceClient();
   
-  // 1. Fetch the specific options strategy
+  // 1. Fetch strategy metadata from Supabase (Name, Description, Streamlit URL)
   const { data: strategy } = await admin
     .from("options_strategies")
     .select("*")
@@ -25,25 +25,31 @@ export default async function OptionsShowcasePage({
 
   if (!strategy) notFound();
 
-  // 2. Fetch the cumulative PnL data
-  const { data: perf } = await admin
-    .from("options_performance")
-    .select("date, cumulative_pnl")
-    .eq("strategy_id", strategy.id)
-    .order("date", { ascending: true });
-
+  // 2. Fetch Live PnL directly from the VM API
   let chartSeries: ChartSeries[] = [];
-  
-  if (perf && perf.length >= 1) {
-    chartSeries = [{
-      name: "Options PnL",
-      color: "var(--color-foreground)",
-      data: perf.map(p => ({ date: p.date, value: Number(p.cumulative_pnl) })),
-      emphasis: "primary"
-    }];
-  }
+  let latestPnl = 0;
 
-  const latestPnl = perf && perf.length > 0 ? Number(perf[perf.length - 1].cumulative_pnl) : 0;
+  try {
+    const res = await fetch("http://80.225.214.33:8000/api/options/pnl", {
+      next: { revalidate: 0 }, // 0 means it fetches live on every page load
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      latestPnl = data.realized_pnl || 0;
+      
+      if (data.history && data.history.length > 0) {
+        chartSeries = [{
+          name: "Options PnL",
+          color: "var(--color-foreground)",
+          data: data.history.map((p: any) => ({ date: p.date, value: p.value })),
+          emphasis: "primary"
+        }];
+      }
+    }
+  } catch (error) {
+    console.error("Failed to connect to VM API", error);
+  }
 
   return (
     <main>
@@ -57,10 +63,10 @@ export default async function OptionsShowcasePage({
           <div className="flex justify-between items-end mb-6">
             <div>
               <h2 className={`${typography.h3} text-foreground`}>Cumulative P&L</h2>
-              <p className="mt-1 text-sm text-tertiary">Live tracking of our options strategy</p>
+              <p className="mt-1 text-sm text-tertiary">Live tracking directly from VM</p>
             </div>
             <div className="text-right">
-              <p className="text-xs uppercase tracking-wide text-tertiary">Total P&L</p>
+              <p className="text-xs uppercase tracking-wide text-tertiary">Total Realized P&L</p>
               <p className={`text-3xl font-serif ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
                 {latestPnl >= 0 ? "+" : ""}₹{latestPnl.toLocaleString("en-IN")}
               </p>
@@ -71,7 +77,7 @@ export default async function OptionsShowcasePage({
             <EquityCurveChart series={chartSeries} height={320} />
           ) : (
             <div className="h-[320px] flex items-center justify-center text-tertiary">
-              Waiting for first data sync from VM...
+              Waiting for data from VM...
             </div>
           )}
         </div>

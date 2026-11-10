@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import Container from "@/components/layout/Container";
 import { createClient } from "@/lib/supabase/server";
@@ -89,4 +89,5 @@ export default async function AdminPage() {
     </Container>
   );
 }
+
 
