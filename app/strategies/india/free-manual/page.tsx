@@ -16,7 +16,8 @@ export default async function FreeManualStrategyPage() {
 
   if (strategy) {
     const perf = await getStrategyPerformance(strategy.id);
-    if (perf.length > 1 && perf[0].total_value > 0) {
+    // Allow 1 data point so the chart shows up on day 1
+    if (perf.length >= 1 && perf[0].total_value > 0) {
       const base = perf[0].total_value;
       chartSeries = [{
         name: "₹1L Portfolio",
