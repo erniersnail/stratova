@@ -256,31 +256,9 @@ export default async function PerformancePage() {
           Past performance does not indicate future results. Track record is
           short and not statistically significant.
         </p>
-              {/* NSE Options Section */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-serif text-foreground mb-4">NSE Options Strategies</h2>
-          <div className="mt-6">
-            <details className="group rounded-md border border-border bg-surface">
-              <summary className="cursor-pointer list-none flex items-center justify-between px-6 py-4 text-sm font-medium text-foreground hover:text-accent transition-colors">
-                <span className="flex items-center gap-2">
-                  <span className="transition-transform group-open:rotate-90">▶</span>
-                  Simplicial Nifty Directional
-                </span>
-                <span className={`font-medium ${optionsReturn >= 0 ? "text-accent" : "text-tertiary"}`}>
-                  {optionsReturn >= 0 ? "+" : ""}{optionsReturn.toFixed(2)}%
-                </span>
-              </summary>
-              <div className="border-t border-border p-6">
-                 {optionsChartSeries.length > 0 ? (
-                    <EquityCurveChart series={optionsChartSeries} height={280} />
-                 ) : (
-                    <p className="text-sm text-tertiary">Waiting for data...</p>
-                 )}
-              </div>
-            </details>
-          </div>
-        </div>
+              
       </Container>
     </main>
   );
 }
+
