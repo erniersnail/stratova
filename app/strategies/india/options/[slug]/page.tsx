@@ -136,22 +136,17 @@ export default async function OptionsShowcasePage({
   return (
     <main>
       <Container className="py-20">
-        <PageHeader 
-          title={strategy.name} 
-          description={strategy.description}
-        />
+        {/* Title Only */}
+        <PageHeader title={strategy.name} />
 
-        {/* Strategy Overview */}
-        <div className="mt-12">
-          <h2 className={`${typography.h3} text-foreground`}>Strategy Overview</h2>
-          <div className={`${typography.body} mt-4 space-y-4 text-secondary`}>
-            <p>
-              This rules-based engine completely removes human emotion from the process. By filtering out low-probability market noise, it executes systematic directional trades to capture high-conviction momentum moves.
-            </p>
-            <p>
-              The strategy is designed for clients seeking aggressive, short-term capital appreciation, backed by strict, automated risk management and intraday-only execution.
-            </p>
-          </div>
+        {/* Intro Text */}
+        <div className={`${typography.body} mt-6 space-y-4 text-secondary max-w-3xl`}>
+          <p>
+            The Simplicial Nifty Directional strategy is a fully systematic, intraday model designed to capture high-conviction momentum moves. By filtering out low-probability market noise, the engine executes rules-based directional trades, completely removing human emotion from the process.
+          </p>
+          <p>
+            This strategy is designed for clients seeking aggressive, short-term capital appreciation with strict, automated risk management.
+          </p>
         </div>
 
         {/* Strategy Specifications */}
