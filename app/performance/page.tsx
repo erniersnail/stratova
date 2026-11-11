@@ -201,10 +201,15 @@ export default async function PerformancePage() {
           date: p.date,
           value: 100 + ((p.value / baseCapital) * 100)
         }));
-        const firstDate = new Date(data.history[0].date);
+        
+        // Get the exact start date of the options strategy
+        const optionsStartDate = data.history[0].date;
+        
+        const firstDate = new Date(optionsStartDate);
         firstDate.setDate(firstDate.getDate() - 1);
-        const startDate = firstDate.toISOString().split("T")[0];
-        mappedChart.unshift({ date: startDate, value: 100 });
+        const chartStartDate = firstDate.toISOString().split("T")[0];
+        mappedChart.unshift({ date: chartStartDate, value: 100 });
+        
         optionsChartSeries = [{
           name: "Nifty Directional",
           color: "var(--color-foreground)",
@@ -212,13 +217,17 @@ export default async function PerformancePage() {
           emphasis: "primary"
         }];
 
-        const benchRaw = await getBenchmark("NIFTY 50", START_DATE);
+        // FIX: Fetch Benchmark starting from the OPTIONS start date, not the global start date
+        const benchRaw = await getBenchmark("NIFTY 50", optionsStartDate);
         if (benchRaw.length > 0) {
           const baseClose = benchRaw[0].close;
-          const mappedBench = benchRaw.map((p) => ({
+          let mappedBench = benchRaw.map((p) => ({
             date: p.date,
             value: (100 * p.close) / baseClose,
           }));
+          
+          // Unshift a starting point for the benchmark to align perfectly
+          mappedBench.unshift({ date: chartStartDate, value: 100 });
           
           optionsBenchmarkSeries = [{
             name: "NIFTY 50",
@@ -246,7 +255,6 @@ export default async function PerformancePage() {
     buildIndividualCards(us),
   ]);
 
-  // Separate Options Card array
   const optionsCards: IndividualCardData[] = [];
   if (optionsChartSeries.length > 0) {
     optionsCards.push({
@@ -287,7 +295,6 @@ export default async function PerformancePage() {
             Individual strategies
           </h2>
           <div className="mt-6">
-            {/* Pass the new options prop */}
             <IndividualChartsToggle nse={nseCards} us={usCards} options={optionsCards} />
           </div>
         </section>
