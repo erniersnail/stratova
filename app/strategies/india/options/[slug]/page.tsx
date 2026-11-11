@@ -28,6 +28,7 @@ export default async function OptionsShowcasePage({
   let chartSeries: ChartSeries[] = [];
   let benchmarkSeries: ChartSeries[] = [];
   let latestPnl = 0;
+  let baseCapital = 500000; // Default fallback
   let monthlyData: { month: string, pnl: number, returnPct: number }[] = [];
   let dailyData: { date: string, pnl: number, returnPct: number }[] = [];
   let startDateStr = "";
@@ -40,15 +41,15 @@ export default async function OptionsShowcasePage({
     if (res.ok) {
       const data = await res.json();
       latestPnl = data.realized_pnl || 0;
+      baseCapital = data.current_balance || 500000; 
       
       if (data.history && data.history.length > 0) {
-        const INITIAL_CAPITAL = 500000;
         startDateStr = data.history[0].date;
         
         // 1. Build Chart Data (Normalized to 100)
         let mappedChart = data.history.map((p: any) => ({
           date: p.date,
-          value: 100 + ((p.value / INITIAL_CAPITAL) * 100)
+          value: 100 + ((p.value / baseCapital) * 100)
         }));
 
         const firstDate = new Date(startDateStr);
@@ -78,7 +79,7 @@ export default async function OptionsShowcasePage({
           monthlyData.push({
             month,
             pnl: pnlThisMonth,
-            returnPct: (pnlThisMonth / INITIAL_CAPITAL) * 100
+            returnPct: (pnlThisMonth / baseCapital) * 100
           });
           
           previousMonthCumulativePnl = endOfMonthCumulativePnl;
@@ -92,7 +93,7 @@ export default async function OptionsShowcasePage({
           dailyData.push({
             date: p.date,
             pnl: dailyPnl,
-            returnPct: (dailyPnl / INITIAL_CAPITAL) * 100
+            returnPct: (dailyPnl / baseCapital) * 100
           });
           prevCumulativePnl = p.value;
         });
@@ -126,13 +127,11 @@ export default async function OptionsShowcasePage({
 
   const allChartSeries = [...chartSeries, ...benchmarkSeries];
 
-  // Format "2026-09" to "Sep 2026"
   const formatMonth = (monthStr: string) => {
     const d = new Date(monthStr + "-01T00:00:00Z");
     return d.toLocaleDateString("en-IN", { month: "short", year: "numeric", timeZone: "UTC" });
   };
 
-  // Format "2026-09-24" to "24 Sep 2026"
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr + "T00:00:00Z");
     return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
@@ -155,7 +154,8 @@ export default async function OptionsShowcasePage({
               </div>
               <div className="text-right">
                 <p className="text-xs uppercase tracking-wide text-tertiary">Total Realized P&L</p>
-                <p className={`text-3xl font-serif ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
+                {/* Changed font from serif to sans for readability */}
+                <p className={`text-4xl font-sans font-semibold tracking-tight ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
                   {latestPnl >= 0 ? "+" : ""}₹{latestPnl.toLocaleString("en-IN")}
                 </p>
               </div>
@@ -165,7 +165,6 @@ export default async function OptionsShowcasePage({
               <div>
                 <EquityCurveChart series={allChartSeries} height={280} />
                 
-                {/* Legend */}
                 <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
                   <span className="flex items-center gap-2 text-foreground">
                     <span aria-hidden className="inline-block h-[3px] w-6 bg-foreground" />
@@ -190,6 +189,9 @@ export default async function OptionsShowcasePage({
           {monthlyData.length > 0 && (
             <div className="lg:col-span-1 rounded-md border border-border bg-surface px-6 py-6">
               <h3 className="text-xs font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
+              {/* Dynamic Capital Deployed */}
+              <p className="text-xs text-tertiary mt-1 mb-4">Capital Deployed: ₹{baseCapital.toLocaleString("en-IN")}</p>
+              
               <div className="mt-4">
                 <table className="w-full text-sm">
                   <thead>
@@ -210,7 +212,7 @@ export default async function OptionsShowcasePage({
                     <tr className="bg-surface-hover/50">
                       <td className="py-2.5 font-medium text-foreground">Total</td>
                       <td className={`py-2.5 text-right font-bold ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
-                        {latestPnl >= 0 ? "+" : ""}{((latestPnl / 500000) * 100).toFixed(2)}%
+                        {latestPnl >= 0 ? "+" : ""}{((latestPnl / baseCapital) * 100).toFixed(2)}%
                       </td>
                     </tr>
                   </tbody>
