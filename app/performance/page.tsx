@@ -20,7 +20,7 @@ import {
 } from "@/lib/strategies/combined";
 
 export const metadata: Metadata = {
-  title: "Performance â€” Simplicial Capital",
+  title: "Performance — Simplicial Capital",
   description:
     "Live results for every Simplicial Capital strategy. Net of costs. Benchmarked against the corresponding regional index.",
 };
@@ -185,12 +185,16 @@ function CombinedCard({
 
 export default async function PerformancePage() {  
   let optionsChartSeries: ChartSeries[] = [];
+  let optionsBenchmarkSeries: ChartSeries[] = [];
   let optionsReturn = 0;
+  let optionsBenchmarkReturn = null;
+
   try {
     const res = await fetch("http://80.225.214.33:8000/api/options/pnl", { next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
       optionsReturn = (data.realized_pnl / 500000) * 100;
+      
       if (data.history && data.history.length > 0) {
         const baseCapital = 500000;
         let mappedChart = data.history.map((p: any) => ({
@@ -207,12 +211,30 @@ export default async function PerformancePage() {
           data: mappedChart,
           emphasis: "primary"
         }];
+
+        // Fetch Benchmark for Options
+        const benchRaw = await getBenchmark("NIFTY 50", START_DATE);
+        if (benchRaw.length > 0) {
+          const baseClose = benchRaw[0].close;
+          optionsBenchmarkSeries = [{
+            name: "NIFTY 50",
+            color: "#b08900",
+            data: benchRaw.map((p) => ({
+              date: p.date,
+              value: (100 * p.close) / baseClose,
+            })),
+            emphasis: "secondary"
+          }];
+          optionsBenchmarkReturn = optionsBenchmarkSeries[optionsBenchmarkSeries.length - 1].value - 100;
+        }
       }
     }
   } catch (e) {}
 
   const allStrategies = await getPublicStrategies();
-  const india = allStrategies.filter((s) => s.region === "india");
+  
+  // Filter out Free Research Picks from the India list
+  const india = allStrategies.filter((s) => s.region === "india" && s.slug !== "free-manual");
   const us = allStrategies.filter((s) => s.region === "us");
 
   const [combinedNse, combinedUs, nseCards, usCards] = await Promise.all([
@@ -221,6 +243,21 @@ export default async function PerformancePage() {
     buildIndividualCards(india),
     buildIndividualCards(us),
   ]);
+
+  // Append the custom Options card to the NSE cards array
+  const finalNseCards: IndividualCardData[] = [...nseCards];
+  if (optionsChartSeries.length > 0) {
+    finalNseCards.push({
+      id: "nifty-options-alpha",
+      name: "Simplicial Nifty Directional",
+      shortDescription: "A fully automated, intraday directional strategy trading Nifty options.",
+      benchmarkSymbol: "NIFTY 50",
+      href: "/strategies/india/options/nifty-options-alpha",
+      series: [...optionsChartSeries, ...optionsBenchmarkSeries],
+      strategyReturn: optionsReturn,
+      benchmarkReturn: optionsBenchmarkReturn,
+    });
+  }
 
   return (
     <main>
@@ -248,7 +285,8 @@ export default async function PerformancePage() {
             Individual strategies
           </h2>
           <div className="mt-6">
-            <IndividualChartsToggle nse={nseCards} us={usCards} />
+            {/* Pass the filtered and appended array */}
+            <IndividualChartsToggle nse={finalNseCards} us={usCards} />
           </div>
         </section>
 
@@ -261,4 +299,3 @@ export default async function PerformancePage() {
     </main>
   );
 }
-
