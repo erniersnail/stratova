@@ -216,16 +216,21 @@ export default async function PerformancePage() {
         const benchRaw = await getBenchmark("NIFTY 50", START_DATE);
         if (benchRaw.length > 0) {
           const baseClose = benchRaw[0].close;
+          const mappedBench = benchRaw.map((p) => ({
+            date: p.date,
+            value: (100 * p.close) / baseClose,
+          }));
+          
           optionsBenchmarkSeries = [{
             name: "NIFTY 50",
             color: "#b08900",
-            data: benchRaw.map((p) => ({
-              date: p.date,
-              value: (100 * p.close) / baseClose,
-            })),
+            data: mappedBench,
             emphasis: "secondary"
           }];
-          optionsBenchmarkReturn = optionsBenchmarkSeries[optionsBenchmarkSeries.length - 1].value - 100;
+          
+          if (mappedBench.length > 0) {
+            optionsBenchmarkReturn = mappedBench[mappedBench.length - 1].value - 100;
+          }
         }
       }
     }
