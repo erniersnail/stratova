@@ -18,6 +18,34 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+// Lightweight SVG Sparkline component
+function Sparkline({ data }: { data: { date: string, value: number }[] }) {
+  if (!data || data.length < 2) return null;
+  
+  const min = Math.min(...data.map(d => d.value));
+  const max = Math.max(...data.map(d => d.value));
+  const range = max - min || 1;
+  
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * 100;
+    const y = 100 - ((d.value - min) / range) * 100;
+    return `${x},${y}`;
+  }).join(" ");
+
+  return (
+    <svg viewBox="0 0 100 100" className="h-8 w-20" preserveAspectRatio="none">
+      <polyline
+        points={points}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        vectorEffect="non-scaling-stroke"
+        className="text-accent"
+      />
+    </svg>
+  );
+}
+
 export default async function IndiaStrategiesPage() {
   const admin = createServiceClient();
   const { data: optionsStrategies } = await admin.from("options_strategies").select("*");
@@ -36,14 +64,23 @@ export default async function IndiaStrategiesPage() {
   
   const perfMap = new Map<string, PerformancePoint[]>(perfEntries);
 
-  // Fetch live return for the options strategy to display on the card
+  // Fetch live return and sparkline data for the options strategy
   let optionsReturn = 0;
+  let optionsSparkline: { date: string, value: number }[] = [];
+  
   try {
     const res = await fetch("http://80.225.214.33:8000/api/options/pnl", { next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
-      // Approximate return % based on 500k initial capital
       optionsReturn = (data.realized_pnl / 500000) * 100;
+      
+      if (data.history && data.history.length > 0) {
+        const INITIAL_CAPITAL = 500000;
+        optionsSparkline = data.history.map((p: any) => ({
+          date: p.date,
+          value: 100 + ((p.value / INITIAL_CAPITAL) * 100)
+        }));
+      }
     }
   } catch (e) {
     // Ignore fetch errors for the card
@@ -79,21 +116,22 @@ export default async function IndiaStrategiesPage() {
                 </li>
               ))}
 
-              {/* Options Strategies (Styled exactly like StrategyCard) */}
+              {/* Options Strategies */}
               {optionsStrategies?.map((opt) => (
                 <li key={opt.id} className="h-full">
                   <Link href={`/strategies/india/options/${opt.slug}`} className="group flex flex-col justify-between h-full rounded-lg border border-border bg-surface p-6 transition-colors hover:border-foreground">
                     <div>
                       <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                          <h2 className="text-xl font-semibold tracking-tight text-foreground">{opt.name}</h2>
-                          <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-background">Live</span>
-                        </div>
-                        <div className="text-right">
+                        <h2 className="text-xl font-semibold tracking-tight text-foreground mt-1">{opt.name}</h2>
+                        
+                        <div className="text-right flex flex-col items-end">
                           <p className={`text-sm font-medium ${optionsReturn >= 0 ? "text-accent" : "text-tertiary"}`}>
                             {optionsReturn >= 0 ? "+" : ""}{optionsReturn.toFixed(2)}%
                           </p>
-                          <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-tertiary">Since inception</p>
+                          <div className="my-1">
+                            <Sparkline data={optionsSparkline} />
+                          </div>
+                          <p className="text-[10px] font-medium uppercase tracking-wider text-tertiary">Since inception</p>
                         </div>
                       </div>
                       <p className="mt-4 text-sm text-secondary">{opt.description}</p>
