@@ -139,16 +139,16 @@ export default async function IndiaStrategiesPage() {
                     
                     <dl className="mt-6 space-y-2 text-sm">
                       <div className="flex justify-between gap-4">
-                        <dt className="text-tertiary">Benchmark</dt>
-                        <dd className="text-foreground">NIFTY 50</dd>
+                        <dt className="text-foreground/80 font-medium">Benchmark</dt>
+                        <dd className="text-white font-medium">NIFTY 50</dd>
                       </div>
                       <div className="flex justify-between gap-4">
-                        <dt className="text-tertiary">Risk</dt>
+                        <dt className="text-foreground/80 font-medium">Risk</dt>
                         <dd className="text-foreground capitalize">High risk</dd>
                       </div>
                       <div className="flex justify-between gap-4">
-                        <dt className="text-tertiary">Investors</dt>
-                        <dd className="text-foreground">0</dd>
+                        <dt className="text-foreground/80 font-medium">Investors</dt>
+                        <dd className="text-white font-medium">0</dd>
                       </div>
                     </dl>
                   </Link>
@@ -161,3 +161,4 @@ export default async function IndiaStrategiesPage() {
     </main>
   );
 }
+

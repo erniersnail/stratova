@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Sparkline from "@/components/strategies/Sparkline";
 import type { PerformancePoint, Strategy } from "@/lib/strategies/fetch";
 
@@ -69,18 +69,18 @@ export default function StrategyCard({
       <dl className="mt-4 space-y-1 text-sm">
         {strategy.benchmark && (
           <div className="flex justify-between gap-4">
-            <dt className="text-tertiary">Benchmark</dt>
+            <dt className="text-foreground/80 font-medium">Benchmark</dt>
             <dd className="text-secondary">{strategy.benchmark}</dd>
           </div>
         )}
         {strategy.risk_level && (
           <div className="flex justify-between gap-4">
-            <dt className="text-tertiary">Risk</dt>
+            <dt className="text-foreground/80 font-medium">Risk</dt>
             <dd className="text-secondary">{RISK_LABEL[strategy.risk_level] ?? strategy.risk_level}</dd>
           </div>
         )}
         <div className="flex justify-between gap-4">
-          <dt className="text-tertiary">Investors</dt>
+          <dt className="text-foreground/80 font-medium">Investors</dt>
           <dd className="text-secondary">{subscribers}</dd>
         </div>
       </dl>
