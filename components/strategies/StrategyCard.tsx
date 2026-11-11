@@ -69,19 +69,19 @@ export default function StrategyCard({
       <dl className="mt-4 space-y-1 text-sm">
         {strategy.benchmark && (
           <div className="flex justify-between gap-4">
-            <dt className="text-foreground/80 font-medium">Benchmark</dt>
-            <dd className="text-secondary">{strategy.benchmark}</dd>
+            <dt className="text-white font-medium">Benchmark</dt>
+            <dd className="text-white font-medium">{strategy.benchmark}</dd>
           </div>
         )}
         {strategy.risk_level && (
           <div className="flex justify-between gap-4">
-            <dt className="text-foreground/80 font-medium">Risk</dt>
-            <dd className="text-secondary">{RISK_LABEL[strategy.risk_level] ?? strategy.risk_level}</dd>
+            <dt className="text-white font-medium">Risk</dt>
+            <dd className="text-white font-medium">{RISK_LABEL[strategy.risk_level] ?? strategy.risk_level}</dd>
           </div>
         )}
         <div className="flex justify-between gap-4">
-          <dt className="text-foreground/80 font-medium">Investors</dt>
-          <dd className="text-secondary">{subscribers}</dd>
+          <dt className="text-white font-medium">Investors</dt>
+          <dd className="text-white font-medium">{subscribers}</dd>
         </div>
       </dl>
 
@@ -93,3 +93,4 @@ export default function StrategyCard({
     </Link>
   );
 }
+
