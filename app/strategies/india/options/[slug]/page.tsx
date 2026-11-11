@@ -139,8 +139,8 @@ export default async function OptionsShowcasePage({
         {/* Title Only */}
         <PageHeader title={strategy.name} />
 
-        {/* Intro Text */}
-        <div className={`${typography.body} mt-6 space-y-4 text-secondary max-w-3xl`}>
+        {/* Intro Text (Removed max-w-3xl so it stretches full width) */}
+        <div className={`${typography.body} mt-6 space-y-4 text-secondary`}>
           <p>
             The Simplicial Nifty Directional strategy is a fully systematic, intraday model designed to capture high-conviction momentum moves. By filtering out low-probability market noise, the engine executes rules-based directional trades, completely removing human emotion from the process.
           </p>
