@@ -146,16 +146,50 @@ export default async function OptionsShowcasePage({
           <h2 className={`${typography.h3} text-foreground`}>Strategy Overview</h2>
           <div className={`${typography.body} mt-4 space-y-4 text-secondary`}>
             <p>
-              The Simplicial Nifty Directional strategy is a fully systematic, intraday model designed to capture high-conviction momentum moves. By filtering out low-probability market noise, the engine executes rules-based directional trades, completely removing human emotion from the process.
+              This rules-based engine completely removes human emotion from the process. By filtering out low-probability market noise, it executes systematic directional trades to capture high-conviction momentum moves.
             </p>
             <p>
-              This strategy is designed for clients seeking aggressive, short-term capital appreciation with strict, automated risk management.
+              The strategy is designed for clients seeking aggressive, short-term capital appreciation, backed by strict, automated risk management and intraday-only execution.
             </p>
           </div>
         </div>
 
+        {/* Strategy Specifications */}
+        <div className="mt-12">
+          <h2 className={`${typography.h3} text-foreground`}>📊 Strategy Specifications</h2>
+          <div className="mt-4 overflow-hidden rounded-md border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-surface-hover/50 text-xs uppercase tracking-wider text-tertiary">
+                  <th className="px-6 py-3 text-left font-medium">Parameter</th>
+                  <th className="px-6 py-3 text-left font-medium">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { param: "Instrument", detail: "NIFTY 50 Index Options" },
+                  { param: "Capital Required", detail: "₹2,00,000 (Recommended per lot)" },
+                  { param: "Max Open Positions", detail: "1 position at a time" },
+                  { param: "Expected Frequency", detail: "1 to 3 trades per day (dependent on volatility)" },
+                  { param: "Holding Period", detail: "Intraday Only (Zero overnight risk)" },
+                  { param: "Target Range", detail: "20% to 40% return on premium per trade*" },
+                  { param: "Execution", detail: "Fully automated (Entry, Exits, and 15:15 Force-Close)" },
+                ].map((row) => (
+                  <tr key={row.param} className="border-b border-border last:border-0">
+                    <td className="px-6 py-3 font-medium text-foreground w-1/3">{row.param}</td>
+                    <td className="px-6 py-3 text-secondary">{row.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className={`${typography.body} mt-3 text-xs text-tertiary`}>
+            * Target percentages vary depending on the trade setup and expiration cycle. The system utilizes dynamic trailing exits to lock in profits early.
+          </p>
+        </div>
+
         {/* Chart & Returns Grid */}
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">
             <div className="flex justify-between items-end mb-6">
               <div>
@@ -227,43 +261,9 @@ export default async function OptionsShowcasePage({
           )}
         </div>
 
-        {/* Strategy Specifications */}
-        <div className="mt-16">
-          <h2 className={`${typography.h3} text-foreground`}>📊 Strategy Specifications</h2>
-          <div className="mt-4 overflow-hidden rounded-md border border-border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-surface-hover/50 text-xs uppercase tracking-wider text-tertiary">
-                  <th className="px-6 py-3 text-left font-medium">Parameter</th>
-                  <th className="px-6 py-3 text-left font-medium">Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { param: "Instrument", detail: "NIFTY 50 Index Options" },
-                  { param: "Capital Required", detail: "₹2,00,000 (Recommended per lot)" },
-                  { param: "Max Open Positions", detail: "1 position at a time" },
-                  { param: "Expected Frequency", detail: "1 to 3 trades per day (dependent on volatility)" },
-                  { param: "Holding Period", detail: "Intraday Only (Zero overnight risk)" },
-                  { param: "Target Range", detail: "20% to 40% return on premium per trade*" },
-                  { param: "Execution", detail: "Fully automated (Entry, Exits, and 15:15 Force-Close)" },
-                ].map((row) => (
-                  <tr key={row.param} className="border-b border-border last:border-0">
-                    <td className="px-6 py-3 font-medium text-foreground w-1/3">{row.param}</td>
-                    <td className="px-6 py-3 text-secondary">{row.detail}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className={`${typography.body} mt-3 text-xs text-tertiary`}>
-            * Target percentages vary depending on the trade setup and expiration cycle. The system utilizes dynamic trailing exits to lock in profits early.
-          </p>
-        </div>
-
         {/* Day-wise Returns Dropdown */}
         {dailyData.length > 0 && (
-          <div className="mt-12">
+          <div className="mt-8">
             <details className="group rounded-md border border-border bg-surface">
               <summary className="cursor-pointer list-none flex items-center justify-between px-6 py-4 text-sm font-medium text-foreground hover:text-accent transition-colors">
                 <span className="flex items-center gap-2">
