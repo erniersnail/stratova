@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import PageHeader from "@/components/common/PageHeader";
 import Container from "@/components/layout/Container";
 import EquityCurveChart, {
@@ -20,7 +20,7 @@ import {
 } from "@/lib/strategies/combined";
 
 export const metadata: Metadata = {
-  title: "Performance — Simplicial Capital",
+  title: "Performance â€” Simplicial Capital",
   description:
     "Live results for every Simplicial Capital strategy. Net of costs. Benchmarked against the corresponding regional index.",
 };
@@ -183,7 +183,34 @@ function CombinedCard({
   );
 }
 
-export default async function PerformancePage() {
+export default async function PerformancePage() {  
+  let optionsChartSeries: ChartSeries[] = [];
+  let optionsReturn = 0;
+  try {
+    const res = await fetch("http://80.225.214.33:8000/api/options/pnl", { next: { revalidate: 0 } });
+    if (res.ok) {
+      const data = await res.json();
+      optionsReturn = (data.realized_pnl / 500000) * 100;
+      if (data.history && data.history.length > 0) {
+        const baseCapital = 500000;
+        let mappedChart = data.history.map((p: any) => ({
+          date: p.date,
+          value: 100 + ((p.value / baseCapital) * 100)
+        }));
+        const firstDate = new Date(data.history[0].date);
+        firstDate.setDate(firstDate.getDate() - 1);
+        const startDate = firstDate.toISOString().split("T")[0];
+        mappedChart.unshift({ date: startDate, value: 100 });
+        optionsChartSeries = [{
+          name: "Nifty Directional",
+          color: "var(--color-foreground)",
+          data: mappedChart,
+          emphasis: "primary"
+        }];
+      }
+    }
+  } catch (e) {}
+
   const allStrategies = await getPublicStrategies();
   const india = allStrategies.filter((s) => s.region === "india");
   const us = allStrategies.filter((s) => s.region === "us");
@@ -229,6 +256,30 @@ export default async function PerformancePage() {
           Past performance does not indicate future results. Track record is
           short and not statistically significant.
         </p>
+              {/* NSE Options Section */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-serif text-foreground mb-4">NSE Options Strategies</h2>
+          <div className="mt-6">
+            <details className="group rounded-md border border-border bg-surface">
+              <summary className="cursor-pointer list-none flex items-center justify-between px-6 py-4 text-sm font-medium text-foreground hover:text-accent transition-colors">
+                <span className="flex items-center gap-2">
+                  <span className="transition-transform group-open:rotate-90">▶</span>
+                  Simplicial Nifty Directional
+                </span>
+                <span className={`font-medium ${optionsReturn >= 0 ? "text-accent" : "text-tertiary"}`}>
+                  {optionsReturn >= 0 ? "+" : ""}{optionsReturn.toFixed(2)}%
+                </span>
+              </summary>
+              <div className="border-t border-border p-6">
+                 {optionsChartSeries.length > 0 ? (
+                    <EquityCurveChart series={optionsChartSeries} height={280} />
+                 ) : (
+                    <p className="text-sm text-tertiary">Waiting for data...</p>
+                 )}
+              </div>
+            </details>
+          </div>
+        </div>
       </Container>
     </main>
   );
