@@ -28,7 +28,7 @@ export default async function OptionsShowcasePage({
   let chartSeries: ChartSeries[] = [];
   let benchmarkSeries: ChartSeries[] = [];
   let latestPnl = 0;
-  let baseCapital = 500000; // Default fallback
+  let baseCapital = 500000;
   let monthlyData: { month: string, pnl: number, returnPct: number }[] = [];
   let dailyData: { date: string, pnl: number, returnPct: number }[] = [];
   let startDateStr = "";
@@ -46,7 +46,6 @@ export default async function OptionsShowcasePage({
       if (data.history && data.history.length > 0) {
         startDateStr = data.history[0].date;
         
-        // 1. Build Chart Data (Normalized to 100)
         let mappedChart = data.history.map((p: any) => ({
           date: p.date,
           value: 100 + ((p.value / baseCapital) * 100)
@@ -64,7 +63,6 @@ export default async function OptionsShowcasePage({
           emphasis: "primary"
         }];
 
-        // 2. Build Monthly Returns
         const sortedHistory = [...data.history].sort((a: any, b: any) => a.date.localeCompare(b.date));
         const months = Array.from(new Set(sortedHistory.map((p: any) => p.date.slice(0, 7)))).sort();
         
@@ -86,7 +84,6 @@ export default async function OptionsShowcasePage({
         });
         monthlyData.reverse();
 
-        // 3. Build Daily Returns
         let prevCumulativePnl = 0;
         data.history.forEach((p: any) => {
           const dailyPnl = p.value - prevCumulativePnl;
@@ -104,7 +101,6 @@ export default async function OptionsShowcasePage({
     console.error("Failed to connect to VM API", error);
   }
 
-  // Fetch NIFTY 50 Benchmark
   if (startDateStr) {
     try {
       const benchRaw = await getBenchmark("NIFTY 50", startDateStr);
@@ -145,8 +141,21 @@ export default async function OptionsShowcasePage({
           description={strategy.description}
         />
 
+        {/* Strategy Overview */}
+        <div className="mt-12">
+          <h2 className={`${typography.h3} text-foreground`}>Strategy Overview</h2>
+          <div className={`${typography.body} mt-4 space-y-4 text-secondary`}>
+            <p>
+              The Simplicial Nifty Directional strategy is a fully systematic, intraday model designed to capture high-conviction momentum moves. By filtering out low-probability market noise, the engine executes rules-based directional trades, completely removing human emotion from the process.
+            </p>
+            <p>
+              This strategy is designed for clients seeking aggressive, short-term capital appreciation with strict, automated risk management.
+            </p>
+          </div>
+        </div>
+
+        {/* Chart & Returns Grid */}
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Chart Area */}
           <div className="lg:col-span-2 rounded-md border border-border bg-surface px-6 py-6 flex flex-col justify-between">
             <div className="flex justify-between items-end mb-6">
               <div>
@@ -154,7 +163,6 @@ export default async function OptionsShowcasePage({
               </div>
               <div className="text-right">
                 <p className="text-xs uppercase tracking-wide text-tertiary">Total Realized P&L</p>
-                {/* Changed font from serif to sans for readability */}
                 <p className={`text-4xl font-sans font-semibold tracking-tight ${latestPnl >= 0 ? "text-accent" : "text-tertiary"}`}>
                   {latestPnl >= 0 ? "+" : ""}₹{latestPnl.toLocaleString("en-IN")}
                 </p>
@@ -164,7 +172,6 @@ export default async function OptionsShowcasePage({
             {allChartSeries.length >= 1 ? (
               <div>
                 <EquityCurveChart series={allChartSeries} height={280} />
-                
                 <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
                   <span className="flex items-center gap-2 text-foreground">
                     <span aria-hidden className="inline-block h-[3px] w-6 bg-foreground" />
@@ -185,11 +192,9 @@ export default async function OptionsShowcasePage({
             )}
           </div>
 
-          {/* Monthly Returns Area */}
           {monthlyData.length > 0 && (
             <div className="lg:col-span-1 rounded-md border border-border bg-surface px-6 py-6">
               <h3 className="text-xs font-medium uppercase tracking-wide text-foreground">Monthly Returns</h3>
-              {/* Dynamic Capital Deployed */}
               <p className="text-xs text-tertiary mt-1 mb-4">Capital Deployed: ₹{baseCapital.toLocaleString("en-IN")}</p>
               
               <div className="mt-4">
@@ -222,9 +227,43 @@ export default async function OptionsShowcasePage({
           )}
         </div>
 
+        {/* Strategy Specifications */}
+        <div className="mt-16">
+          <h2 className={`${typography.h3} text-foreground`}>📊 Strategy Specifications</h2>
+          <div className="mt-4 overflow-hidden rounded-md border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-surface-hover/50 text-xs uppercase tracking-wider text-tertiary">
+                  <th className="px-6 py-3 text-left font-medium">Parameter</th>
+                  <th className="px-6 py-3 text-left font-medium">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { param: "Instrument", detail: "NIFTY 50 Index Options" },
+                  { param: "Capital Required", detail: "₹2,00,000 (Recommended per lot)" },
+                  { param: "Max Open Positions", detail: "1 position at a time" },
+                  { param: "Expected Frequency", detail: "1 to 3 trades per day (dependent on volatility)" },
+                  { param: "Holding Period", detail: "Intraday Only (Zero overnight risk)" },
+                  { param: "Target Range", detail: "20% to 40% return on premium per trade*" },
+                  { param: "Execution", detail: "Fully automated (Entry, Exits, and 15:15 Force-Close)" },
+                ].map((row) => (
+                  <tr key={row.param} className="border-b border-border last:border-0">
+                    <td className="px-6 py-3 font-medium text-foreground w-1/3">{row.param}</td>
+                    <td className="px-6 py-3 text-secondary">{row.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className={`${typography.body} mt-3 text-xs text-tertiary`}>
+            * Target percentages vary depending on the trade setup and expiration cycle. The system utilizes dynamic trailing exits to lock in profits early.
+          </p>
+        </div>
+
         {/* Day-wise Returns Dropdown */}
         {dailyData.length > 0 && (
-          <div className="mt-6">
+          <div className="mt-12">
             <details className="group rounded-md border border-border bg-surface">
               <summary className="cursor-pointer list-none flex items-center justify-between px-6 py-4 text-sm font-medium text-foreground hover:text-accent transition-colors">
                 <span className="flex items-center gap-2">
@@ -261,7 +300,7 @@ export default async function OptionsShowcasePage({
         )}
 
         {/* Subscribe Section */}
-        <div className="mt-12 max-w-xl">
+        <div className="mt-16 max-w-xl">
           <div className="rounded-md border border-border bg-surface p-8 flex flex-col items-start">
             <h3 className={`${typography.h3} text-foreground`}>Subscribe to Options</h3>
             <p className={`${typography.body} mt-2 text-secondary flex-1`}>
