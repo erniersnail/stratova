@@ -167,7 +167,7 @@ export default async function OptionsShowcasePage({
                   { param: "Max Open Positions", detail: "1 position at a time" },
                   { param: "Expected Frequency", detail: "1 to 3 trades per day (dependent on volatility)" },
                   { param: "Holding Period", detail: "Intraday Only (Zero overnight risk)" },
-                  { param: "Target Range", detail: "20% to 40% return on premium per trade*" },
+                  { param: "Target Range", detail: "20% to 40% return on premium per trade" },
                   { param: "Execution", detail: "Fully automated (Entry, Exits, and 15:15 Force-Close)" },
                 ].map((row) => (
                   <tr key={row.param} className="border-b border-border last:border-0">
@@ -178,9 +178,6 @@ export default async function OptionsShowcasePage({
               </tbody>
             </table>
           </div>
-          <p className={`${typography.body} mt-3 text-xs text-tertiary`}>
-            * Target percentages vary depending on the trade setup and expiration cycle. The system utilizes dynamic trailing exits to lock in profits early.
-          </p>
         </div>
 
         {/* Chart & Returns Grid */}
