@@ -131,7 +131,8 @@ export default async function IndiaStrategiesPage() {
                           <div className="my-1">
                             <Sparkline data={optionsSparkline} />
                           </div>
-                          <p className="text-[10px] font-medium uppercase tracking-wider text-tertiary">Since inception</p>
+                          {/* Changed text-tertiary to text-foreground */}
+                          <p className="text-[10px] font-medium uppercase tracking-wider text-foreground">Since inception</p>
                         </div>
                       </div>
                       <p className="mt-4 text-sm text-secondary">{opt.description}</p>
@@ -144,7 +145,7 @@ export default async function IndiaStrategiesPage() {
                       </div>
                       <div className="flex justify-between gap-4">
                         <dt className="text-white font-medium">Risk</dt>
-                        <dd className="text-white font-medium">High risk</dd>
+                        <dd className="text-white font-medium capitalize">High risk</dd>
                       </div>
                       <div className="flex justify-between gap-4">
                         <dt className="text-white font-medium">Investors</dt>
@@ -161,5 +162,3 @@ export default async function IndiaStrategiesPage() {
     </main>
   );
 }
-
-
