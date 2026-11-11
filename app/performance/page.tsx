@@ -193,18 +193,18 @@ export default async function PerformancePage() {
     const res = await fetch("http://80.225.214.33:8000/api/options/pnl", { next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
-      optionsReturn = (data.realized_pnl / 500000) * 100;
+      
+      // FIX: Use the actual current_balance from the DB instead of hardcoded 500000
+      const baseCapital = data.current_balance || 500000;
+      optionsReturn = (data.realized_pnl / baseCapital) * 100;
       
       if (data.history && data.history.length > 0) {
-        const baseCapital = 500000;
         let mappedChart = data.history.map((p: any) => ({
           date: p.date,
           value: 100 + ((p.value / baseCapital) * 100)
         }));
         
-        // Get the exact start date of the options strategy
         const optionsStartDate = data.history[0].date;
-        
         const firstDate = new Date(optionsStartDate);
         firstDate.setDate(firstDate.getDate() - 1);
         const chartStartDate = firstDate.toISOString().split("T")[0];
@@ -217,7 +217,6 @@ export default async function PerformancePage() {
           emphasis: "primary"
         }];
 
-        // FIX: Fetch Benchmark starting from the OPTIONS start date, not the global start date
         const benchRaw = await getBenchmark("NIFTY 50", optionsStartDate);
         if (benchRaw.length > 0) {
           const baseClose = benchRaw[0].close;
@@ -226,7 +225,6 @@ export default async function PerformancePage() {
             value: (100 * p.close) / baseClose,
           }));
           
-          // Unshift a starting point for the benchmark to align perfectly
           mappedBench.unshift({ date: chartStartDate, value: 100 });
           
           optionsBenchmarkSeries = [{
