@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export type IndividualCardData = {
   benchmarkReturn: number | null;
 };
 
-type Region = "nse" | "us";
+type Region = "nse" | "us" | "options";
 
 function fmt(v: number): string {
   return `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
@@ -27,12 +27,17 @@ function fmt(v: number): string {
 export default function IndividualChartsToggle({
   nse,
   us,
+  options,
 }: {
   nse: IndividualCardData[];
   us: IndividualCardData[];
+  options: IndividualCardData[];
 }) {
   const [region, setRegion] = useState<Region>("nse");
-  const cards = region === "nse" ? nse : us;
+  
+  let cards = nse;
+  if (region === "us") cards = us;
+  if (region === "options") cards = options;
 
   return (
     <div>
@@ -49,6 +54,7 @@ export default function IndividualChartsToggle({
           >
             <option value="nse">India (NSE)</option>
             <option value="us">U.S. (Nasdaq)</option>
+            <option value="options">NSE Options</option>
           </select>
         </label>
       </div>

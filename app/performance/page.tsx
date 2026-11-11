@@ -212,7 +212,6 @@ export default async function PerformancePage() {
           emphasis: "primary"
         }];
 
-        // Fetch Benchmark for Options
         const benchRaw = await getBenchmark("NIFTY 50", START_DATE);
         if (benchRaw.length > 0) {
           const baseClose = benchRaw[0].close;
@@ -237,8 +236,6 @@ export default async function PerformancePage() {
   } catch (e) {}
 
   const allStrategies = await getPublicStrategies();
-  
-  // Filter out Free Research Picks from the India list
   const india = allStrategies.filter((s) => s.region === "india" && s.slug !== "free-manual");
   const us = allStrategies.filter((s) => s.region === "us");
 
@@ -249,10 +246,10 @@ export default async function PerformancePage() {
     buildIndividualCards(us),
   ]);
 
-  // Append the custom Options card to the NSE cards array
-  const finalNseCards: IndividualCardData[] = [...nseCards];
+  // Separate Options Card array
+  const optionsCards: IndividualCardData[] = [];
   if (optionsChartSeries.length > 0) {
-    finalNseCards.push({
+    optionsCards.push({
       id: "nifty-options-alpha",
       name: "Simplicial Nifty Directional",
       shortDescription: "A fully automated, intraday directional strategy trading Nifty options.",
@@ -290,8 +287,8 @@ export default async function PerformancePage() {
             Individual strategies
           </h2>
           <div className="mt-6">
-            {/* Pass the filtered and appended array */}
-            <IndividualChartsToggle nse={finalNseCards} us={usCards} />
+            {/* Pass the new options prop */}
+            <IndividualChartsToggle nse={nseCards} us={usCards} options={optionsCards} />
           </div>
         </section>
 
